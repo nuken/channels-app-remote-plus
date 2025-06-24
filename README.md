@@ -1,79 +1,81 @@
-# Channels DVR Simple Remote Control
+# Channels DVR Remote Plus
 
-This is a basic, dockerized web-based remote control for your Channels DVR client apps (e.g., Apple TV, Fire TV). It's designed for simple control and mobile use.
-
-**Note:** This is a work in progress. Future updates may include integration with the Channels DVR *Server* API (port 8089) for content Browse and DVR management.
+This is a web-based remote control for your Channels DVR client apps (e.g., Apple TV, Fire TV), now with integration for your Channels DVR Server for Browse and playing recorded content. It's designed for simple control and mobile use.
 
 ## Limitations
 
-* **No Content Browse:** Does not list or browse your recorded shows or guide data. It only controls playback on the Channels app client.
-* **No DVR Server Interaction:** Communicates only with the Channels *App* client (port 57000), not the DVR server itself.
-* **No Generic UI Navigation:** Does not provide "Up, Down, Left, Right" D-pad controls for general app navigation.
-* **Local Network Only:** For security, it's intended for use only within your local network.
+  * **No Generic UI Navigation:** Does not provide "Up, Down, Left, Right" D-pad controls for general app navigation within the Channels app.
+  * **Local Network Only:** For security, it's intended for use only within your local network.
 
 ## Features
 
-* **Multi-Client Control:** Select and control different Channels app clients.
-* **Basic Playback:** Play/Pause, Stop, Mute.
-* **Channel Control:** Channel Up/Down, Previous Channel, Manual channel entry, Tune to favorite channels (fetched from the client).
-* **Adjustable Seek:** Jump forward/backward by custom seconds.
-* **App Navigation:** Go directly to Live TV, Guide, Library, or Search sections.
-* **Real-time Status:** View current playback status.
-* **Toggle Notifications:** Enable/disable status pop-up notifications (off by default).
-* **Mobile-Friendly:** Responsive design for various screen sizes.
+  * **Multi-Client Control:** Select and control different Channels app clients.
+  * **Basic Playback:** Play/Pause, Stop, Mute.
+  * **Channel Control:** Channel Up/Down, Previous Channel, Manual channel entry, Tune to favorite channels (fetched from the client).
+  * **Adjustable Seek:** Jump forward/backward by custom seconds.
+  * **App Navigation:** Go directly to Live TV, Guide, Library, or Search sections.
+  * **Browse & Play DVR Movies:** Load and play movies recorded on your Channels DVR Server.
+  * **Browse & Play Recent TV Show Episodes:** Load and play recently recorded TV show episodes from your Channels DVR Server.
+  * **Real-time Status:** View current playback status.
+  * **Toggle Notifications:** Enable/disable status pop-up notifications (off by default for mobile).
+  * **Mobile-Friendly:** Responsive design for various screen sizes.
+  * **Theming Options:** Select between different light and dark themes.
 
 ## Installation
 
 This remote is deployed as a Docker image.
 
-### 1. Pull the Docker Image
-```
+### 1\. Pull the Docker Image
+
+```bash
 docker pull rcvaughn2/channels-remote-plus
 ```
 
-### 2. Run the Docker Container
+### 2\. Run the Docker Container
 
 Provide your Channels App client devices as a comma-separated list of `Name:IP` pairs using the `CHANNELS_APP_CLIENTS` environment variable. Ensure no spaces around commas or colons.
-Provide your Channels Server(s) as a comma-separated list of `Name:IP` pairs using the `CHANNELS_DVR_SERVERS` environment variable. Ensure no spaces around commas or colons.
+
+Provide your Channels DVR Server(s) as a comma-separated list of `Name:IP` pairs using the `CHANNELS_DVR_SERVERS` environment variable. Ensure no spaces around commas or colons. If you don't configure `CHANNELS_DVR_SERVERS`, the application will attempt to use the first configured `CHANNELS_APP_CLIENTS` IP as a fallback for the DVR server.
+
 **Example Command:**
-```
-docker run -d --restart unless-stopped
 
--p 5020:5000
-
--e "CHANNELS_APP_CLIENTS=Family Room TV:192.168.86.35,Master TV:192.168.86.21,Front Door TV:192.168.86.60"
-
- -e CHANNELS_DVR_SERVERS="Home DVR:192.168.86.64"
-
---name channels-remote
-
-rcvaughn2/channels-remote-plus
+```bash
+docker run -d --restart unless-stopped \
+  -p 5020:5000 \
+  -e "CHANNELS_APP_CLIENTS=Family Room TV:192.168.86.35,Master TV:192.168.86.21" \
+  -e "CHANNELS_DVR_SERVERS=Home DVR:192.168.86.64" \
+  --name channels-remote \
+  rcvaughn2/channels-remote-plus
 ```
 
-* `-d`: Run in detached mode.
-* `--restart unless-stopped`: Restart automatically on Docker daemon start.
-* `-p 5010:5000`: Maps host port 5010 to container port 5000 (change 5010 if needed).
-* `-e CHANNELS_APP_CLIENTS="..."`: Your client names and IPs.
-* `-e CHANNELS_DVR_SERVERS="..."`: Your server(s) name(s) and IP(s).
-* `--name channels-remote`: Assigns a name to the container.
+  * `-d`: Run in detached mode.
+  * `--restart unless-stopped`: Restart automatically on Docker daemon start.
+  * `-p 5020:5000`: Maps host port 5020 to container port 5000 (change 5020 if needed on your host).
+  * `-e "CHANNELS_APP_CLIENTS=..."`: Your Channels App client names and IPs.
+  * `-e "CHANNELS_DVR_SERVERS=..."`: Your Channels DVR Server name(s) and IP(s).
+  * `--name channels-remote`: Assigns a name to the container.
 
-### 3. Access the Remote Control
+### 3\. Access the Remote Control
 
 Open your web browser and navigate to:
 
 `http://<Your_Docker_Host_IP>:5020`
 
-Replace `<Your_Docker_Host_IP>` with the IP of your Docker machine (e.g., `localhost` or `192.168.86.10`).
+Replace `<Your_Docker_Host_IP>` with the IP address of the machine running Docker (e.g., `localhost` if running on the same machine, or `192.168.86.10` for a common local network IP).
 
 ## Usage
 
-1.  Select a client from the dropdown.
-2.  Use buttons to control playback, channels, seek, and app navigation.
-3.  Refresh favorite channels or status as needed.
-4.  Toggle notifications for pop-ups.
+1.  **Select a Client:** Choose a Channels App client device from the "Configured Clients" dropdown to control its playback.
+2.  **Select a DVR Server:** Choose a Channels DVR Server from the "Select Channels DVR Server" dropdown to browse its content.
+3.  **Control Playback:** Use the "Playback Controls" buttons for basic actions (Play/Pause, Stop, Mute, Channel Up/Down, Seek, etc.).
+4.  **Browse Content:**
+      * Click "Load Movies" to view recorded movies, then click "Play" on a movie card to play it on the selected client.
+      * Click "Load Recent Episodes" to view recent TV show recordings, then click "Play Episode" on an episode card to play it.
+5.  **View Status:** Click "Refresh Status" under "Current Device Status" to see what's currently playing on the selected client.
+6.  **Customize:** Select a theme from the "Select Theme" dropdown. Toggle "Show Status Notifications" as desired.
 
 ## Future Enhancements
 
-* Channels DVR Server API integration (content Browse, management).
-* UI/UX improvements.
-* Automated client discovery.
+  * More advanced DVR management features (e.g., scheduling recordings, deleting content).
+  * Further UI/UX improvements.
+  * Automated Channels App client and DVR server discovery.
