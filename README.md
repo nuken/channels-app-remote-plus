@@ -28,37 +28,40 @@ This remote is deployed as a Docker image.
 
 ### 1. Pull the Docker Image
 ```
-docker pull rcvaughn2/channels-app-remote
+docker pull rcvaughn2/channels-remote-plus
 ```
 
 ### 2. Run the Docker Container
 
 Provide your Channels App client devices as a comma-separated list of `Name:IP` pairs using the `CHANNELS_APP_CLIENTS` environment variable. Ensure no spaces around commas or colons.
-
+Provide your Channels Server(s) as a comma-separated list of `Name:IP` pairs using the `CHANNELS_DVR_SERVERS` environment variable. Ensure no spaces around commas or colons.
 **Example Command:**
 ```
 docker run -d --restart unless-stopped
 
--p 5010:5000
+-p 5020:5000
 
 -e "CHANNELS_APP_CLIENTS=Family Room TV:192.168.86.35,Master TV:192.168.86.21,Front Door TV:192.168.86.60"
 
---name dvr-remote
+ -e CHANNELS_DVR_SERVERS="Home DVR:192.168.86.64"
 
-rcvaughn2/channels-app-remote
+--name channels-remote
+
+rcvaughn2/channels-remote-plus
 ```
 
 * `-d`: Run in detached mode.
 * `--restart unless-stopped`: Restart automatically on Docker daemon start.
 * `-p 5010:5000`: Maps host port 5010 to container port 5000 (change 5010 if needed).
 * `-e CHANNELS_APP_CLIENTS="..."`: Your client names and IPs.
-* `--name dvr-remote`: Assigns a name to the container.
+* `-e CHANNELS_DVR_SERVERS="..."`: Your server(s) name(s) and IP(s).
+* `--name channels-remote`: Assigns a name to the container.
 
 ### 3. Access the Remote Control
 
 Open your web browser and navigate to:
 
-`http://<Your_Docker_Host_IP>:5010`
+`http://<Your_Docker_Host_IP>:5020`
 
 Replace `<Your_Docker_Host_IP>` with the IP of your Docker machine (e.g., `localhost` or `192.168.86.10`).
 
