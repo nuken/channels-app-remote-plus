@@ -1,0 +1,17 @@
+# Python files
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+.venv/
+
+# Docker persistent data
+data/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment variables file
+.env

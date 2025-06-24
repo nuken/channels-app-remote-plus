@@ -1,0 +1,47 @@
+name: Build and Push Docker Image to Docker Hub
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  DOCKER_IMAGE_NAME: channels-app-remote # Your Docker Hub repository name
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Needed for pushing packages (even to Docker Hub sometimes)
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Set up QEMU # NEW: Required for cross-platform emulation during build
+      # This enables building images for different architectures (like arm64) on an amd64 runner
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: all # Enable emulation for all supported platforms
+
+    - name: Set up Docker Buildx # NEW: Buildx is essential for multi-platform builds
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build and push Multi-Arch Docker image # MODIFIED STEP
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        # MODIFIED: Specify the platforms to build for
+        platforms: linux/amd64,linux/arm64/v8 # Build for both Intel/AMD and ARM (M1 Macs, Raspberry Pi)
+        tags: ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
