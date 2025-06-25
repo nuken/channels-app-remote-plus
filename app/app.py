@@ -34,11 +34,9 @@ if CHANNELS_DVR_SERVERS_STR:
 if not DVR_SERVERS_CONFIGURED:
     print("WARNING: CHANNELS_DVR_SERVERS environment variable not set or incorrectly formatted.")
     print("Please set CHANNELS_DVR_SERVERS to 'Name1:IP1,Name2:IP2,...'.")
-    # If no DVR servers are explicitly configured, prompt user to provide one for client discovery
-    print("NOTE: To enable automatic client discovery, please configure at least one Channels DVR Server IP.")
     # No automatic fallback to client IP for DVR server, as clients are now *discovered* from DVR.
 
-# --- New: Dynamic Channels App Clients Discovery from DVR Server ---
+# --- New: Dynamic Channels App Clients Discovery from DVR Server with Exclusion Logic ---
 CHANNELS_CLIENTS = []
 CLIENTS_CONFIGURED = False # Flag to indicate if any clients are configured/discovered
 
@@ -54,17 +52,29 @@ if CHANNELS_DVR_SERVERS:
         raw_clients_data = response.json()
         
         for client_data in raw_clients_data:
-            if 'hostname' in client_data and 'local_ip' in client_data:
-                CHANNELS_CLIENTS.append({
-                    "name": client_data['hostname'],
-                    "ip": client_data['local_ip']
-                })
+            if 'hostname' in client_data and 'local_ip' in client_data and 'platform' in client_data:
+                platform = client_data['platform']
+                device_name = client_data['device']
+                
+                # Exclude phones/tablets based on platform string
+                # AndroidTV platforms are typically streaming boxes/sticks
+                # "Android" without "AndroidTV" usually indicates a phone or tablet
+                is_phone_or_tablet = platform.startswith("Android ") and not platform.startswith("AndroidTV ")
+                
+                # You can add more specific device name exclusions if needed, e.g.,
+                # if "Pixel" in device_name or "Fpad" in device_name: is_phone_or_tablet = True
+
+                if not is_phone_or_tablet:
+                    CHANNELS_CLIENTS.append({
+                        "name": client_data['hostname'],
+                        "ip": client_data['local_ip']
+                    })
         
         if CHANNELS_CLIENTS:
             CLIENTS_CONFIGURED = True
-            print(f"INFO: Successfully discovered {len(CHANNELS_CLIENTS)} Channels App clients.")
+            print(f"INFO: Successfully discovered {len(CHANNELS_CLIENTS)} Channels App clients (excluding phones/tablets).")
         else:
-            print("WARNING: No Channels App clients found via DVR server API, or response was empty.")
+            print("WARNING: No eligible Channels App clients found via DVR server API, or response was empty after filtering.")
 
     except requests.exceptions.Timeout:
         print(f"ERROR: Timeout connecting to DVR server at {clients_info_url} for client discovery.")
@@ -100,7 +110,7 @@ def control_channels():
     if not target_device_ip:
         return jsonify({"status": "error", "message": "No target device IP provided."}), 400
 
-    # Validate against the backend's configured list (now populated by discovery)
+    # Validate against the backend's configured list (now populated by discovery and filtering)
     if not any(client['ip'] == target_device_ip for client in CHANNELS_CLIENTS):
          return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured or discovered."}), 400
 
