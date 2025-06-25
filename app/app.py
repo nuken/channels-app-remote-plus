@@ -7,32 +7,11 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Configuration for multiple Channels App clients
-# Format: "Name1:IP1,Name2:IP2,..."
-CHANNELS_APP_CLIENTS_STR = os.environ.get('CHANNELS_APP_CLIENTS')
+# Configuration for Channels App client and Channels DVR Server ports
 CHANNELS_APP_PORT = 57000 # Standard Channels App API port
 CHANNELS_DVR_SERVER_PORT = 8089 # Standard Channels DVR Server API port
 
-# Parse the client string into a list of dictionaries
-CHANNELS_CLIENTS = []
-CLIENTS_CONFIGURED = False # Flag to indicate if any clients are configured via env var
-if CHANNELS_APP_CLIENTS_STR:
-    try:
-        for client_pair in CHANNELS_APP_CLIENTS_STR.split(','):
-            name, ip = client_pair.strip().split(':')
-            CHANNELS_CLIENTS.append({"name": name.strip(), "ip": ip.strip()})
-        if CHANNELS_CLIENTS: # Only set to True if clients were successfully parsed
-            CLIENTS_CONFIGURED = True
-    except Exception as e:
-        print(f"ERROR: Could not parse CHANNELS_APP_CLIENTS environment variable: {e}")
-        CHANNELS_CLIENTS = [] # Clear if parsing fails
-        CLIENTS_CONFIGURED = False # Ensure flag is false on error
-
-if not CLIENTS_CONFIGURED: # Use the new flag for warning
-    print("WARNING: CHANNELS_APP_CLIENTS environment variable not set or incorrectly formatted.")
-    print("Please set CHANNELS_APP_CLIENTS to 'Name1:IP1,Name2:IP2,...'.")
-
-# --- New: Channels DVR Server IPs Configuration ---
+# --- Channels DVR Server IPs Configuration (Remains largely the same) ---
 # Format: "Name1:IP1,Name2:IP2,..."
 CHANNELS_DVR_SERVERS_STR = os.environ.get('CHANNELS_DVR_SERVERS')
 CHANNELS_DVR_SERVERS = []
@@ -50,16 +29,54 @@ if CHANNELS_DVR_SERVERS_STR:
         CHANNELS_DVR_SERVERS = []
         DVR_SERVERS_CONFIGURED = False
 
+# --- Fallback for DVR server IP if not explicitly configured ---
+# This is crucial for client discovery if no DVR server is set via env var
 if not DVR_SERVERS_CONFIGURED:
     print("WARNING: CHANNELS_DVR_SERVERS environment variable not set or incorrectly formatted.")
     print("Please set CHANNELS_DVR_SERVERS to 'Name1:IP1,Name2:IP2,...'.")
-    # If no DVR servers are explicitly configured, and clients are configured,
-    # default to using the first client's IP as a fallback for the DVR server.
-    if CHANNELS_CLIENTS:
-        default_dvr_ip = CHANNELS_CLIENTS[0]['ip']
-        CHANNELS_DVR_SERVERS.append({"name": f"Default ({default_dvr_ip})", "ip": default_dvr_ip})
-        print(f"INFO: Defaulting Channels DVR Server to first client IP: {default_dvr_ip}")
-        DVR_SERVERS_CONFIGURED = True
+    # If no DVR servers are explicitly configured, prompt user to provide one for client discovery
+    print("NOTE: To enable automatic client discovery, please configure at least one Channels DVR Server IP.")
+    # No automatic fallback to client IP for DVR server, as clients are now *discovered* from DVR.
+
+# --- New: Dynamic Channels App Clients Discovery from DVR Server ---
+CHANNELS_CLIENTS = []
+CLIENTS_CONFIGURED = False # Flag to indicate if any clients are configured/discovered
+
+if CHANNELS_DVR_SERVERS:
+    # Use the IP of the first configured DVR server to discover clients
+    dvr_server_ip_for_discovery = CHANNELS_DVR_SERVERS[0]['ip']
+    clients_info_url = f"http://{dvr_server_ip_for_discovery}:{CHANNELS_DVR_SERVER_PORT}/dvr/clients/info"
+    
+    print(f"INFO: Attempting to discover Channels App clients from DVR server at {clients_info_url}")
+    try:
+        response = requests.get(clients_info_url, timeout=5) # Add a timeout
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+        raw_clients_data = response.json()
+        
+        for client_data in raw_clients_data:
+            if 'hostname' in client_data and 'local_ip' in client_data:
+                CHANNELS_CLIENTS.append({
+                    "name": client_data['hostname'],
+                    "ip": client_data['local_ip']
+                })
+        
+        if CHANNELS_CLIENTS:
+            CLIENTS_CONFIGURED = True
+            print(f"INFO: Successfully discovered {len(CHANNELS_CLIENTS)} Channels App clients.")
+        else:
+            print("WARNING: No Channels App clients found via DVR server API, or response was empty.")
+
+    except requests.exceptions.Timeout:
+        print(f"ERROR: Timeout connecting to DVR server at {clients_info_url} for client discovery.")
+    except requests.exceptions.RequestException as e:
+        print(f"ERROR: Could not fetch Channels App client info from DVR server ({clients_info_url}): {e}")
+    except json.JSONDecodeError:
+        print(f"ERROR: Failed to decode JSON response from DVR server at {clients_info_url}.")
+    except Exception as e:
+        print(f"ERROR: An unexpected error occurred during client discovery: {e}")
+else:
+    print("WARNING: No Channels DVR Server configured, so automatic client discovery is not possible.")
+    print("Please set CHANNELS_DVR_SERVERS environment variable to enable client discovery.")
 
 
 @app.route('/')
@@ -78,17 +95,17 @@ def control_channels():
     action = data.get('action')
     value = data.get('value')
     seek_amount = data.get('seek_amount')
-    recording_id = data.get('recording_id') # Renamed from movie_id for clarity
+    recording_id = data.get('recording_id')
 
     if not target_device_ip:
         return jsonify({"status": "error", "message": "No target device IP provided."}), 400
 
-    # Validate against the backend's configured list
+    # Validate against the backend's configured list (now populated by discovery)
     if not any(client['ip'] == target_device_ip for client in CHANNELS_CLIENTS):
-         return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured."}), 400
+         return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured or discovered."}), 400
 
     try:
-        if action == 'play_recording': # New action type to explicitly handle recording playback
+        if action == 'play_recording':
             if recording_id:
                 play_api_url = f"http://{target_device_ip}:{CHANNELS_APP_PORT}/api/play/recording/{recording_id}"
                 try:
@@ -150,10 +167,9 @@ def get_channels_list():
         return jsonify({"status": "error", "message": "No target device IP provided for channel list."}), 400
 
     if not any(client['ip'] == target_device_ip for client in CHANNELS_CLIENTS):
-         return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured."}), 400
+         return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured or discovered."}), 400
 
     try:
-        # Use requests directly as pychannels doesn't expose this API
         favorite_channels_url = f"http://{target_device_ip}:{CHANNELS_APP_PORT}/api/favorite_channels"
         response = requests.get(favorite_channels_url)
         response.raise_for_status()
@@ -184,7 +200,7 @@ def get_status():
         return jsonify({"status": "error", "message": "No target device IP provided for status."}), 400
 
     if not any(client['ip'] == target_device_ip for client in CHANNELS_CLIENTS):
-         return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured."}), 400
+         return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured or discovered."}), 400
 
     try:
         client = Channels(target_device_ip, CHANNELS_APP_PORT)
@@ -297,4 +313,3 @@ def get_dvr_shows():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
-
