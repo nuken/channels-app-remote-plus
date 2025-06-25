@@ -37,14 +37,14 @@ if not DVR_SERVERS_CONFIGURED:
     # No automatic fallback to client IP for DVR server, as clients are now *discovered* from DVR.
 
 # --- New: Dynamic Channels App Clients Discovery from DVR Server with Exclusion Logic ---
-# --- New: Dynamic Channels App Clients Discovery from DVR Server with Exclusion Logic ---
 CHANNELS_CLIENTS = []
 CLIENTS_CONFIGURED = False # Flag to indicate if any clients are configured/discovered
 
 if CHANNELS_DVR_SERVERS:
     # Use the IP of the first configured DVR server to discover clients
     dvr_server_ip_for_discovery = CHANNELS_DVR_SERVERS[0]['ip']
-    clients_info_url = f"http://{dvr_server_ip_for_server_for_discovery}:{CHANNELS_DVR_SERVER_PORT}/dvr/clients/info"
+    # Corrected line below:
+    clients_info_url = f"http://{dvr_server_ip_for_discovery}:{CHANNELS_DVR_SERVER_PORT}/dvr/clients/info"
     
     print(f"INFO: Attempting to discover Channels App clients from DVR server at {clients_info_url}")
     try:
@@ -91,6 +91,7 @@ if CHANNELS_DVR_SERVERS:
 else:
     print("WARNING: No Channels DVR Server configured, so automatic client discovery is not possible.")
     print("Please set CHANNELS_DVR_SERVERS environment variable to enable client discovery.")
+
 
 @app.route('/')
 def index():
@@ -202,127 +203,4 @@ def get_channels_list():
     except requests.exceptions.RequestException as e:
         return jsonify({"status": "error", "message": f"Error fetching favorite channels from {target_device_ip}: {e}. Is the app running on this device?"}), 500
     except Exception as e:
-        return jsonify({"status": "error", "message": f"An unexpected error occurred during channel list fetch: {e}"}), 500
-
-
-@app.route('/status', methods=['GET'])
-def get_status():
-    target_device_ip = request.args.get('device_ip')
-
-    if not target_device_ip:
-        return jsonify({"status": "error", "message": "No target device IP provided for status."}), 400
-
-    if not any(client['ip'] == target_device_ip for client in CHANNELS_CLIENTS):
-         return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured or discovered."}), 400
-
-    try:
-        client = Channels(target_device_ip, CHANNELS_APP_PORT)
-        status = client.status()
-        return jsonify(status)
-    except Exception as e:
-        return jsonify({"status": "error", "message": f"Error fetching status from {target_device_ip}: {e}"}), 500
-
-@app.route('/dvr_movies', methods=['GET'])
-def get_dvr_movies():
-    """
-    Fetches a list of all movies from the Channels DVR Server API for a given IP.
-    """
-    dvr_server_ip = request.args.get('dvr_server_ip')
-    if not dvr_server_ip:
-        return jsonify({"status": "error", "message": "No DVR Server IP provided."}), 400
-
-    dvr_server_url = f"http://{dvr_server_ip}:{CHANNELS_DVR_SERVER_PORT}"
-    movies_api_url = f"{dvr_server_url}/api/v1/movies"
-
-    try:
-        response = requests.get(movies_api_url)
-        response.raise_for_status() # Raise an exception for HTTP errors
-        raw_movies = response.json()
-
-        processed_movies = []
-        for movie in raw_movies:
-            if 'title' in movie and 'id' in movie:
-                release_timestamp = 0
-                if movie.get('release_date'):
-                    try:
-                        dt_object = datetime.strptime(movie['release_date'], '%Y-%m-%d')
-                        release_timestamp = int(dt_object.timestamp())
-                    except ValueError:
-                        pass
-
-                processed_movies.append({
-                    "id": movie['id'],
-                    "title": movie.get('title'),
-                    "episode_title": movie.get('episode_title'),
-                    "summary": movie.get('summary'),
-                    "duration": movie.get('duration'), # Duration in seconds
-                    "air_date": release_timestamp, # Using release_date as air_date for sorting
-                    "channel_call_sign": movie.get('channel'),
-                    "image_url": movie.get('image_url'),
-                    "series_id": None
-                })
-        
-        processed_movies.sort(key=lambda x: x.get('air_date', 0), reverse=True)
-
-        return jsonify({"status": "success", "movies": processed_movies})
-    except requests.exceptions.RequestException as e:
-        return jsonify({"status": "error", "message": f"Error connecting to Channels DVR Server at {dvr_server_url}: {e}. Is the server running and reachable and is /api/v1/movies the correct endpoint?"}), 500
-    except json.JSONDecodeError:
-        return jsonify({"status": "error", "message": f"Failed to parse JSON response from DVR server at {movies_api_url}."}), 500
-    except Exception as e:
-        return jsonify({"status": "error", "message": f"An unexpected error occurred while fetching DVR movies: {e}"}), 500
-
-@app.route('/dvr_shows', methods=['GET'])
-def get_dvr_shows():
-    """
-    Fetches a list of all TV show episodes from the Channels DVR Server API for a given IP.
-    """
-    dvr_server_ip = request.args.get('dvr_server_ip')
-    if not dvr_server_ip:
-        return jsonify({"status": "error", "message": "No DVR Server IP provided."}), 400
-
-    dvr_server_url = f"http://{dvr_server_ip}:{CHANNELS_DVR_SERVER_PORT}"
-    episodes_api_url = f"{dvr_server_url}/api/v1/episodes"
-
-    try:
-        response = requests.get(episodes_api_url)
-        response.raise_for_status()
-        raw_episodes = response.json()
-
-        processed_episodes = []
-        for episode in raw_episodes:
-            if 'id' in episode and 'title' in episode:
-                air_timestamp = 0
-                if episode.get('original_air_date'):
-                    try:
-                        dt_object = datetime.strptime(episode['original_air_date'], '%Y-%m-%d')
-                        air_timestamp = int(dt_object.timestamp())
-                    except ValueError:
-                        pass
-                
-                processed_episodes.append({
-                    "id": episode['id'],
-                    "show_title": episode.get('title'),
-                    "episode_title": episode.get('episode_title'),
-                    "season_number": episode.get('season_number'),
-                    "episode_number": episode.get('episode_number'),
-                    "summary": episode.get('summary'),
-                    "duration": episode.get('duration'),
-                    "air_date": air_timestamp,
-                    "channel_call_sign": episode.get('channel'),
-                    "image_url": episode.get('image_url')
-                })
-        
-        processed_episodes.sort(key=lambda x: (x.get('air_date', 0), x.get('show_title', '')), reverse=True)
-
-        return jsonify({"status": "success", "episodes": processed_episodes})
-    except requests.exceptions.RequestException as e:
-        return jsonify({"status": "error", "message": f"Error connecting to Channels DVR Server at {dvr_server_url}: {e}. Is the server running and reachable and is /api/v1/episodes the correct endpoint?"}), 500
-    except json.JSONDecodeError:
-        return jsonify({"status": "error", "message": f"Failed to parse JSON response from DVR server at {episodes_api_url}."}), 500
-    except Exception as e:
-        return jsonify({"status": "error", "message": f"An unexpected error occurred while fetching DVR shows: {e}"}), 500
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+        return jsonify({"status": "error", "message": f
