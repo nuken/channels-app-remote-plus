@@ -37,13 +37,14 @@ if not DVR_SERVERS_CONFIGURED:
     # No automatic fallback to client IP for DVR server, as clients are now *discovered* from DVR.
 
 # --- New: Dynamic Channels App Clients Discovery from DVR Server with Exclusion Logic ---
+# --- New: Dynamic Channels App Clients Discovery from DVR Server with Exclusion Logic ---
 CHANNELS_CLIENTS = []
 CLIENTS_CONFIGURED = False # Flag to indicate if any clients are configured/discovered
 
 if CHANNELS_DVR_SERVERS:
     # Use the IP of the first configured DVR server to discover clients
     dvr_server_ip_for_discovery = CHANNELS_DVR_SERVERS[0]['ip']
-    clients_info_url = f"http://{dvr_server_ip_for_discovery}:{CHANNELS_DVR_SERVER_PORT}/dvr/clients/info"
+    clients_info_url = f"http://{dvr_server_ip_for_server_for_discovery}:{CHANNELS_DVR_SERVER_PORT}/dvr/clients/info"
     
     print(f"INFO: Attempting to discover Channels App clients from DVR server at {clients_info_url}")
     try:
@@ -56,14 +57,17 @@ if CHANNELS_DVR_SERVERS:
                 platform = client_data['platform']
                 device_name = client_data['device']
                 
-                # Exclude phones/tablets based on platform string
-                # AndroidTV platforms are typically streaming boxes/sticks
-                # "Android" without "AndroidTV" usually indicates a phone or tablet
-                is_phone_or_tablet = platform.startswith("Android ") and not platform.startswith("AndroidTV ")
+                # Exclusion logic for phones/tablets
+                is_phone_or_tablet = False
+                # Filter out Android phones/tablets
+                if platform.startswith("Android ") and not platform.startswith("AndroidTV "):
+                    is_phone_or_tablet = True
                 
-                # You can add more specific device name exclusions if needed, e.g.,
-                # if "Pixel" in device_name or "Fpad" in device_name: is_phone_or_tablet = True
-
+                # Filter out Apple iPhones/iPads
+                if platform.startswith("iOS") or platform.startswith("iPadOS"):
+                    is_phone_or_tablet = True
+                
+                # Only add client if it's NOT a phone or tablet
                 if not is_phone_or_tablet:
                     CHANNELS_CLIENTS.append({
                         "name": client_data['hostname'],
@@ -72,7 +76,7 @@ if CHANNELS_DVR_SERVERS:
         
         if CHANNELS_CLIENTS:
             CLIENTS_CONFIGURED = True
-            print(f"INFO: Successfully discovered {len(CHANNELS_CLIENTS)} Channels App clients (excluding phones/tablets).")
+            print(f"INFO: Successfully discovered {len(CHANNELS_CLIENTS)} Channels App clients (excluding mobile devices).")
         else:
             print("WARNING: No eligible Channels App clients found via DVR server API, or response was empty after filtering.")
 
@@ -87,7 +91,6 @@ if CHANNELS_DVR_SERVERS:
 else:
     print("WARNING: No Channels DVR Server configured, so automatic client discovery is not possible.")
     print("Please set CHANNELS_DVR_SERVERS environment variable to enable client discovery.")
-
 
 @app.route('/')
 def index():
