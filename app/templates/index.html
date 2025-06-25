@@ -333,13 +333,42 @@
             margin-top: 25px;
         }
 
-        #movies-list, #episodes-list {
-            display: grid; /* Explicitly set initial display */
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+        /* Wrapper for horizontal scrolling + arrows */
+        .carousel-wrapper {
+            position: relative; /* For positioning arrows */
             margin-top: 15px;
-            max-height: 400px; /* Added max height */
-            overflow-y: auto; /* Added scrollbar */
+            /* Ensure the wrapper doesn't expand beyond its parent visually */
+            max-width: 100%;
+            overflow: hidden; /* Hide arrows that are outside the bounds of the wrapper */
+        }
+
+        /* MODIFIED for Horizontal Scrolling */
+        #movies-list, #episodes-list {
+            display: flex; /* Change from grid to flex */
+            flex-wrap: nowrap; /* Prevent wrapping */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            overflow-y: hidden; /* Hide vertical scrollbar */
+            -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+            gap: 20px; /* Spacing between cards */
+            padding-bottom: 20px; /* Add some padding at the bottom for scrollbar visibility if not hidden */
+            padding-left: 10px; /* Padding for the start of the list within wrapper */
+            padding-right: 10px; /* Padding for the end of the list within wrapper */
+
+
+            /* Optional: For a smoother "snap" effect like a real carousel */
+            scroll-snap-type: x mandatory; /* Snap points along the x-axis */
+            scroll-padding-left: 10px; /* Padding for the snapping area at the start */
+
+
+            /* Optional: Hide scrollbar for a cleaner look */
+            scrollbar-width: none; /* For Firefox */
+            -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+        }
+
+        /* Hide scrollbar for WebKit browsers (Chrome, Safari) */
+        #movies-list::-webkit-scrollbar,
+        #episodes-list::-webkit-scrollbar {
+            display: none;
         }
 
         .movie-card, .episode-card {
@@ -351,6 +380,11 @@
             display: flex;
             flex-direction: column;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+
+            /* MODIFIED for Horizontal Scrolling */
+            flex-shrink: 0; /* Prevents cards from shrinking */
+            width: 280px; /* Fixed width for cards */
+            scroll-snap-align: start; /* Align card to snap point */
         }
 
         .movie-card:hover, .episode-card:hover {
@@ -476,6 +510,62 @@
         .section-toggle-button:hover {
             background-color: #5a6268;
         }
+
+        /* Scroll Arrows Styling */
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            color: white;
+            border: none;
+            border-radius: 50%; /* Make them round */
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10; /* Ensure they are above content */
+            opacity: 0.8;
+            transition: opacity 0.3s ease, background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none; /* Prevent text selection */
+            -webkit-user-select: none;
+        }
+
+        .scroll-arrow:hover {
+            opacity: 1;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .scroll-arrow.left {
+            left: 5px; /* Adjust as needed */
+        }
+
+        .scroll-arrow.right {
+            right: 5px; /* Adjust as needed */
+        }
+
+        .scroll-arrow.hidden {
+            display: none;
+        }
+
+
+        /* Media queries */
+        @media (max-width: 600px) {
+            .movie-card, .episode-card {
+                /* Make cards take up more width on smaller screens, accounting for container margins/padding */
+                width: calc(100vw - 40px); /* Example: 100vw - (2 * 20px body margin) */
+            }
+            /* On mobile, arrows might be always visible or have different opacity */
+            .scroll-arrow {
+                opacity: 0.9;
+                /* If you want them always visible without hover: */
+                /* display: flex !important; */
+            }
+        }
     </style>
 </head>
 <body>
@@ -568,23 +658,31 @@
         <div id="movies-list-section">
             <div class="section-header">
                 <h2>Movies</h2>
-                <button class="section-toggle-button" onclick="toggleSection('movies-list', this)">Hide Content</button>
+                <button class="section-toggle-button" onclick="toggleSection('movies-carousel-wrapper', this)">Hide Content</button>
             </div>
             <button class="control-button" onclick="loadMovies()">Load Movies</button>
             <p style="font-size: 0.8em; margin-top: 5px;">Fetches movies from your Channels DVR Server.</p>
-            <div id="movies-list">
+            <div id="movies-carousel-wrapper" class="carousel-wrapper">
+                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('movies-list'), -1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()">&#9664;</button>
+                <div id="movies-list">
                 </div>
+                <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('movies-list'), 1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()">&#9654;</button>
+            </div>
         </div>
 
         <div id="shows-list-section">
             <div class="section-header">
                 <h2>TV Shows (Recent Episodes)</h2>
-                <button class="section-toggle-button" onclick="toggleSection('episodes-list', this)">Hide Content</button>
+                <button class="section-toggle-button" onclick="toggleSection('episodes-carousel-wrapper', this)">Hide Content</button>
             </div>
             <button class="control-button" onclick="loadShows()">Load Recent Episodes</button>
             <p style="font-size: 0.8em; margin-top: 5px;">Fetches recent TV show episodes from your Channels DVR Server.</p>
-            <div id="episodes-list">
+            <div id="episodes-carousel-wrapper" class="carousel-wrapper">
+                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('episodes-list'), -1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()">&#9664;</button>
+                <div id="episodes-list">
                 </div>
+                <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('episodes-list'), 1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()">&#9654;</button>
+            </div>
         </div>
 
         <div class="status-section">
@@ -614,6 +712,7 @@
 
         let selectedClientIp = '';
         let selectedDvrServerIp = ''; // New variable
+        let autoScrollInterval; // Variable to hold the interval ID
 
         const flaskClients = {{ clients | tojson }};
         const clientsConfiguredViaEnv = {{ clients_configured | tojson }};
@@ -695,6 +794,8 @@
                 dvrServerSelect.disabled = true;
                 showNotification("No DVR servers configured.", true);
             }
+
+            setupCarouselNavigation(); // Setup carousel navigation after DOM content is loaded
         });
 
         async function selectClient() {
@@ -989,6 +1090,7 @@
                     moviesListDiv.innerHTML = '<p>No movies found on the DVR server.</p>';
                     showNotification("No movies found.", false);
                 }
+                checkArrowVisibility(moviesListDiv); // Check arrows after loading content
             } catch (error) {
                 moviesListDiv.innerHTML = `<p style="color: red;">Error fetching movies: ${error.message}</p>`;
                 moviesListDiv.classList.remove('loading');
@@ -1063,6 +1165,7 @@
                     episodesListDiv.innerHTML = '<p>No TV show episodes found on the DVR server.</p>';
                     showNotification("No TV show episodes found.", false);
                 }
+                checkArrowVisibility(episodesListDiv); // Check arrows after loading content
             } catch (error) {
                 episodesListDiv.innerHTML = `<p style="color: red;">Error fetching TV shows: ${error.message}</p>`;
                 episodesListDiv.classList.remove('loading');
@@ -1085,19 +1188,95 @@
             }
         }
 
-        function toggleSection(sectionId, button) {
-            const sectionDiv = document.getElementById(sectionId);
-            // Check computed style for 'display' instead of inline style
-            const currentDisplay = window.getComputedStyle(sectionDiv).display;
+        // Modified toggleSection to use carousel-wrapper IDs
+        function toggleSection(wrapperId, button) {
+            const wrapperDiv = document.getElementById(wrapperId);
+            const currentDisplay = window.getComputedStyle(wrapperDiv).display;
 
             if (currentDisplay === 'none') {
-                sectionDiv.style.display = 'grid'; // Revert to grid display for cards
+                wrapperDiv.style.display = 'block'; // Revert to block to contain flex carousel
                 button.textContent = 'Hide Content';
+                // Re-check arrow visibility if content was hidden and now shown
+                const carouselDiv = wrapperDiv.querySelector('.scroll-arrow').previousElementSibling; // Get the actual list div
+                checkArrowVisibility(carouselDiv);
             } else {
-                sectionDiv.style.display = 'none';
+                wrapperDiv.style.display = 'none';
                 button.textContent = 'Show Content';
             }
         }
+
+        // Carousel Navigation JavaScript
+        function scrollCarousel(carouselElement, direction) {
+            const scrollAmount = 300; // Adjust scroll amount as needed
+            carouselElement.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        function startAutoScroll(carouselElement, direction) {
+            // Clear any existing interval to prevent multiple intervals running
+            stopAutoScroll();
+            // Start a new interval
+            autoScrollInterval = setInterval(() => {
+                scrollCarousel(carouselElement, direction);
+            }, 50); // Scroll every 50ms for a smooth effect
+        }
+
+        function stopAutoScroll() {
+            clearInterval(autoScrollInterval);
+            autoScrollInterval = null;
+        }
+
+        function checkArrowVisibility(carouselElement) {
+            const wrapper = carouselElement.closest('.carousel-wrapper');
+            if (!wrapper) return; // Exit if not inside a wrapper
+
+            const leftArrow = wrapper.querySelector('.scroll-arrow.left');
+            const rightArrow = wrapper.querySelector('.scroll-arrow.right');
+
+            if (!leftArrow || !rightArrow) return; // Ensure arrows exist
+
+            const { scrollLeft, scrollWidth, clientWidth } = carouselElement;
+
+            // Show/hide left arrow
+            if (scrollLeft > 0) {
+                leftArrow.classList.remove('hidden');
+            } else {
+                leftArrow.classList.add('hidden');
+            }
+
+            // Show/hide right arrow
+            // Give a small buffer (e.g., 1px) for floating point inaccuracies
+            if (scrollLeft + clientWidth < scrollWidth - 1) {
+                rightArrow.classList.remove('hidden');
+            } else {
+                rightArrow.classList.add('hidden');
+            }
+        }
+
+        function setupCarouselNavigation() {
+            const movieCarousel = document.getElementById('movies-list');
+            const episodeCarousel = document.getElementById('episodes-list');
+
+            if (movieCarousel) {
+                movieCarousel.addEventListener('scroll', () => checkArrowVisibility(movieCarousel));
+                // Initial check for movies
+                checkArrowVisibility(movieCarousel);
+            }
+            if (episodeCarousel) {
+                episodeCarousel.addEventListener('scroll', () => checkArrowVisibility(episodeCarousel));
+                // Initial check for episodes
+                checkArrowVisibility(episodeCarousel);
+            }
+
+            // Re-check on window resize
+            window.addEventListener('resize', () => {
+                if (movieCarousel) checkArrowVisibility(movieCarousel);
+                if (episodeCarousel) checkArrowVisibility(episodeCarousel);
+            });
+        }
+
     </script>
 </body>
 </html>
