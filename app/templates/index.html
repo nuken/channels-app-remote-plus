@@ -663,10 +663,10 @@
             <button class="control-button" onclick="loadMovies()">Load Movies</button>
             <p style="font-size: 0.8em; margin-top: 5px;">Fetches movies from your Channels DVR Server.</p>
             <div id="movies-carousel-wrapper" class="carousel-wrapper">
-                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('movies-list'), -1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()">&#9664;</button>
-                <div id="movies-list">
-                </div>
-                <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('movies-list'), 1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()">&#9654;</button>
+                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('movies-list'), -1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), -1)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
+<div id="movies-list">
+</div>
+<button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('movies-list'), 1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), 1)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
             </div>
         </div>
 
@@ -678,10 +678,10 @@
             <button class="control-button" onclick="loadShows()">Load Recent Episodes</button>
             <p style="font-size: 0.8em; margin-top: 5px;">Fetches recent TV show episodes from your Channels DVR Server.</p>
             <div id="episodes-carousel-wrapper" class="carousel-wrapper">
-                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('episodes-list'), -1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()">&#9664;</button>
-                <div id="episodes-list">
-                </div>
-                <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('episodes-list'), 1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()">&#9654;</button>
+                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('episodes-list'), -1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), -1)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
+<div id="episodes-list">
+</div>
+<button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('episodes-list'), 1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
             </div>
         </div>
 
