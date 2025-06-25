@@ -1207,7 +1207,7 @@
 
         // Carousel Navigation JavaScript
         function scrollCarousel(carouselElement, direction) {
-            const scrollAmount = 300; // Adjust scroll amount as needed
+            const scrollAmount = 400; // Adjust scroll amount as needed
             carouselElement.scrollBy({
                 left: direction * scrollAmount,
                 behavior: 'smooth'
@@ -1220,7 +1220,7 @@
             // Start a new interval
             autoScrollInterval = setInterval(() => {
                 scrollCarousel(carouselElement, direction);
-            }, 50); // Scroll every 50ms for a smooth effect
+            }, 70); // Scroll every 50ms for a smooth effect
         }
 
         function stopAutoScroll() {
