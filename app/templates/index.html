@@ -533,6 +533,7 @@
             justify-content: center;
             user-select: none; /* Prevent text selection */
             -webkit-user-select: none;
+            touch-action: none; /* Add this line */
         }
 
         .scroll-arrow:hover {
@@ -554,16 +555,14 @@
 
 
         /* Media queries */
-        @media (max-width: 600px) {
+        @media (max-width: 600px) and (any-hover: none) {
             .movie-card, .episode-card {
-                /* Make cards take up more width on smaller screens, accounting for container margins/padding */
-                width: calc(100vw - 40px); /* Example: 100vw - (2 * 20px body margin) */
+                /* Make cards narrower to show part of the next card */
+                width: 85%; /* Adjust this percentage as needed to show more or less of the next card */
             }
-            /* On mobile, arrows might be always visible or have different opacity */
+            /* Hide scroll arrows on phone-like devices */
             .scroll-arrow {
-                opacity: 0.8;
-                /* If you want them always visible without hover: */
-                /* display: flex !important; */
+                display: none; /* This will hide the arrows */
             }
         }
     </style>
@@ -663,10 +662,10 @@
             <button class="control-button" onclick="loadMovies()">Load Movies</button>
             <p style="font-size: 0.8em; margin-top: 5px;">Fetches movies from your Channels DVR Server.</p>
             <div id="movies-carousel-wrapper" class="carousel-wrapper">
-                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('movies-list'), -1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), -1)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
-<div id="movies-list">
-</div>
-<button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('movies-list'), 1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), 1)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
+                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('movies-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
+                <div id="movies-list">
+                </div>
+                <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('movies-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
             </div>
         </div>
 
@@ -678,10 +677,10 @@
             <button class="control-button" onclick="loadShows()">Load Recent Episodes</button>
             <p style="font-size: 0.8em; margin-top: 5px;">Fetches recent TV show episodes from your Channels DVR Server.</p>
             <div id="episodes-carousel-wrapper" class="carousel-wrapper">
-                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('episodes-list'), -1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), -1)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
-<div id="episodes-list">
-</div>
-<button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('episodes-list'), 1)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
+                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('episodes-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
+                <div id="episodes-list">
+                </div>
+                <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('episodes-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
             </div>
         </div>
 
@@ -1207,20 +1206,23 @@
 
         // Carousel Navigation JavaScript
         function scrollCarousel(carouselElement, direction) {
-            const scrollAmount = 175; // Adjust scroll amount as needed
+            const scrollAmount = 150; // Smaller steps for smoother animation
             carouselElement.scrollBy({
                 left: direction * scrollAmount,
                 behavior: 'smooth'
             });
         }
 
-        function startAutoScroll(carouselElement, direction) {
+        function startAutoScroll(carouselElement, direction, event) { // Add 'event' parameter
+            if (event) { // Check if an event object is passed
+                event.preventDefault(); // Prevent default touch/mouse behavior
+            }
             // Clear any existing interval to prevent multiple intervals running
             stopAutoScroll();
             // Start a new interval
             autoScrollInterval = setInterval(() => {
                 scrollCarousel(carouselElement, direction);
-            }, 70); // Scroll every 50ms for a smooth effect
+            }, 75); // Scroll every 75ms for a smoother effect
         }
 
         function stopAutoScroll() {
