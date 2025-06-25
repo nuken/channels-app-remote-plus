@@ -10,6 +10,7 @@ This is a web-based remote control for your Channels DVR client apps (e.g., Appl
 ## Features
 
   * **Multi-Client Control:** Select and control different Channels app clients.
+  * **Multi-Server Support:** Ability to use multiple server installs.
   * **Basic Playback:** Play/Pause, Stop, Mute.
   * **Channel Control:** Channel Up/Down, Previous Channel, Manual channel entry, Tune to favorite channels (fetched from the client).
   * **Adjustable Seek:** Jump forward/backward by custom seconds.
@@ -33,16 +34,13 @@ docker pull rcvaughn2/channels-remote-plus
 
 ### 2\. Run the Docker Container
 
-Provide your Channels App client devices as a comma-separated list of `Name:IP` pairs using the `CHANNELS_APP_CLIENTS` environment variable. Ensure no spaces around commas or colons.
-
-Provide your Channels DVR Server(s) as a comma-separated list of `Name:IP` pairs using the `CHANNELS_DVR_SERVERS` environment variable. Ensure no spaces around commas or colons. If you don't configure `CHANNELS_DVR_SERVERS`, the application will attempt to use the first configured `CHANNELS_APP_CLIENTS` IP as a fallback for the DVR server.
+Provide your Channels DVR Server(s) as a comma-separated list of `Name:IP` pairs using the `CHANNELS_DVR_SERVERS` environment variable. Ensure no spaces around commas or colons. 
 
 **Example Command:**
 
 ```bash
 docker run -d --restart unless-stopped \
   -p 5020:5000 \
-  -e "CHANNELS_APP_CLIENTS=Family Room TV:192.168.86.35,Master TV:192.168.86.21" \
   -e "CHANNELS_DVR_SERVERS=Home DVR:192.168.86.64" \
   --name channels-remote \
   rcvaughn2/channels-remote-plus
@@ -51,7 +49,6 @@ docker run -d --restart unless-stopped \
   * `-d`: Run in detached mode.
   * `--restart unless-stopped`: Restart automatically on Docker daemon start.
   * `-p 5020:5000`: Maps host port 5020 to container port 5000 (change 5020 if needed on your host).
-  * `-e "CHANNELS_APP_CLIENTS=..."`: Your Channels App client names and IPs.
   * `-e "CHANNELS_DVR_SERVERS=..."`: Your Channels DVR Server name(s) and IP(s).
   * `--name channels-remote`: Assigns a name to the container.
 
