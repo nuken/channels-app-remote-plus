@@ -1,0 +1,690 @@
+/* Base CSS Variables (Default Light Theme) */
+:root {
+    --body-bg-color: #f4f4f4;
+    --text-color: #333;
+    --container-bg-color: #fff;
+    --box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    --header-color: #0056b3;
+    --config-info-bg: #e9ecef;
+
+    --button-bg-color: #007bff;
+    --button-hover-bg-color: #0056b3;
+    --button-active-bg-color: #004085;
+    --button-text-color: white;
+
+    --input-border-color: #ccc;
+    --pre-bg-color: #e9ecef;
+    --pre-border-color: #dee2e6;
+
+    --notification-success-bg: #4CAF50;
+    --notification-error-bg: #f44336;
+
+    --now-playing-bg: #e9ecef;
+    --now-playing-border: #dee2e2;
+    --now-playing-header-color: #0056b3;
+    --now-playing-text-color: #333;
+    --now-playing-episode-color: #666;
+    --now-playing-summary-color: #555;
+    --now-playing-image-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+    --recording-card-bg: #f8f9fa;
+    --recording-card-border: #e0e0e0;
+    --recording-title-color: #007bff;
+    --recording-episode-color: #6c757d;
+    --recording-summary-color: #495057;
+}
+
+/* Dark Theme 1: Default Dark with Gray Buttons */
+body.theme-dark-gray {
+    --body-bg-color: #2c2c2c;
+    --text-color: #e0e0e0;
+    --container-bg-color: #3a3a3a;
+    --box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    --header-color: #7dd3fc; /* Light blue for headers */
+    --config-info-bg: #4a4a4a;
+
+    --button-bg-color: #555555;
+    --button-hover-bg-color: #666666;
+    --button-active-bg-color: #444444;
+    --button-text-color: #ffffff;
+
+    --input-border-color: #666;
+    --pre-bg-color: #4a4a4a;
+    --pre-border-color: #5a5a5a;
+
+    --notification-success-bg: #28a745;
+    --notification-error-bg: #dc3545;
+
+    --now-playing-bg: #4a4a4a;
+    --now-playing-border: #5a5a5a;
+    --now-playing-header-color: #7dd3fc;
+    --now-playing-text-color: #e0e0e0;
+    --now-playing-episode-color: #b0b0b0;
+    --now-playing-summary-color: #c0c0c0;
+
+    --recording-card-bg: #4a4a4a;
+    --recording-card-border: #5a5a5a;
+    --recording-title-color: #7dd3fc;
+    --recording-episode-color: #b0b0b0;
+    --recording-summary-color: #c0c0c0;
+}
+
+/* Dark Theme 2: Dark with Green Buttons */
+body.theme-dark-green {
+    --body-bg-color: #1e1e1e;
+    --text-color: #e0e0e0;
+    --container-bg-color: #2b2b2b;
+    --box-shadow: 0 2px 15px rgba(0,0,0,0.4);
+    --header-color: #a7f3d0; /* Light green for headers */
+    --config-info-bg: #3c3c3c;
+
+    --button-bg-color: #28a745; /* Green */
+    --button-hover-bg-color: #218838;
+    --button-active-bg-color: #1e7e34;
+    --button-text-color: #ffffff;
+
+    --input-border-color: #555;
+    --pre-bg-color: #3c3c3c;
+    --pre-border-color: #4c4c4c;
+
+    --notification-success-bg: #28a745;
+    --notification-error-bg: #dc3545;
+
+    --now-playing-bg: #3c3c3c;
+    --now-playing-border: #4c4c4c;
+    --now-playing-header-color: #a7f3d0;
+    --now-playing-text-color: #e0e0e0;
+    --now-playing-episode-color: #b0b0b0;
+    --now-playing-summary-color: #c0c0c0;
+
+    --recording-card-bg: #3c3c3c;
+    --recording-card-border: #4c4c4c;
+    --recording-title-color: #a7f3d0;
+    --recording-episode-color: #b0b0b0;
+    --recording-summary-color: #c0c0c0;
+}
+
+/* Light Theme 2: Light with Purple Buttons */
+body.theme-light-purple {
+    --body-bg-color: #f0f2f5;
+    --text-color: #333;
+    --container-bg-color: #ffffff;
+    --box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --header-color: #6f42c1; /* Purple for headers */
+    --config-info-bg: #e6eaf0;
+
+    --button-bg-color: #6f42c1; /* Purple */
+    --button-hover-bg-color: #5c37a7;
+    --button-active-bg-color: #4b2e8a;
+    --button-text-color: white;
+
+    --input-border-color: #d1d4d8;
+    --pre-bg-color: #e6eaf0;
+    --pre-border-color: #d1d4d8;
+
+    --notification-success-bg: #28a745;
+    --notification-error-bg: #dc3545;
+
+    --now-playing-bg: #e6eaf0;
+    --now-playing-border: #d1d4d8;
+    --now-playing-header-color: #6f42c1;
+    --now-playing-text-color: #333;
+    --now-playing-episode-color: #666;
+    --now-playing-summary-color: #555;
+
+    --recording-card-bg: #f0f2f5;
+    --recording-card-border: #d1d4d8;
+    --recording-title-color: #6f42c1;
+    --recording-episode-color: #666;
+    --recording-summary-color: #555;
+}
+
+
+/* General Styles using CSS Variables */
+body {
+    font-family: sans-serif;
+    margin: 20px;
+    background-color: var(--body-bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--container-bg-color);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+h1, h2 {
+    color: var(--header-color);
+    transition: color 0.3s ease;
+}
+.config-info {
+    background-color: var(--config-info-bg);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+/* Styling for "Configured Clients" and "Select Channels DVR Server" labels */
+.config-info p strong {
+    display: block; /* Make it a block element to control margins */
+    font-size: 0.95em; /* Consistent size */
+    margin-bottom: 5px; /* Space between label and select box */
+    color: var(--text-color); /* Ensure consistent text color */
+}
+/* Consistent margin-top for subsequent sections within config-info */
+.config-info p:nth-of-type(2) { /* Target the second p tag in config-info (for DVR Server) */
+    margin-top: 15px; /* Consistent spacing between sections in config-info */
+    font-size: inherit; /* Inherit font size from parent, overriding any inline styles */
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+button {
+    padding: 12px 15px;
+    font-size: 1em;
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+}
+button:hover { background-color: var(--button-hover-bg-color); }
+button:active { background-color: var(--button-active-bg-color); }
+button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
+
+.input-group { margin-top: 15px; display: flex; gap: 10px; align-items: center; }
+
+/* General input and select styling for a modern look */
+.input-group input,
+#theme-select, /* Added theme select to general input/select styling */
+#client-select, /* Added client select */
+#dvr-server-select, /* Added dvr server select */
+.input-group select,
+.channel-list-section select,
+.filter-sort-controls input[type="search"],
+.filter-sort-controls select {
+    padding: 10px 15px; /* Slightly more horizontal padding */
+    font-size: 1em;
+    border: 1px solid var(--input-border-color);
+    border-radius: 6px; /* Slightly more rounded corners */
+    background-color: var(--container-bg-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* Subtle inner shadow for depth */
+    flex-grow: 1; /* Allow inputs to grow in flex containers */
+}
+
+/* Focus state */
+.input-group input:focus,
+#theme-select:focus, /* Added theme select focus */
+#client-select:focus, /* Added client select focus */
+#dvr-server-select:focus, /* Added dvr server select focus */
+.input-group select:focus,
+.channel-list-section select:focus,
+.filter-sort-controls input[type="search"]:focus,
+.filter-sort-controls select:focus {
+    outline: none; /* Remove default outline */
+    border-color: var(--button-hover-bg-color); /* Highlight border on focus */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Subtle blue glow on focus */
+}
+
+
+#seek_amount_input {
+    width: 70px;
+    text-align: center;
+    -moz-appearance: textfield;
+    flex-grow: 0;
+}
+#seek_amount_input::-webkit-outer-spin-button,
+#seek_amount_input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#manual_channel_input {
+    min-width: 120px;
+}
+
+pre {
+    background-color: var(--pre-bg-color);
+    padding: 15px;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.85em;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--pre-border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.status-section { margin-top: 25px; }
+.channel-list-section { margin-top: 25px; }
+.channel-list-section select {
+    width: 100%; /* Keep width 100% for this specific select */
+    margin-bottom: 10px;
+}
+.channel-list-section .refresh-button-container { text-align: right; margin-top: 5px; }
+.seek-controls { margin-top: 15px; }
+
+/* Notification Styling */
+#notification-area {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+}
+.notification {
+    background-color: var(--notification-success-bg);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out, background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-size: 0.9em;
+}
+.notification.error { background-color: var(--notification-error-bg); }
+.notification.show { opacity: 1; }
+
+/* Styling for Now Playing display */
+#now-playing-display {
+    display: flex;
+    align-items: flex-start;
+    background-color: var(--now-playing-bg);
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid var(--now-playing-border);
+    margin-top: 10px;
+    gap: 15px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+#now-playing-display img {
+    max-width: 120px;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: var(--now-playing-image-shadow);
+    flex-shrink: 0;
+}
+#now-playing-info {
+    flex-grow: 1;
+}
+#now-playing-info h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: var(--now-playing-header-color);
+    font-size: 1.2em;
+    transition: color 0.3s ease;
+}
+#now-playing-info p {
+    margin: 0;
+    font-size: 0.95em;
+    color: var(--now-playing-text-color);
+    transition: color 0.3s ease;
+}
+#now-playing-info .episode-details {
+    font-size: 0.85em;
+    color: var(--now-playing-episode-color);
+    margin-bottom: 5px;
+    transition: color 0.3s ease;
+}
+#now-playing-info .summary {
+    font-size: 0.85em;
+    color: var(--now-playing-summary-color);
+    transition: color 0.3s ease;
+}
+#now-playing-display.hidden {
+    display: none;
+}
+
+/* New styles for DVR movies and shows section */
+#movies-list-section, #shows-list-section {
+    margin-top: 25px;
+}
+
+/* Wrapper for horizontal scrolling + arrows */
+.carousel-wrapper {
+    position: relative; /* For positioning arrows */
+    margin-top: 15px;
+    /* Ensure the wrapper doesn't expand beyond its parent visually */
+    max-width: 100%;
+    overflow: hidden; /* Hide arrows that are outside the bounds of the wrapper */
+}
+
+/* MODIFIED for Horizontal Scrolling */
+#movies-list, #episodes-list {
+    display: flex; /* Change from grid to flex */
+    flex-wrap: nowrap; /* Prevent wrapping */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-y: hidden; /* Hide vertical scrollbar */
+    -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+    gap: 20px; /* Spacing between cards */
+    padding-bottom: 20px; /* Add some padding at the bottom for scrollbar visibility if not hidden */
+    padding-left: 10px; /* Padding for the start of the list within wrapper */
+    padding-right: 10px; /* Padding for the end of the list within wrapper */
+
+
+    /* Optional: For a smoother "snap" effect like a real carousel */
+    scroll-snap-type: x mandatory; /* Snap points along the x-axis */
+    scroll-padding-left: 10px; /* Padding for the snapping area at the start */
+
+
+    /* Optional: Hide scrollbar for a cleaner look */
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari) */
+#movies-list::-webkit-scrollbar,
+#episodes-list::-webkit-scrollbar {
+    display: none;
+}
+
+.movie-card, .episode-card {
+    background-color: var(--recording-card-bg);
+    border: 1px solid var(--recording-card-border);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+
+    /* MODIFIED for Horizontal Scrolling */
+    flex-shrink: 0; /* Prevents cards from shrinking */
+    width: 280px; /* Fixed width for cards */
+    scroll-snap-align: start; /* Align card to snap point */
+}
+
+.movie-card:hover, .episode-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.movie-card-image-container, .episode-card-image-container {
+    width: 100%;
+    height: 160px; /* Fixed height for image area */
+    background-color: #333; /* Placeholder background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.movie-card-image-container img, .episode-card-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the area, crop if necessary */
+    display: block;
+    transition: opacity 0.3s ease;
+}
+
+.movie-card-image-container img.error-img, .episode-card-image-container img.error-img {
+    display: none; /* Hide if error occurs */
+}
+
+.movie-card-image-container .no-image-text, .episode-card-image-container .no-image-text {
+    color: #fff;
+    font-size: 0.9em;
+    text-align: center;
+    padding: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.movie-card-content, .episode-card-content {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-card-content h3, .episode-card-content h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+    color: var(--recording-title-color);
+    transition: color 0.3s ease;
+}
+
+.movie-card-content .episode-details, .episode-card-content .episode-details {
+    font-size: 0.85em;
+    color: var(--recording-episode-color);
+    margin-bottom: 8px;
+    transition: color 0.3s ease;
+}
+
+.movie-card-content .summary, .episode-card-content .summary {
+    font-size: 0.8em;
+    color: var(--recording-summary-color);
+    margin-bottom: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limit to 3 lines */
+    -webkit-box-orient: vertical;
+    transition: color 0.3s ease;
+}
+
+.movie-card-content .play-button-container, .episode-card-content .play-button-container {
+    margin-top: auto; /* Push button to the bottom */
+    text-align: center;
+}
+
+.movie-card-content .play-button, .episode-card-content .play-button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    width: 100%;
+}
+
+#movies-list.loading::after, #episodes-list.loading::after {
+    content: "Loading...";
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    color: var(--text-color);
+}
+
+#movies-list.loading .movie-card, #episodes-list.loading .episode-card {
+    opacity: 0.5; /* Dim cards while loading */
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.section-header h2 {
+    margin: 0;
+    padding: 0;
+}
+
+.section-toggle-button {
+    padding: 8px 12px;
+    font-size: 0.85em;
+    background-color: #6c757d; /* A neutral gray */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.section-toggle-button:hover {
+    background-color: #5a6268;
+}
+
+/* Scroll Arrows Styling */
+.scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    color: white;
+    border: none;
+    border-radius: 50%; /* Make them round */
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10; /* Ensure they are above content */
+    opacity: 0.8;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none; /* Prevent text selection */
+    -webkit-user-select: none;
+    touch-action: none; /* Add this line */
+}
+
+.scroll-arrow:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.scroll-arrow.left {
+    left: 5px; /* Adjust as needed */
+}
+
+.scroll-arrow.right {
+    right: 5px; /* Adjust as needed */
+}
+
+.scroll-arrow.hidden {
+    display: none;
+}
+
+.filter-sort-controls { /* New: Style for search/sort group */
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    align-items: center;
+}
+.filter-sort-controls label {
+    white-space: nowrap;
+}
+.filter-sort-controls input[type="search"] {
+    min-width: 220px; /* Increased from 150px to provide more space */
+    flex-grow: 1; /* Allow it to grow beyond min-width if space is available */
+}
+.filter-sort-controls select {
+    min-width: 100px;
+}
+
+/* Specific styling for selects (to try to control default arrow better) */
+#theme-select, /* Added theme select */
+#client-select, /* Added client select */
+#dvr-server-select, /* Added dvr server select */
+.input-group select,
+.channel-list-section select,
+.filter-sort-controls select {
+    padding: 10px 15px; /* Slightly more horizontal padding */
+    font-size: 1em;
+    border: 1px solid var(--input-border-color);
+    border-radius: 6px; /* Slightly more rounded corners */
+    background-color: var(--container-bg-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* Subtle inner shadow for depth */
+    flex-grow: 1; /* Allow inputs to grow in flex containers */
+
+    -webkit-appearance: none; /* Remove default arrow on WebKit */
+    -moz-appearance: none;    /* Remove default arrow on Firefox */
+    appearance: none;         /* Remove default arrow */
+    /* Using a data URI for a simple SVG arrow */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center; /* Position custom arrow */
+    background-size: 18px; /* Size custom arrow */
+    padding-right: 30px; /* Make space for the arrow */
+    flex-grow: 0; /* Override flex-grow:1 for selects generally to prevent stretching */
+}
+
+/* Focus state */
+.input-group input:focus,
+#theme-select:focus, /* Added theme select focus */
+#client-select:focus, /* Added client select focus */
+#dvr-server-select:focus, /* Added dvr server select focus */
+.input-group select:focus,
+.channel-list-section select:focus,
+.filter-sort-controls input[type="search"]:focus,
+.filter-sort-controls select:focus {
+    outline: none; /* Remove default outline */
+    border-color: var(--button-hover-bg-color); /* Highlight border on focus */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Subtle blue glow on focus */
+}
+
+
+/* Adjust arrow color for dark themes */
+body.theme-dark-gray #theme-select,
+body.theme-dark-gray #client-select, /* Added client select */
+body.theme-dark-gray #dvr-server-select, /* Added dvr server select */
+body.theme-dark-gray .input-group select,
+body.theme-dark-gray .channel-list-section select,
+body.theme-dark-gray .filter-sort-controls select,
+body.theme-dark-green #theme-select,
+body.theme-dark-green #client-select, /* Added client select */
+body.theme-dark-green #dvr-server-select, /* Added dvr server select */
+body.theme-dark-green .input-group select,
+body.theme-dark-green .channel-list-section select,
+body.theme-dark-green .filter-sort-controls select {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* White arrow for dark themes */
+}
+
+/* Styling for the selected DVR server display */
+#dvr-server-ip-display {
+    display: inline-block; /* Allow padding and border */
+    padding: 8px 12px; /* Consistent with other small inputs/buttons */
+    margin-left: 10px; /* Space from the select box */
+    border: 1px solid var(--input-border-color);
+    border-radius: 6px;
+    background-color: var(--config-info-bg); /* Use a subtle background, perhaps config-info's background */
+    color: var(--text-color);
+    font-size: 0.95em; /* Consistent with the labels */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+    vertical-align: middle; /* Align nicely with dropdown */
+}
+
+
+/* Media queries */
+@media (max-width: 600px) and (any-hover: none) {
+    .movie-card, .episode-card {
+        /* Make cards narrower to show part of the next card */
+        width: 85%; /* Adjust this percentage as needed to show more or less of the next card */
+    }
+    /* Hide scroll arrows on phone-like devices */
+    .scroll-arrow {
+        display: none; /* This will hide the arrows */
+    }
+    .filter-sort-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .filter-sort-controls input,
+    .filter-sort-controls select {
+        width: 100%;
+    }
+}
