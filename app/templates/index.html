@@ -177,6 +177,19 @@
             font-size: 0.9em;
             transition: background-color 0.3s ease;
         }
+        /* Styling for "Configured Clients" and "Select Channels DVR Server" labels */
+        .config-info p strong {
+            display: block; /* Make it a block element to control margins */
+            font-size: 0.95em; /* Consistent size */
+            margin-bottom: 5px; /* Space between label and select box */
+            color: var(--text-color); /* Ensure consistent text color */
+        }
+        /* Consistent margin-top for subsequent sections within config-info */
+        .config-info p:nth-of-type(2) { /* Target the second p tag in config-info (for DVR Server) */
+            margin-top: 15px; /* Consistent spacing between sections in config-info */
+            font-size: inherit; /* Inherit font size from parent, overriding any inline styles */
+        }
+
         .button-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
@@ -199,16 +212,41 @@
         button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
 
         .input-group { margin-top: 15px; display: flex; gap: 10px; align-items: center; }
-        .input-group input {
-            padding: 10px;
+        
+        /* General input and select styling for a modern look */
+        .input-group input,
+        #theme-select, /* Added theme select to general input/select styling */
+        #client-select, /* Added client select */
+        #dvr-server-select, /* Added dvr server select */
+        .input-group select,
+        .channel-list-section select,
+        .filter-sort-controls input[type="search"],
+        .filter-sort-controls select {
+            padding: 10px 15px; /* Slightly more horizontal padding */
             font-size: 1em;
             border: 1px solid var(--input-border-color);
-            border-radius: 5px;
-            flex-grow: 1;
-            background-color: var(--container-bg-color); /* Match container bg */
+            border-radius: 6px; /* Slightly more rounded corners */
+            background-color: var(--container-bg-color);
             color: var(--text-color);
-            transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+            transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* Subtle inner shadow for depth */
+            flex-grow: 1; /* Allow inputs to grow in flex containers */
         }
+
+        /* Focus state */
+        .input-group input:focus,
+        #theme-select:focus, /* Added theme select focus */
+        #client-select:focus, /* Added client select focus */
+        #dvr-server-select:focus, /* Added dvr server select focus */
+        .input-group select:focus,
+        .channel-list-section select:focus,
+        .filter-sort-controls input[type="search"]:focus,
+        .filter-sort-controls select:focus {
+            outline: none; /* Remove default outline */
+            border-color: var(--button-hover-bg-color); /* Highlight border on focus */
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Subtle blue glow on focus */
+        }
+
 
         #seek_amount_input {
             width: 70px;
@@ -241,15 +279,8 @@
         .status-section { margin-top: 25px; }
         .channel-list-section { margin-top: 25px; }
         .channel-list-section select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid var(--input-border-color);
-            font-size: 1em;
+            width: 100%; /* Keep width 100% for this specific select */
             margin-bottom: 10px;
-            background-color: var(--container-bg-color); /* Match container bg */
-            color: var(--text-color);
-            transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
         }
         .channel-list-section .refresh-button-container { text-align: right; margin-top: 5px; }
         .seek-controls { margin-top: 15px; }
@@ -553,6 +584,98 @@
             display: none;
         }
 
+        .filter-sort-controls { /* New: Style for search/sort group */
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            align-items: center;
+        }
+        .filter-sort-controls label {
+            white-space: nowrap;
+        }
+        .filter-sort-controls input[type="search"] {
+            min-width: 220px; /* Increased from 150px to provide more space */
+            flex-grow: 1; /* Allow it to grow beyond min-width if space is available */
+        }
+        .filter-sort-controls select {
+            min-width: 100px;
+        }
+
+        /* Specific styling for selects (to try to control default arrow better) */
+        #theme-select, /* Added theme select */
+        #client-select, /* Added client select */
+        #dvr-server-select, /* Added dvr server select */
+        .input-group select,
+        .channel-list-section select,
+        .filter-sort-controls select {
+            padding: 10px 15px; /* Slightly more horizontal padding */
+            font-size: 1em;
+            border: 1px solid var(--input-border-color);
+            border-radius: 6px; /* Slightly more rounded corners */
+            background-color: var(--container-bg-color);
+            color: var(--text-color);
+            transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* Subtle inner shadow for depth */
+            flex-grow: 1; /* Allow inputs to grow in flex containers */
+
+            -webkit-appearance: none; /* Remove default arrow on WebKit */
+            -moz-appearance: none;    /* Remove default arrow on Firefox */
+            appearance: none;         /* Remove default arrow */
+            /* Using a data URI for a simple SVG arrow */
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); 
+            background-repeat: no-repeat;
+            background-position: right 8px center; /* Position custom arrow */
+            background-size: 18px; /* Size custom arrow */
+            padding-right: 30px; /* Make space for the arrow */
+            flex-grow: 0; /* Override flex-grow:1 for selects generally to prevent stretching */
+        }
+
+        /* Focus state */
+        .input-group input:focus,
+        #theme-select:focus, /* Added theme select focus */
+        #client-select:focus, /* Added client select focus */
+        #dvr-server-select:focus, /* Added dvr server select focus */
+        .input-group select:focus,
+        .channel-list-section select:focus,
+        .filter-sort-controls input[type="search"]:focus,
+        .filter-sort-controls select:focus {
+            outline: none; /* Remove default outline */
+            border-color: var(--button-hover-bg-color); /* Highlight border on focus */
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Subtle blue glow on focus */
+        }
+
+
+        /* Adjust arrow color for dark themes */
+        body.theme-dark-gray #theme-select,
+        body.theme-dark-gray #client-select, /* Added client select */
+        body.theme-dark-gray #dvr-server-select, /* Added dvr server select */
+        body.theme-dark-gray .input-group select,
+        body.theme-dark-gray .channel-list-section select,
+        body.theme-dark-gray .filter-sort-controls select,
+        body.theme-dark-green #theme-select,
+        body.theme-dark-green #client-select, /* Added client select */
+        body.theme-dark-green #dvr-server-select, /* Added dvr server select */
+        body.theme-dark-green .input-group select,
+        body.theme-dark-green .channel-list-section select,
+        body.theme-dark-green .filter-sort-controls select {
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* White arrow for dark themes */
+        }
+
+        /* Styling for the selected DVR server display */
+        #dvr-server-ip-display {
+            display: inline-block; /* Allow padding and border */
+            padding: 8px 12px; /* Consistent with other small inputs/buttons */
+            margin-left: 10px; /* Space from the select box */
+            border: 1px solid var(--input-border-color);
+            border-radius: 6px;
+            background-color: var(--config-info-bg); /* Use a subtle background, perhaps config-info's background */
+            color: var(--text-color);
+            font-size: 0.95em; /* Consistent with the labels */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+            vertical-align: middle; /* Align nicely with dropdown */
+        }
+
 
         /* Media queries */
         @media (max-width: 600px) and (any-hover: none) {
@@ -563,6 +686,14 @@
             /* Hide scroll arrows on phone-like devices */
             .scroll-arrow {
                 display: none; /* This will hide the arrows */
+            }
+            .filter-sort-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .filter-sort-controls input,
+            .filter-sort-controls select {
+                width: 100%;
             }
         }
     </style>
@@ -592,7 +723,7 @@
             {% if not clients_configured %}
                 <p style="color: red;">No clients configured. Set CHANNELS_APP_CLIENTS environment variable.</p>
             {% endif %}
-            <p style="font-size: 0.8em; margin-top: 10px;">
+            <p>
                 <strong>Select Channels DVR Server:</strong><br>
                 <select id="dvr-server-select" onchange="selectDvrServer()">
                     <option value="">Select a DVR Server</option>
@@ -659,8 +790,24 @@
                 <h2>Movies</h2>
                 <button class="section-toggle-button" onclick="toggleSection('movies-carousel-wrapper', this)">Hide Content</button>
             </div>
-            <button class="control-button" onclick="loadMovies()">Load Movies</button>
-            <p style="font-size: 0.8em; margin-top: 5px;">Fetches movies from your Channels DVR Server.</p>
+            <div class="filter-sort-controls">
+                <label for="movies-search">Search:</label>
+                <input type="search" id="movies-search" placeholder="Search movies by title/summary">
+
+                <label for="movies-sort-by">Sort By:</label>
+                <select id="movies-sort-by">
+                    <option value="date_released">Release Date</option>
+                    <option value="alpha">Title</option>
+                    <option value="duration">Duration</option>
+                </select>
+
+                <label for="movies-sort-order">Order:</label>
+                <select id="movies-sort-order">
+                    <option value="desc">Descending</option>
+                    <option value="asc">Ascending</option>
+                </select>
+            </div>
+
             <div id="movies-carousel-wrapper" class="carousel-wrapper">
                 <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('movies-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
                 <div id="movies-list">
@@ -674,8 +821,25 @@
                 <h2>TV Shows (Recent Episodes)</h2>
                 <button class="section-toggle-button" onclick="toggleSection('episodes-carousel-wrapper', this)">Hide Content</button>
             </div>
-            <button class="control-button" onclick="loadShows()">Load Recent Episodes</button>
-            <p style="font-size: 0.8em; margin-top: 5px;">Fetches recent TV show episodes from your Channels DVR Server.</p>
+            <div class="filter-sort-controls">
+                <label for="shows-search">Search:</label>
+                <input type="search" id="shows-search" placeholder="Search shows/episodes by title/summary">
+
+                <label for="shows-sort-by">Sort By:</label>
+                <select id="shows-sort-by">
+                    <option value="date_aired">Air Date</option>
+                    <option value="title">Show Title</option> 
+                    <option value="episode_title">Episode Title</option> 
+                    <option value="date_added">Date Added</option>
+                    <option value="duration">Duration</option>
+                </select>
+
+                <label for="shows-sort-order">Order:</label>
+                <select id="shows-sort-order">
+                    <option value="desc">Descending</option>
+                    <option value="asc">Ascending</option>
+                </select>
+            </div>
             <div id="episodes-carousel-wrapper" class="carousel-wrapper">
                 <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('episodes-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
                 <div id="episodes-list">
@@ -697,7 +861,7 @@
 
     <script>
         const clientSelect = document.getElementById('client-select');
-        const dvrServerSelect = document.getElementById('dvr-server-select'); // New element
+        const dvrServerSelect = document.getElementById('dvr-server-select');
         const channelSelect = document.getElementById('channel-select');
         const enablePopupsCheckbox = document.getElementById('enablePopups');
         const notificationArea = document.getElementById('notification-area');
@@ -709,15 +873,25 @@
         const moviesListDiv = document.getElementById('movies-list');
         const episodesListDiv = document.getElementById('episodes-list');
 
+        // New elements for search and sort
+        const moviesSearchInput = document.getElementById('movies-search');
+        const moviesSortBySelect = document.getElementById('movies-sort-by');
+        const moviesSortOrderSelect = document.getElementById('movies-sort-order');
+
+        const showsSearchInput = document.getElementById('shows-search');
+        const showsSortBySelect = document.getElementById('shows-sort-by');
+        const showsSortOrderSelect = document.getElementById('shows-sort-order');
+
         let selectedClientIp = '';
-        let selectedDvrServerIp = ''; // New variable
-        let autoScrollInterval; // Variable to hold the interval ID
+        let selectedDvrServerIp = '';
+        let autoScrollInterval;
+        let allMoviesData = []; // Store original fetched movies data for client-side filtering/sorting
+        let allEpisodesData = []; // Store original fetched episodes data
 
         const flaskClients = {{ clients | tojson }};
         const clientsConfiguredViaEnv = {{ clients_configured | tojson }};
-        const flaskDvrServers = {{ dvr_servers | tojson }}; // New from Flask
+        const flaskDvrServers = {{ dvr_servers | tojson }};
         const dvrServersConfiguredViaEnv = {{ dvr_servers_configured | tojson }};
-
 
         function showNotification(message, isError = false) {
             if (!enablePopupsCheckbox.checked) {
@@ -729,7 +903,7 @@
             notification.textContent = message;
             notificationArea.appendChild(notification);
 
-            void notification.offsetWidth; // Trigger reflow for CSS transition
+            void notification.offsetWidth;
             notification.classList.add('show');
 
             setTimeout(() => {
@@ -751,24 +925,23 @@
 
         function applyTheme() {
             const selectedTheme = themeSelect.value;
-            document.body.className = ''; // Remove existing theme classes
+            document.body.className = '';
             if (selectedTheme !== 'default-light') {
                 document.body.classList.add(`theme-${selectedTheme}`);
             }
-            localStorage.setItem('selectedTheme', selectedTheme); // Save preference
+            localStorage.setItem('selectedTheme', selectedTheme);
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            // Load and apply saved theme
             const savedTheme = localStorage.getItem('selectedTheme') || 'default-light';
-            themeSelect.value = savedTheme; // Set dropdown to saved value
-            applyTheme(); // Apply the theme
+            themeSelect.value = savedTheme;
+            applyTheme();
 
             const savedPopupState = localStorage.getItem('enablePopups');
             if (savedPopupState !== null) {
                 enablePopupsCheckbox.checked = JSON.parse(savedPopupState);
             } else {
-                enablePopupsCheckbox.checked = false; // Default to off for better mobile experience
+                enablePopupsCheckbox.checked = false;
             }
 
             enablePopupsCheckbox.addEventListener('change', () => {
@@ -776,8 +949,8 @@
             });
 
             if (flaskClients.length > 0) {
-                clientSelect.selectedIndex = 1; // Auto-select first client
-                await selectClient(); // Use await to ensure client is selected before further actions
+                clientSelect.selectedIndex = 1;
+                await selectClient();
             } else {
                 toggleControls(false);
                 statusDisplay.innerText = "No Channels App clients configured. Please set CHANNELS_APP_CLIENTS environment variable.";
@@ -785,16 +958,24 @@
                 showNotification("No Channels App clients configured.", true);
             }
 
-            // Auto-select first DVR server if available
             if (flaskDvrServers.length > 0) {
                 dvrServerSelect.selectedIndex = 1;
-                selectDvrServer(); // Select the first DVR server
+                selectDvrServer();
             } else {
                 dvrServerSelect.disabled = true;
                 showNotification("No DVR servers configured.", true);
             }
 
-            setupCarouselNavigation(); // Setup carousel navigation after DOM content is loaded
+            setupCarouselNavigation();
+
+            // Add event listeners for search and sort
+            moviesSearchInput.addEventListener('input', debounce(filterAndRenderMovies, 300));
+            moviesSortBySelect.addEventListener('change', filterAndRenderMovies);
+            moviesSortOrderSelect.addEventListener('change', filterAndRenderMovies);
+
+            showsSearchInput.addEventListener('input', debounce(filterAndRenderShows, 300));
+            showsSortBySelect.addEventListener('change', filterAndRenderShows);
+            showsSortOrderSelect.addEventListener('change', filterAndRenderShows);
         });
 
         async function selectClient() {
@@ -817,17 +998,18 @@
             selectedDvrServerIp = dvrServerSelect.value;
             if (selectedDvrServerIp) {
                 dvrServerIpDisplay.textContent = `Selected: ${dvrServerSelect.options[dvrServerSelect.selectedIndex].text}`;
-                dvrServerIpDisplay.style.display = 'inline'; // Show the selected IP
+                dvrServerIpDisplay.style.display = 'inline';
                 showNotification(``, false);
-                // Optionally auto-load movies/shows here, or leave to user's button clicks
-                loadMovies();
+                loadMovies(); // Automatically load movies/shows when a DVR server is selected
                 loadShows();
             } else {
                 dvrServerIpDisplay.textContent = 'Not Selected';
-                dvrServerIpDisplay.style.display = 'none'; // Hide if no server selected
+                dvrServerIpDisplay.style.display = 'none';
                 moviesListDiv.innerHTML = '<p>Please select a DVR server.</p>';
                 episodesListDiv.innerHTML = '<p>Please select a DVR server.</p>';
                 showNotification("Please select a DVR server.", true);
+                allMoviesData = []; // Clear data when no server is selected
+                allEpisodesData = [];
             }
         }
 
@@ -842,7 +1024,7 @@
                 data.value = value;
             }
             if (recordingId !== null) {
-                data.recording_id = recordingId; // Send as recording_id to backend
+                data.recording_id = recordingId;
             }
 
             try {
@@ -853,7 +1035,7 @@
                 });
                 const result = await response.json();
                 showNotification(`Action '${action}': ${result.message}`, result.status === 'error');
-                getStatus(); // Refresh status after any command
+                getStatus();
                 return result.status;
             } catch (error) {
                 showNotification(`Error sending command: ${error.message}`, true);
@@ -952,9 +1134,8 @@
                 } else {
                     showNotification(`Status refreshed for ${selectedClientIp}.`, false);
 
-                    const np = status.now_playing; // Shorter variable for convenience
+                    const np = status.now_playing;
 
-                    // Check if now_playing data is available and meaningful
                     if (np && np.title) {
                         let episodeDetails = '';
                         if (np.season_number && np.episode_number) {
@@ -975,7 +1156,7 @@
                             </div>
                         `;
                         nowPlayingDisplay.classList.remove('hidden');
-                        statusDisplay.style.display = 'none'; // Hide raw JSON when formatted is shown
+                        statusDisplay.style.display = 'none';
                     } else {
                         nowPlayingDisplay.classList.add('hidden');
                         statusDisplay.style.display = 'block';
@@ -1035,18 +1216,33 @@
             }
         }
 
+        // Global variable to hold debounce timeout
+        let debounceTimeout;
+
+        function debounce(func, delay) {
+            return function(...args) {
+                const context = this;
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
+
         async function loadMovies() {
             if (!selectedDvrServerIp) {
                 moviesListDiv.innerHTML = '<p>Please select a DVR server to load movies.</p>';
                 showNotification("Please select a DVR server to load movies.", true);
+                allMoviesData = [];
                 return;
             }
             moviesListDiv.innerHTML = '';
             moviesListDiv.classList.add('loading');
             showNotification("Loading movies from DVR server...", false);
 
+            const sortBy = moviesSortBySelect.value;
+            const sortOrder = moviesSortOrderSelect.value;
+
             try {
-                const response = await fetch(`/dvr_movies?dvr_server_ip=${selectedDvrServerIp}`); // Pass DVR IP
+                const response = await fetch(`/dvr_movies?dvr_server_ip=${selectedDvrServerIp}&sort_by=${sortBy}&sort_order=${sortOrder}`);
                 const result = await response.json();
 
                 moviesListDiv.classList.remove('loading');
@@ -1054,62 +1250,142 @@
                 if (result.status === 'error') {
                     moviesListDiv.innerHTML = `<p style="color: red;">Error: ${result.message}</p>`;
                     showNotification(`Failed to load movies: ${result.message}`, true);
-                } else if (result.movies && result.movies.length > 0) {
-                    result.movies.forEach(movie => {
-                        const card = document.createElement('div');
-                        card.className = 'movie-card';
-
-                        const imageUrl = movie.image_url || 'https://placehold.co/120x90/333/eee?text=No+Image';
-                        let movieDetails = '';
-                        if (movie.release_year) {
-                            movieDetails += `<p class="episode-details">Year: ${movie.release_year}</p>`;
-                        }
-                        if (movie.channel_call_sign) {
-                            movieDetails += `<p class="episode-details">Channel: ${movie.channel_call_sign}</p>`;
-                        }
-                       
-                        card.innerHTML = `
-                            <div class="movie-card-image-container">
-                                <img src="${imageUrl}" alt="${movie.title || 'Movie'}" onerror="this.onerror=null; this.src='https://placehold.co/120x90/333/eee?text=No+Image'; this.classList.add('error-img'); this.nextElementSibling.style.display='block';" />
-                                ${!movie.image_url ? '<div class="no-image-text">No Image Available</div>' : ''}
-                            </div>
-                            <div class="movie-card-content">
-                                <h3>${movie.title || 'Unknown Title'}</h3>
-                                ${movieDetails}
-                                ${movie.summary ? `<p class="summary">${movie.summary}</p>` : ''}
-                                <div class="play-button-container">
-                                    <button class="control-button play-button" onclick="playRecording('${movie.id}')">Play</button>
-                                </div>
-                            </div>
-                        `;
-                        moviesListDiv.appendChild(card);
-                    });
+                    allMoviesData = [];
+                } else if (result.movies) {
+                    allMoviesData = result.movies; // Store the original fetched data
+                    filterAndRenderMovies(); // Filter and render based on current search/sort inputs
                     showNotification(`Loaded ${result.movies.length} movies.`, false);
                 } else {
                     moviesListDiv.innerHTML = '<p>No movies found on the DVR server.</p>';
                     showNotification("No movies found.", false);
+                    allMoviesData = [];
                 }
-                checkArrowVisibility(moviesListDiv); // Check arrows after loading content
+                checkArrowVisibility(moviesListDiv);
             } catch (error) {
                 moviesListDiv.innerHTML = `<p style="color: red;">Error fetching movies: ${error.message}</p>`;
                 moviesListDiv.classList.remove('loading');
                 showNotification(`Error fetching movies: ${error.message}`, true);
                 console.error("Error fetching movies:", error);
+                allMoviesData = [];
             }
         }
+
+        function filterAndRenderMovies() {
+            const searchTerm = moviesSearchInput.value.toLowerCase();
+            const sortBy = moviesSortBySelect.value;
+            const sortOrder = moviesSortOrderSelect.value;
+
+            let filteredMovies = allMoviesData;
+
+            if (searchTerm) {
+                filteredMovies = allMoviesData.filter(movie =>
+                    (movie.title && movie.title.toLowerCase().includes(searchTerm)) ||
+                    (movie.summary && movie.summary.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // Client-side sorting, just in case API sort isn't perfect or for re-sorting filtered results
+            filteredMovies.sort((a, b) => {
+                let valA, valB;
+                if (sortBy === 'alpha') {
+                    valA = a.title ? a.title.toLowerCase() : '';
+                    valB = b.title ? b.title.toLowerCase() : '';
+                } else if (sortBy === 'date_released') {
+                    valA = a.air_date || 0; // Use air_date (which is release_timestamp)
+                    valB = b.air_date || 0;
+                } else if (sortBy === 'duration') {
+                    valA = a.duration || 0;
+                    valB = b.duration || 0;
+                } else { // Default to alpha if unrecognized
+                    valA = a.title ? a.title.toLowerCase() : '';
+                    valB = b.title ? b.title.toLowerCase() : '';
+                }
+
+                if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+                if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderMovies(filteredMovies);
+        }
+
+        function renderMovies(moviesToRender) {
+            moviesListDiv.innerHTML = ''; // Clear existing content
+            if (moviesToRender.length === 0) {
+                moviesListDiv.innerHTML = '<p>No movies found matching your criteria.</p>';
+                checkArrowVisibility(moviesListDiv);
+                return;
+            }
+
+            moviesToRender.forEach(movie => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+
+                const imageUrl = movie.image_url || ''; // Set to empty string if no image URL
+                const hasImage = !!imageUrl; // Check if imageUrl is not empty or null/undefined
+                
+                // Construct the image HTML block with the no-image-text div always present, but controlled by style
+                const imageHtml = `
+                    <img src="${imageUrl}" alt="${movie.title || 'Movie'}" class="main-image"
+                         style="${hasImage ? '' : 'display: none;'}" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/120x90/333/eee?text=No+Image';
+                                  this.classList.add('error-img');
+                                  this.style.display='none'; /* Hide the broken image */
+                                  this.closest('.movie-card-image-container').querySelector('.no-image-text').style.display='block';" />
+                    <div class="no-image-text"
+                         style="${hasImage ? 'display: none;' : 'display: block;'}">No Image Available</div>
+                `;
+
+                let movieDetails = '';
+                if (movie.release_year) {
+                    movieDetails += `<p class="episode-details">Year: ${movie.release_year}</p>`;
+                }
+                if (movie.channel_call_sign) {
+                    movieDetails += `<p class="episode-details">Channel: ${movie.channel_call_sign}</p>`;
+                }
+               
+                card.innerHTML = `
+                    <div class="movie-card-image-container">
+                        ${imageHtml}
+                    </div>
+                    <div class="movie-card-content">
+                        <h3>${movie.title || 'Unknown Title'}</h3>
+                        ${movieDetails}
+                        ${movie.summary ? `<p class="summary">${movie.summary}</p>` : ''}
+                        <div class="play-button-container">
+                            <button class="control-button play-button" onclick="playRecording('${movie.id}')">Play</button>
+                        </div>
+                    </div>
+                `;
+                moviesListDiv.appendChild(card);
+            });
+            checkArrowVisibility(moviesListDiv);
+        }
+
 
         async function loadShows() {
             if (!selectedDvrServerIp) {
                 episodesListDiv.innerHTML = '<p>Please select a DVR server to load TV shows.</p>';
                 showNotification("Please select a DVR server to load TV shows.", true);
+                allEpisodesData = [];
                 return;
             }
             episodesListDiv.innerHTML = '';
             episodesListDiv.classList.add('loading');
             showNotification("Loading TV show episodes from DVR server...", false);
 
+            const sortBy = showsSortBySelect.value;
+            const sortOrder = showsSortOrderSelect.value;
+
+            // Note: The API 'title' sort for episodes is for the show title.
+            // If sorting by episode_title is desired, it must be client-side.
+            let apiSortBy = sortBy;
+            if (sortBy === 'episode_title') {
+                apiSortBy = 'date_aired'; // Fallback to date_aired for API, then client-side sort
+            }
+
             try {
-                const response = await fetch(`/dvr_shows?dvr_server_ip=${selectedDvrServerIp}`); // Pass DVR IP
+                const response = await fetch(`/dvr_shows?dvr_server_ip=${selectedDvrServerIp}&sort_by=${apiSortBy}&sort_order=${sortOrder}`);
                 const result = await response.json();
 
                 episodesListDiv.classList.remove('loading');
@@ -1117,60 +1393,140 @@
                 if (result.status === 'error') {
                     episodesListDiv.innerHTML = `<p style="color: red;">Error: ${result.message}</p>`;
                     showNotification(`Failed to load TV show episodes: ${result.message}`, true);
-                } else if (result.episodes && result.episodes.length > 0) {
-                    result.episodes.forEach(episode => {
-                        const card = document.createElement('div');
-                        card.className = 'episode-card';
-
-                        const imageUrl = episode.image_url || 'https://placehold.co/120x90/333/eee?text=No+Image';
-                        let episodeDetails = '';
-                        if (episode.season_number && episode.episode_number) {
-                            episodeDetails += `<p class="episode-details">S${episode.season_number} E${episode.episode_number}`;
-                            if (episode.episode_title) {
-                                episodeDetails += `: ${episode.episode_title}</p>`;
-                            } else {
-                                episodeDetails += `</p>`;
-                            }
-                        } else if (episode.episode_title) {
-                            episodeDetails += `<p class="episode-details">${episode.episode_title}</p>`;
-                        }
-                        if (episode.channel_call_sign) {
-                            episodeDetails += `<p class="episode-details">Channel: ${episode.channel_call_sign}</p>`;
-                        }
-                        if (episode.air_date) {
-                            const date = new Date(episode.air_date * 1000);
-                            episodeDetails += `<p class="episode-details">Aired: ${date.toLocaleDateString()}</p>`;
-                        }
-
-
-                        card.innerHTML = `
-                            <div class="episode-card-image-container">
-                                <img src="${imageUrl}" alt="${episode.show_title || 'Show'}" onerror="this.onerror=null; this.src='https://placehold.co/120x90/333/eee?text=No+Image'; this.classList.add('error-img'); this.nextElementSibling.style.display='block';" />
-                                ${!episode.image_url ? '<div class="no-image-text">No Image Available</div>' : ''}
-                            </div>
-                            <div class="episode-card-content">
-                                <h3>${episode.show_title || 'Unknown Show'}</h3>
-                                ${episodeDetails}
-                                ${episode.summary ? `<p class="summary">${episode.summary}</p>` : ''}
-                                <div class="play-button-container">
-                                    <button class="control-button play-button" onclick="playRecording('${episode.id}')">Play Episode</button>
-                                </div>
-                            </div>
-                        `;
-                        episodesListDiv.appendChild(card);
-                    });
+                    allEpisodesData = [];
+                } else if (result.episodes) {
+                    allEpisodesData = result.episodes; // Store original fetched data
+                    filterAndRenderShows(); // Filter and render based on current search/sort inputs
                     showNotification(`Loaded ${result.episodes.length} TV show episodes.`, false);
                 } else {
                     episodesListDiv.innerHTML = '<p>No TV show episodes found on the DVR server.</p>';
                     showNotification("No TV show episodes found.", false);
+                    allEpisodesData = [];
                 }
-                checkArrowVisibility(episodesListDiv); // Check arrows after loading content
+                checkArrowVisibility(episodesListDiv);
             } catch (error) {
                 episodesListDiv.innerHTML = `<p style="color: red;">Error fetching TV shows: ${error.message}</p>`;
                 episodesListDiv.classList.remove('loading');
                 showNotification(`Error fetching TV shows: ${error.message}`, true);
                 console.error("Error fetching TV shows:", error);
+                allEpisodesData = [];
             }
+        }
+
+        function filterAndRenderShows() {
+            const searchTerm = showsSearchInput.value.toLowerCase();
+            const sortBy = showsSortBySelect.value;
+            const sortOrder = showsSortOrderSelect.value;
+
+            let filteredEpisodes = allEpisodesData;
+
+            if (searchTerm) {
+                filteredEpisodes = allEpisodesData.filter(episode =>
+                    (episode.show_title && episode.show_title.toLowerCase().includes(searchTerm)) ||
+                    (episode.episode_title && episode.episode_title.toLowerCase().includes(searchTerm)) ||
+                    (episode.summary && episode.summary.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // Client-side sorting for episodes
+            filteredEpisodes.sort((a, b) => {
+                let valA, valB;
+                if (sortBy === 'title') { // Sort by show_title
+                    valA = a.show_title ? a.show_title.toLowerCase() : '';
+                    valB = b.show_title ? b.show_title.toLowerCase() : '';
+                } else if (sortBy === 'episode_title') {
+                    valA = a.episode_title ? a.episode_title.toLowerCase() : '';
+                    valB = b.episode_title ? b.episode_title.toLowerCase() : '';
+                } else if (sortBy === 'date_aired') {
+                    valA = a.air_date || 0;
+                    valB = b.air_date || 0;
+                } else if (sortBy === 'date_added') { 
+                    // This sort option is for Channels DVR API 'date_added'
+                    // Ensure your fetched data includes 'date_added' if you want this client-side sort to be effective.
+                    // For now, it's just a placeholder and might not sort correctly if data is missing.
+                    valA = a.date_added || 0; 
+                    valB = b.date_added || 0;
+                } else if (sortBy === 'duration') {
+                    valA = a.duration || 0;
+                    valB = b.duration || 0;
+                }
+                 else { // Default to air_date if unrecognized
+                    valA = a.air_date || 0;
+                    valB = b.air_date || 0;
+                }
+
+                if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+                if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderShows(filteredEpisodes);
+        }
+
+        function renderShows(episodesToRender) {
+            episodesListDiv.innerHTML = ''; // Clear existing content
+            if (episodesToRender.length === 0) {
+                episodesListDiv.innerHTML = '<p>No TV show episodes found matching your criteria.</p>';
+                checkArrowVisibility(episodesListDiv);
+                return;
+            }
+
+            episodesToRender.forEach(episode => {
+                const card = document.createElement('div');
+                card.className = 'episode-card';
+
+                const imageUrl = episode.image_url || '';
+                const hasImage = !!imageUrl;
+
+                // Construct the image HTML block with the no-image-text div always present, but controlled by style
+                const imageHtml = `
+                    <img src="${imageUrl}" alt="${episode.show_title || 'Show'}" class="main-image"
+                         style="${hasImage ? '' : 'display: none;'}" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/120x90/333/eee?text=No+Image';
+                                  this.classList.add('error-img');
+                                  this.style.display='none'; /* Hide the broken image */
+                                  this.closest('.episode-card-image-container').querySelector('.no-image-text').style.display='block';" />
+                    <div class="no-image-text"
+                         style="${hasImage ? 'display: none;' : 'display: block;'}">No Image Available</div>
+                `;
+
+
+                let episodeDetails = '';
+                if (episode.season_number && episode.episode_number) {
+                    episodeDetails += `<p class="episode-details">S${episode.season_number} E${episode.episode_number}`;
+                    if (episode.episode_title) {
+                        episodeDetails += `: ${episode.episode_title}</p>`;
+                    } else {
+                        episodeDetails += `</p>`;
+                    }
+                } else if (episode.episode_title) {
+                    episodeDetails += `<p class="episode-details">${episode.episode_title}</p>`;
+                }
+                if (episode.channel_call_sign) {
+                    episodeDetails += `<p class="episode-details">Channel: ${episode.channel_call_sign}</p>`;
+                }
+                if (episode.air_date) {
+                    const date = new Date(episode.air_date * 1000);
+                    episodeDetails += `<p class="episode-details">Aired: ${date.toLocaleDateString()}</p>`;
+                }
+
+
+                card.innerHTML = `
+                    <div class="episode-card-image-container">
+                        ${imageHtml}
+                    </div>
+                    <div class="episode-card-content">
+                        <h3>${episode.show_title || 'Unknown Show'}</h3>
+                        ${episodeDetails}
+                        ${episode.summary ? `<p class="summary">${episode.summary}</p>` : ''}
+                        <div class="play-button-container">
+                            <button class="control-button play-button" onclick="playRecording('${episode.id}')">Play Episode</button>
+                        </div>
+                    </div>
+                `;
+                episodesListDiv.appendChild(card);
+            });
+            checkArrowVisibility(episodesListDiv);
         }
 
         async function playRecording(recordingId) {
@@ -1179,7 +1535,7 @@
                 return;
             }
             showNotification(`Attempting to play recording ${recordingId} on ${selectedClientIp}...`, false);
-            const status = await sendCommand('play_recording', null, recordingId); // Changed action to 'play_recording'
+            const status = await sendCommand('play_recording', null, recordingId);
             if (status === 'success') {
                 showNotification(`Playing recording ${recordingId}.`, false);
             } else {
@@ -1187,42 +1543,37 @@
             }
         }
 
-        // Modified toggleSection to use carousel-wrapper IDs
         function toggleSection(wrapperId, button) {
             const wrapperDiv = document.getElementById(wrapperId);
             const currentDisplay = window.getComputedStyle(wrapperDiv).display;
 
             if (currentDisplay === 'none') {
-                wrapperDiv.style.display = 'block'; // Revert to block to contain flex carousel
+                wrapperDiv.style.display = 'block';
                 button.textContent = 'Hide Content';
-                // Re-check arrow visibility if content was hidden and now shown
-                const carouselDiv = wrapperDiv.querySelector('.scroll-arrow').previousElementSibling; // Get the actual list div
-                checkArrowVisibility(carouselDiv);
+                const carouselDiv = wrapperDiv.querySelector('#movies-list, #episodes-list'); // Select the actual list div
+                if (carouselDiv) checkArrowVisibility(carouselDiv);
             } else {
                 wrapperDiv.style.display = 'none';
                 button.textContent = 'Show Content';
             }
         }
 
-        // Carousel Navigation JavaScript
         function scrollCarousel(carouselElement, direction) {
-            const scrollAmount = 150; // Smaller steps for smoother animation
+            const scrollAmount = 150;
             carouselElement.scrollBy({
                 left: direction * scrollAmount,
                 behavior: 'smooth'
             });
         }
 
-        function startAutoScroll(carouselElement, direction, event) { // Add 'event' parameter
-            if (event) { // Check if an event object is passed
-                event.preventDefault(); // Prevent default touch/mouse behavior
+        function startAutoScroll(carouselElement, direction, event) {
+            if (event) {
+                event.preventDefault();
             }
-            // Clear any existing interval to prevent multiple intervals running
             stopAutoScroll();
-            // Start a new interval
             autoScrollInterval = setInterval(() => {
                 scrollCarousel(carouselElement, direction);
-            }, 75); // Scroll every 75ms for a smoother effect
+            }, 75);
         }
 
         function stopAutoScroll() {
@@ -1232,24 +1583,21 @@
 
         function checkArrowVisibility(carouselElement) {
             const wrapper = carouselElement.closest('.carousel-wrapper');
-            if (!wrapper) return; // Exit if not inside a wrapper
+            if (!wrapper) return;
 
             const leftArrow = wrapper.querySelector('.scroll-arrow.left');
             const rightArrow = wrapper.querySelector('.scroll-arrow.right');
 
-            if (!leftArrow || !rightArrow) return; // Ensure arrows exist
+            if (!leftArrow || !rightArrow) return;
 
             const { scrollLeft, scrollWidth, clientWidth } = carouselElement;
 
-            // Show/hide left arrow
             if (scrollLeft > 0) {
                 leftArrow.classList.remove('hidden');
             } else {
                 leftArrow.classList.add('hidden');
             }
 
-            // Show/hide right arrow
-            // Give a small buffer (e.g., 1px) for floating point inaccuracies
             if (scrollLeft + clientWidth < scrollWidth - 1) {
                 rightArrow.classList.remove('hidden');
             } else {
@@ -1263,16 +1611,13 @@
 
             if (movieCarousel) {
                 movieCarousel.addEventListener('scroll', () => checkArrowVisibility(movieCarousel));
-                // Initial check for movies
                 checkArrowVisibility(movieCarousel);
             }
             if (episodeCarousel) {
                 episodeCarousel.addEventListener('scroll', () => checkArrowVisibility(episodeCarousel));
-                // Initial check for episodes
                 checkArrowVisibility(episodeCarousel);
             }
 
-            // Re-check on window resize
             window.addEventListener('resize', () => {
                 if (movieCarousel) checkArrowVisibility(movieCarousel);
                 if (episodeCarousel) checkArrowVisibility(episodeCarousel);

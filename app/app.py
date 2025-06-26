@@ -205,7 +205,6 @@ def get_channels_list():
     except Exception as e:
         return jsonify({"status": "error", "message": f"An unexpected error occurred during channel list fetch: {e}"}), 500
 
-
 @app.route('/status', methods=['GET'])
 def get_status():
     target_device_ip = request.args.get('device_ip')
@@ -213,27 +212,31 @@ def get_status():
     if not target_device_ip:
         return jsonify({"status": "error", "message": "No target device IP provided for status."}), 400
 
-    if not any(client['ip'] == target_device_ip for client in CHANNELS_CLIENTS):
-         return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured or discovered."}), 400
-
     try:
         client = Channels(target_device_ip, CHANNELS_APP_PORT)
         status = client.status()
         return jsonify(status)
     except Exception as e:
-        return jsonify({"status": "error", "message": f"Error fetching status from {target_device_ip}: {e}"}), 500
+        # Ensure the error message is always a string to prevent jsonify issues with complex exceptions
+        error_message = f"Error fetching status from {target_device_ip}: {str(e)}"
+        print(f"DEBUG: Exception in /status route: {error_message}") # Added for console visibility
+        return jsonify({"status": "error", "message": error_message}), 500
 
 @app.route('/dvr_movies', methods=['GET'])
 def get_dvr_movies():
     """
     Fetches a list of all movies from the Channels DVR Server API for a given IP.
+    Supports sorting based on API parameters.
     """
     dvr_server_ip = request.args.get('dvr_server_ip')
+    sort_by = request.args.get('sort_by', 'date_released') # Default sort by release date
+    sort_order = request.args.get('sort_order', 'desc') # Default order descending
+
     if not dvr_server_ip:
         return jsonify({"status": "error", "message": "No DVR Server IP provided."}), 400
 
     dvr_server_url = f"http://{dvr_server_ip}:{CHANNELS_DVR_SERVER_PORT}"
-    movies_api_url = f"{dvr_server_url}/api/v1/movies"
+    movies_api_url = f"{dvr_server_url}/api/v1/movies?sort={sort_by}&order={sort_order}" # Add sort and order
 
     try:
         response = requests.get(movies_api_url)
@@ -244,30 +247,35 @@ def get_dvr_movies():
         for movie in raw_movies:
             if 'title' in movie and 'id' in movie:
                 release_timestamp = 0
+                release_year = None
                 if movie.get('release_date'):
                     try:
                         dt_object = datetime.strptime(movie['release_date'], '%Y-%m-%d')
                         release_timestamp = int(dt_object.timestamp())
+                        release_year = dt_object.year
                     except ValueError:
                         pass
 
                 processed_movies.append({
                     "id": movie['id'],
                     "title": movie.get('title'),
-                    "episode_title": movie.get('episode_title'),
+                    "episode_title": movie.get('episode_title'), 
                     "summary": movie.get('summary'),
                     "duration": movie.get('duration'), # Duration in seconds
-                    "air_date": release_timestamp, # Using release_date as air_date for sorting
+                    "air_date": release_timestamp, # Using release_date as air_date for sorting client-side if needed
+                    "release_year": release_year, # New: for display/sorting
                     "channel_call_sign": movie.get('channel'),
                     "image_url": movie.get('image_url'),
-                    "series_id": None
+                    "series_id": None # Movies don't have series_id
                 })
         
-        processed_movies.sort(key=lambda x: x.get('air_date', 0), reverse=True)
+        # Client-side sorting is removed as API handles primary sorting
+        # processed_movies.sort(key=lambda x: x.get('air_date', 0), reverse=True)
+
 
         return jsonify({"status": "success", "movies": processed_movies})
     except requests.exceptions.RequestException as e:
-        return jsonify({"status": "error", "message": f"Error connecting to Channels DVR Server at {dvr_server_url}: {e}. Is the server running and reachable and is /api/v1/movies the correct endpoint?"}), 500
+        return jsonify({"status": "error", "message": f"Error connecting to Channels DVR Server at {dvr_server_url}: {e}. Is the server running and reachable and is /api/v1/movies the correct endpoint with provided sort/order?"}), 500
     except json.JSONDecodeError:
         return jsonify({"status": "error", "message": f"Failed to parse JSON response from DVR server at {movies_api_url}."}), 500
     except Exception as e:
@@ -277,13 +285,17 @@ def get_dvr_movies():
 def get_dvr_shows():
     """
     Fetches a list of all TV show episodes from the Channels DVR Server API for a given IP.
+    Supports sorting based on API parameters.
     """
     dvr_server_ip = request.args.get('dvr_server_ip')
+    sort_by = request.args.get('sort_by', 'date_aired') # Default sort by air date
+    sort_order = request.args.get('sort_order', 'desc') # Default order descending
+
     if not dvr_server_ip:
         return jsonify({"status": "error", "message": "No DVR Server IP provided."}), 400
 
     dvr_server_url = f"http://{dvr_server_ip}:{CHANNELS_DVR_SERVER_PORT}"
-    episodes_api_url = f"{dvr_server_url}/api/v1/episodes"
+    episodes_api_url = f"{dvr_server_url}/api/v1/episodes?sort={sort_by}&order={sort_order}" # Add sort and order
 
     try:
         response = requests.get(episodes_api_url)
@@ -309,12 +321,13 @@ def get_dvr_shows():
                     "episode_number": episode.get('episode_number'),
                     "summary": episode.get('summary'),
                     "duration": episode.get('duration'),
-                    "air_date": air_timestamp,
+                    "air_date": air_timestamp, # Using original_air_date timestamp for client-side sorting if needed
                     "channel_call_sign": episode.get('channel'),
                     "image_url": episode.get('image_url')
                 })
         
-        processed_episodes.sort(key=lambda x: (x.get('air_date', 0), x.get('show_title', '')), reverse=True)
+        # Client-side sorting is removed as API handles primary sorting
+        # processed_episodes.sort(key=lambda x: (x.get('air_date', 0), x.get('show_title', '')), reverse=True)
 
         return jsonify({"status": "success", "episodes": processed_episodes})
     except requests.exceptions.RequestException as e:
