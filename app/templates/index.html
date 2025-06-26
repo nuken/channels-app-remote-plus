@@ -948,23 +948,48 @@
                 localStorage.setItem('enablePopups', enablePopupsCheckbox.checked);
             });
 
-            if (flaskClients.length > 0) {
-                clientSelect.selectedIndex = 1;
+            // Load last selected client IP
+            const lastSelectedClientIp = localStorage.getItem('lastSelectedClientIp');
+            let foundLastClient = false;
+            if (lastSelectedClientIp) {
+                const clientOption = Array.from(clientSelect.options).find(option => option.value === lastSelectedClientIp);
+                if (clientOption) {
+                    clientSelect.value = lastSelectedClientIp;
+                    await selectClient();
+                    foundLastClient = true;
+                }
+            }
+
+            if (!foundLastClient && flaskClients.length > 0) {
+                clientSelect.selectedIndex = 1; // Select the first client if no saved preference or saved client not found
                 await selectClient();
-            } else {
+            } else if (flaskClients.length === 0) {
                 toggleControls(false);
                 statusDisplay.innerText = "No Channels App clients configured. Please set CHANNELS_APP_CLIENTS environment variable.";
                 nowPlayingDisplay.classList.add('hidden');
                 showNotification("No Channels App clients configured.", true);
             }
 
-            if (flaskDvrServers.length > 0) {
-                dvrServerSelect.selectedIndex = 1;
+            // Load last selected DVR server IP
+            const lastSelectedDvrServerIp = localStorage.getItem('lastSelectedDvrServerIp');
+            let foundLastDvrServer = false;
+            if (lastSelectedDvrServerIp) {
+                const dvrServerOption = Array.from(dvrServerSelect.options).find(option => option.value === lastSelectedDvrServerIp);
+                if (dvrServerOption) {
+                    dvrServerSelect.value = lastSelectedDvrServerIp;
+                    selectDvrServer();
+                    foundLastDvrServer = true;
+                }
+            }
+
+            if (!foundLastDvrServer && flaskDvrServers.length > 0) {
+                dvrServerSelect.selectedIndex = 1; // Select the first DVR server if no saved preference or saved server not found
                 selectDvrServer();
-            } else {
+            } else if (flaskDvrServers.length === 0) {
                 dvrServerSelect.disabled = true;
                 showNotification("No DVR servers configured.", true);
             }
+
 
             setupCarouselNavigation();
 
@@ -981,11 +1006,13 @@
         async function selectClient() {
             selectedClientIp = clientSelect.value;
             if (selectedClientIp) {
+                localStorage.setItem('lastSelectedClientIp', selectedClientIp); // Save selected client
                 showNotification(`Controlling: ${clientSelect.options[clientSelect.selectedIndex].text}`, false);
                 toggleControls(true);
                 getStatus();
                 loadChannels();
             } else {
+                localStorage.removeItem('lastSelectedClientIp'); // Clear if no client is selected
                 showNotification("Please select a client device.", true);
                 toggleControls(false);
                 statusDisplay.innerText = "Select a client and click \"Refresh Status\" to fetch.";
@@ -997,12 +1024,14 @@
         function selectDvrServer() {
             selectedDvrServerIp = dvrServerSelect.value;
             if (selectedDvrServerIp) {
+                localStorage.setItem('lastSelectedDvrServerIp', selectedDvrServerIp); // Save selected DVR server
                 dvrServerIpDisplay.textContent = `Selected: ${dvrServerSelect.options[dvrServerSelect.selectedIndex].text}`;
                 dvrServerIpDisplay.style.display = 'inline';
                 showNotification(``, false);
                 loadMovies(); // Automatically load movies/shows when a DVR server is selected
                 loadShows();
             } else {
+                localStorage.removeItem('lastSelectedDvrServerIp'); // Clear if no DVR server is selected
                 dvrServerIpDisplay.textContent = 'Not Selected';
                 dvrServerIpDisplay.style.display = 'none';
                 moviesListDiv.innerHTML = '<p>Please select a DVR server.</p>';
