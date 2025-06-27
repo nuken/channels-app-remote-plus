@@ -57,7 +57,7 @@ if CHANNELS_DVR_SERVERS:
                 platform = client_data['platform']
                 device_name = client_data['device']
                 
-                # Exclusion logic for phones/tablets
+               # Exclusion logic for phones/tablets
                 is_phone_or_tablet = False
                 # Filter out Android phones/tablets
                 if platform.startswith("Android ") and not platform.startswith("AndroidTV "):
@@ -65,6 +65,10 @@ if CHANNELS_DVR_SERVERS:
                 
                 # Filter out Apple iPhones/iPads
                 if platform.startswith("iOS") or platform.startswith("iPadOS"):
+                    is_phone_or_tablet = True
+
+                # Filter out Amazon Fire Tablets
+                if platform.startswith("Fire Tablets"):
                     is_phone_or_tablet = True
                 
                 # Only add client if it's NOT a phone or tablet
