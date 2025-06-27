@@ -50,10 +50,10 @@ You must provide your Channels DVR Server(s) as a comma-separated list of Name:I
 
 **Example Command:**
 ```
-docker run -d --restart unless-stopped \ \
-  -p 5020:5000 \ \
-  -e "CHANNELS_DVR_SERVERS=Home DVR:192.168.86.64,Office DVR:192.168.1.100" \ \
-  --name channels-remote \ \
+docker run -d --restart unless-stopped \
+  -p 5020:5000 \
+  -e "CHANNELS_DVR_SERVERS=Home DVR:192.168.86.64,Office DVR:192.168.1.100" \
+  --name channels-remote \
   rcvaughn2/channels-remote-plus
 ```
 - -d: Runs the container in detached mode (in the background).
