@@ -58,17 +58,28 @@ function toggleControls(enable) {
 
 function applyTheme() {
     const selectedTheme = themeSelect.value;
-    document.body.className = '';
+    console.log("applyTheme function called. Selected theme:", selectedTheme); // Debugging line
+
+    // Clear all existing theme classes from the <html> element
+    document.documentElement.className = ''; // MODIFIED: Only clear classes from html tag
+
     if (selectedTheme !== 'default-light') {
-        document.body.classList.add(`theme-${selectedTheme}`);
+        document.documentElement.classList.add(`theme-${selectedTheme}`); // MODIFIED: Only apply to html tag
+        console.log(`applyTheme: Applied theme-${selectedTheme} to <html>.`); // Debugging line
+    } else {
+        console.log("applyTheme: Reverting to default-light theme (no class added to <html>)."); // Debugging line
     }
-    localStorage.setItem('selectedTheme', selectedTheme);
+    localStorage.setItem('selectedTheme', selectedTheme); // Save the selected theme
+    console.log("applyTheme: Saved selectedTheme to localStorage:", selectedTheme); // Debugging line
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Set the themeSelect dropdown value based on localStorage
     const savedTheme = localStorage.getItem('selectedTheme') || 'default-light';
-    themeSelect.value = savedTheme;
-    applyTheme();
+    console.log("DOMContentLoaded: Initial savedTheme from localStorage:", savedTheme); // Debugging line
+    themeSelect.value = savedTheme; // Set the dropdown to the saved theme
+    console.log("DOMContentLoaded: Set themeSelect dropdown value to:", themeSelect.value); // Debugging line
+    // The theme class itself is applied by the inline script in index.html's head
 
     const savedPopupState = localStorage.getItem('enablePopups');
     if (savedPopupState !== null) {
@@ -170,7 +181,7 @@ function selectDvrServer() {
         moviesListDiv.innerHTML = '<p>Please select a DVR server.</p>';
         episodesListDiv.innerHTML = '<p>Please select a DVR server.</p>';
         showNotification("Please select a DVR server.", true);
-        allMoviesData = []; // Clear data when no server is selected
+        allMoviesData = [];
         allEpisodesData = [];
     }
 }

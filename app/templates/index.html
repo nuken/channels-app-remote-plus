@@ -6,6 +6,23 @@
     <title>Channels Remote Plus</title>
 	<link rel="manifest" href="/static/manifest.json">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        (function() {
+            // Get the saved theme from localStorage, default to 'default-light'
+            const savedTheme = localStorage.getItem('selectedTheme') || 'default-light';
+            console.log("Inline script: Initial savedTheme from localStorage:", savedTheme); // Debugging line
+
+            // If a theme other than default-light is saved, apply its class to the html element
+            if (savedTheme && savedTheme !== 'default-light') {
+                document.documentElement.classList.add(`theme-${savedTheme}`); // MODIFIED: Only target document.documentElement
+                console.log(`Inline script: Applied theme-${savedTheme} to <html>.`); // Debugging line
+            }
+
+            // Define a placeholder applyTheme function to avoid errors if the select's onchange
+            // fires before the main script.js is fully loaded and parsed.
+            window.applyTheme = window.applyTheme || function() {};
+        })();
+    </script>
 </head>
 <body>
     <div class="container">

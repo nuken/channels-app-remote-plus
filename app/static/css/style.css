@@ -35,7 +35,7 @@
 }
 
 /* Dark Theme 1: Default Dark with Gray Buttons */
-body.theme-dark-gray {
+html.theme-dark-gray { /* MODIFIED: Target html instead of body */
     --body-bg-color: #2c2c2c;
     --text-color: #e0e0e0;
     --container-bg-color: #3a3a3a;
@@ -70,7 +70,7 @@ body.theme-dark-gray {
 }
 
 /* Dark Theme 2: Dark with Green Buttons */
-body.theme-dark-green {
+html.theme-dark-green { /* MODIFIED: Target html instead of body */
     --body-bg-color: #1e1e1e;
     --text-color: #e0e0e0;
     --container-bg-color: #2b2b2b;
@@ -105,7 +105,7 @@ body.theme-dark-green {
 }
 
 /* Light Theme 2: Light with Purple Buttons */
-body.theme-light-purple {
+html.theme-light-purple { /* MODIFIED: Target html instead of body */
     --body-bg-color: #f0f2f5;
     --text-color: #333;
     --container-bg-color: #ffffff;
@@ -144,8 +144,8 @@ body.theme-light-purple {
 body {
     font-family: sans-serif;
     margin: 20px;
-    background-color: var(--body-bg-color);
-    color: var(--text-color);
+    background-color: var(--body-bg-color); /* Uses CSS variable */
+    color: var(--text-color); /* Uses CSS variable */
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 .container {
@@ -639,18 +639,18 @@ pre {
 
 
 /* Adjust arrow color for dark themes */
-body.theme-dark-gray #theme-select,
-body.theme-dark-gray #client-select, /* Added client select */
-body.theme-dark-gray #dvr-server-select, /* Added dvr server select */
-body.theme-dark-gray .input-group select,
-body.theme-dark-gray .channel-list-section select,
-body.theme-dark-gray .filter-sort-controls select,
-body.theme-dark-green #theme-select,
-body.theme-dark-green #client-select, /* Added client select */
-body.theme-dark-green #dvr-server-select, /* Added dvr server select */
-body.theme-dark-green .input-group select,
-body.theme-dark-green .channel-list-section select,
-body.theme-dark-green .filter-sort-controls select {
+html.theme-dark-gray #theme-select, /* MODIFIED: Target html instead of body */
+html.theme-dark-gray #client-select, /* MODIFIED: Target html instead of body */
+html.theme-dark-gray #dvr-server-select, /* MODIFIED: Target html instead of body */
+html.theme-dark-gray .input-group select, /* MODIFIED: Target html instead of body */
+html.theme-dark-gray .channel-list-section select, /* MODIFIED: Target html instead of body */
+html.theme-dark-gray .filter-sort-controls select, /* MODIFIED: Target html instead of body */
+html.theme-dark-green #theme-select, /* MODIFIED: Target html instead of body */
+html.theme-dark-green #client-select, /* MODIFIED: Target html instead of body */
+html.theme-dark-green #dvr-server-select, /* MODIFIED: Target html instead of body */
+html.theme-dark-green .input-group select, /* MODIFIED: Target html instead of body */
+html.theme-dark-green .channel-list-section select, /* MODIFIED: Target html instead of body */
+html.theme-dark-green .filter-sort-controls select { /* MODIFIED: Target html instead of body */
     background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* White arrow for dark themes */
 }
 
