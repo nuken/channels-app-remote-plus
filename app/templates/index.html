@@ -54,7 +54,8 @@
                 <select id="dvr-server-select" onchange="selectDvrServer()">
                     <option value="">Select a DVR Server</option>
                     {% for server in dvr_servers %}
-                        <option value="{{ server.ip }}">{{ server.name }} ({{ server.ip }})</option>
+                        {# MODIFIED: Value is now IP:Port, display is also IP:Port #}
+                        <option value="{{ server.ip }}:{{ server.port }}">{{ server.ip }}:{{ server.port }}</option>
                     {% endfor %}
                 </select>
                 {% if not dvr_servers_configured %}

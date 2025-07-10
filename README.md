@@ -40,18 +40,20 @@ docker pull rcvaughn2/channels-remote-plus
 
 ### 2. Run the Container
 
-Set the `CHANNELS_DVR_SERVERS` environment variable with a comma-separated list of `Name:IP` pairs. No spaces around commas or colons.
+Set the `CHANNELS_DVR_SERVERS` environment variable with a comma-separated list of `IP:Port` pairs. No spaces around commas or colons.
 
 **Example:**
 ```bash
 docker run -d --restart unless-stopped \
   -p 5020:5000 \
-  -e "CHANNELS_DVR_SERVERS=Home DVR:192.168.86.64,Office DVR:192.168.1.100" \
+  -e "CHANNELS_DVR_SERVERS=192.168.86.64:8089,192.168.1.100:8090" \
   --name channels-remote \
   rcvaughn2/channels-remote-plus
 ```
 
-> Replace `5020` with any preferred host port, and update IPs per your local setup.
+> Replace `5020` with any preferred host port, and update IPs/Ports per your local setup.
+
+Using Hostnames: You can use local hostnames (e.g., media-server8:8089) instead of IP addresses if your Docker environment is configured to resolve them. For containers running in default bridge mode, you might need to use the --add-host flag (e.g., --add-host media-server8:192.168.1.50) or configure Docker to use a local DNS server that can resolve these names.
 
 ---
 

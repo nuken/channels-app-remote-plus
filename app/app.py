@@ -9,10 +9,10 @@ app = Flask(__name__)
 
 # Configuration for Channels App client and Channels DVR Server ports
 CHANNELS_APP_PORT = 57000 # Standard Channels App API port
-CHANNELS_DVR_SERVER_PORT = 8089 # Standard Channels DVR Server API port
+CHANNELS_DVR_SERVER_PORT = 8089 # Standard Channels DVR Server API port - This will be used as a fallback or if not explicitly provided per server
 
-# --- Channels DVR Server IPs Configuration (Remains largely the same) ---
-# Format: "Name1:IP1,Name2:IP2,..."
+# --- Channels DVR Server IPs Configuration ---
+# Format: "IP1:Port1,IP2:Port2,..."
 CHANNELS_DVR_SERVERS_STR = os.environ.get('CHANNELS_DVR_SERVERS')
 CHANNELS_DVR_SERVERS = []
 DVR_SERVERS_CONFIGURED = False
@@ -20,8 +20,8 @@ DVR_SERVERS_CONFIGURED = False
 if CHANNELS_DVR_SERVERS_STR:
     try:
         for server_pair in CHANNELS_DVR_SERVERS_STR.split(','):
-            name, ip = server_pair.strip().split(':')
-            CHANNELS_DVR_SERVERS.append({"name": name.strip(), "ip": ip.strip()})
+            ip, port = server_pair.strip().split(':')
+            CHANNELS_DVR_SERVERS.append({"ip": ip.strip(), "port": int(port.strip())})
         if CHANNELS_DVR_SERVERS:
             DVR_SERVERS_CONFIGURED = True
     except Exception as e:
@@ -33,18 +33,19 @@ if CHANNELS_DVR_SERVERS_STR:
 # This is crucial for client discovery if no DVR server is set via env var
 if not DVR_SERVERS_CONFIGURED:
     print("WARNING: CHANNELS_DVR_SERVERS environment variable not set or incorrectly formatted.")
-    print("Please set CHANNELS_DVR_SERVERS to 'Name1:IP1,Name2:IP2,...'.")
-    # No automatic fallback to client IP for DVR server, as clients are now *discovered* from DVR.
+    print("Please set CHANNELS_DVR_SERVERS to 'IP1:Port1,IP2:Port2,...'.")
 
 # --- New: Dynamic Channels App Clients Discovery from DVR Server with Exclusion Logic ---
 CHANNELS_CLIENTS = []
 CLIENTS_CONFIGURED = False # Flag to indicate if any clients are configured/discovered
 
 if CHANNELS_DVR_SERVERS:
-    # Use the IP of the first configured DVR server to discover clients
+    # Use the IP and Port of the first configured DVR server to discover clients
+    # Default to CHANNELS_DVR_SERVER_PORT if no port specified in the first DVR server entry
     dvr_server_ip_for_discovery = CHANNELS_DVR_SERVERS[0]['ip']
-    # Corrected line below:
-    clients_info_url = f"http://{dvr_server_ip_for_discovery}:{CHANNELS_DVR_SERVER_PORT}/dvr/clients/info"
+    dvr_server_port_for_discovery = CHANNELS_DVR_SERVERS[0].get('port', CHANNELS_DVR_SERVER_PORT)
+    
+    clients_info_url = f"http://{dvr_server_ip_for_discovery}:{dvr_server_port_for_discovery}/dvr/clients/info"
     
     print(f"INFO: Attempting to discover Channels App clients from DVR server at {clients_info_url}")
     try:
@@ -55,7 +56,6 @@ if CHANNELS_DVR_SERVERS:
         for client_data in raw_clients_data:
             if 'hostname' in client_data and 'local_ip' in client_data and 'platform' in client_data:
                 platform = client_data['platform']
-                device_name = client_data['device']
                 
                # Exclusion logic for phones/tablets
                 is_phone_or_tablet = False
@@ -233,13 +233,14 @@ def get_dvr_movies():
     Supports sorting based on API parameters.
     """
     dvr_server_ip = request.args.get('dvr_server_ip')
+    dvr_server_port = request.args.get('dvr_server_port', CHANNELS_DVR_SERVER_PORT) # Use provided port or fallback
     sort_by = request.args.get('sort_by', 'date_released') # Default sort by release date
     sort_order = request.args.get('sort_order', 'desc') # Default order descending
 
     if not dvr_server_ip:
         return jsonify({"status": "error", "message": "No DVR Server IP provided."}), 400
 
-    dvr_server_url = f"http://{dvr_server_ip}:{CHANNELS_DVR_SERVER_PORT}"
+    dvr_server_url = f"http://{dvr_server_ip}:{dvr_server_port}" # Use the dynamic port
     movies_api_url = f"{dvr_server_url}/api/v1/movies?sort={sort_by}&order={sort_order}" # Add sort and order
 
     try:
@@ -292,13 +293,14 @@ def get_dvr_shows():
     Supports sorting based on API parameters.
     """
     dvr_server_ip = request.args.get('dvr_server_ip')
+    dvr_server_port = request.args.get('dvr_server_port', CHANNELS_DVR_SERVER_PORT) # Use provided port or fallback
     sort_by = request.args.get('sort_by', 'date_aired') # Default sort by air date
     sort_order = request.args.get('sort_order', 'desc') # Default order descending
 
     if not dvr_server_ip:
         return jsonify({"status": "error", "message": "No DVR Server IP provided."}), 400
 
-    dvr_server_url = f"http://{dvr_server_ip}:{CHANNELS_DVR_SERVER_PORT}"
+    dvr_server_url = f"http://{dvr_server_ip}:{dvr_server_port}" # Use the dynamic port
     episodes_api_url = f"{dvr_server_url}/api/v1/episodes?sort={sort_by}&order={sort_order}" # Add sort and order
 
     try:
@@ -317,6 +319,15 @@ def get_dvr_shows():
                     except ValueError:
                         pass
                 
+                # Extract 'created_at' and convert from milliseconds to seconds
+                created_at_timestamp = 0
+                if episode.get('created_at'):
+                    try:
+                        # Assuming created_at is in milliseconds, convert to seconds
+                        created_at_timestamp = int(episode['created_at'] / 1000)
+                    except (ValueError, TypeError):
+                        pass
+
                 processed_episodes.append({
                     "id": episode['id'],
                     "show_title": episode.get('title'),
@@ -327,7 +338,8 @@ def get_dvr_shows():
                     "duration": episode.get('duration'),
                     "air_date": air_timestamp, # Using original_air_date timestamp for client-side sorting if needed
                     "channel_call_sign": episode.get('channel'),
-                    "image_url": episode.get('image_url')
+                    "image_url": episode.get('image_url'),
+                    "date_added": created_at_timestamp # Include date_added for client-side sorting
                 })
         
         # Client-side sorting is removed as API handles primary sorting

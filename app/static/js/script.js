@@ -22,6 +22,7 @@ const showsSortOrderSelect = document.getElementById('shows-sort-order');
 
 let selectedClientIp = '';
 let selectedDvrServerIp = '';
+let selectedDvrServerPort = ''; // NEW: To store the selected DVR server port
 let autoScrollInterval;
 let allMoviesData = []; // Store original fetched movies data for client-side filtering/sorting
 let allEpisodesData = []; // Store original fetched episodes data
@@ -114,21 +115,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         showNotification("No Channels App clients configured.", true);
     }
 
-    // Load last selected DVR server IP
-    const lastSelectedDvrServerIp = localStorage.getItem('lastSelectedDvrServerIp');
+    // Load last selected DVR server IP:Port
+    const lastSelectedDvrServerIpPort = localStorage.getItem('lastSelectedDvrServerIpPort'); // MODIFIED: changed key
     let foundLastDvrServer = false;
-    if (lastSelectedDvrServerIp) {
-        const dvrServerOption = Array.from(dvrServerSelect.options).find(option => option.value === lastSelectedDvrServerIp);
+    if (lastSelectedDvrServerIpPort) {
+        const dvrServerOption = Array.from(dvrServerSelect.options).find(option => option.value === lastSelectedDvrServerIpPort);
         if (dvrServerOption) {
-            dvrServerSelect.value = lastSelectedDvrServerIp;
+            dvrServerSelect.value = lastSelectedDvrServerIpPort;
             selectDvrServer();
             foundLastDvrServer = true;
         }
     }
 
     if (!foundLastDvrServer && flaskDvrServers.length > 0) {
-        dvrServerSelect.selectedIndex = 1; // Select the first DVR server if no saved preference or saved server not found
-        selectDvrServer();
+        // MODIFIED: Construct the value from ip and port
+        const firstDvrServerValue = `${flaskDvrServers[0].ip}:${flaskDvrServers[0].port}`;
+        const dvrServerOption = Array.from(dvrServerSelect.options).find(option => option.value === firstDvrServerValue);
+        if (dvrServerOption) {
+            dvrServerSelect.value = firstDvrServerValue;
+            selectDvrServer();
+        }
     } else if (flaskDvrServers.length === 0) {
         dvrServerSelect.disabled = true;
         showNotification("No DVR servers configured.", true);
@@ -166,16 +172,19 @@ async function selectClient() {
 }
 
 function selectDvrServer() {
-    selectedDvrServerIp = dvrServerSelect.value;
-    if (selectedDvrServerIp) {
-        localStorage.setItem('lastSelectedDvrServerIp', selectedDvrServerIp); // Save selected DVR server
-        dvrServerIpDisplay.textContent = `Selected: ${dvrServerSelect.options[dvrServerSelect.selectedIndex].text}`;
+    const selectedValue = dvrServerSelect.value; // This will now be "IP:Port"
+    if (selectedValue) {
+        const [ip, port] = selectedValue.split(':');
+        selectedDvrServerIp = ip; 
+        selectedDvrServerPort = port; // Set the new port variable
+        localStorage.setItem('lastSelectedDvrServerIpPort', selectedValue); // Save the combined value
+        dvrServerIpDisplay.textContent = `Selected: ${selectedValue}`; // Display the combined value
         dvrServerIpDisplay.style.display = 'inline';
         showNotification(``, false);
         loadMovies(); // Automatically load movies/shows when a DVR server is selected
         loadShows();
     } else {
-        localStorage.removeItem('lastSelectedDvrServerIp'); // Clear if no DVR server is selected
+        localStorage.removeItem('lastSelectedDvrServerIpPort'); // Clear if no DVR server is selected
         dvrServerIpDisplay.textContent = 'Not Selected';
         dvrServerIpDisplay.style.display = 'none';
         moviesListDiv.innerHTML = '<p>Please select a DVR server.</p>';
@@ -401,7 +410,7 @@ function debounce(func, delay) {
 }
 
 async function loadMovies() {
-    if (!selectedDvrServerIp) {
+    if (!selectedDvrServerIp || !selectedDvrServerPort) { // MODIFIED: Check for port too
         moviesListDiv.innerHTML = '<p>Please select a DVR server to load movies.</p>';
         showNotification("Please select a DVR server to load movies.", true);
         allMoviesData = [];
@@ -415,7 +424,8 @@ async function loadMovies() {
     const sortOrder = moviesSortOrderSelect.value;
 
     try {
-        const response = await fetch(`/dvr_movies?dvr_server_ip=${selectedDvrServerIp}&sort_by=${sortBy}&sort_order=${sortOrder}`);
+        // MODIFIED: Pass dvr_server_port to the backend
+        const response = await fetch(`/dvr_movies?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}&sort_by=${sortBy}&sort_order=${sortOrder}`);
         const result = await response.json();
 
         moviesListDiv.classList.remove('loading');
@@ -495,7 +505,7 @@ function renderMovies(moviesToRender) {
         card.className = 'movie-card';
 
         const imageUrl = movie.image_url || ''; // Set to empty string if no image URL
-        const hasImage = !!imageUrl; // Check if imageUrl is not empty or null/undefined
+        const hasImage = !!imageUrl; 
         
         // Construct the image HTML block with the no-image-text div always present, but controlled by style
         const imageHtml = `
@@ -537,7 +547,7 @@ function renderMovies(moviesToRender) {
 
 
 async function loadShows() {
-    if (!selectedDvrServerIp) {
+    if (!selectedDvrServerIp || !selectedDvrServerPort) { // MODIFIED: Check for port too
         episodesListDiv.innerHTML = '<p>Please select a DVR server to load TV shows.</p>';
         showNotification("Please select a DVR server to load TV shows.", true);
         allEpisodesData = [];
@@ -558,7 +568,8 @@ async function loadShows() {
     }
 
     try {
-        const response = await fetch(`/dvr_shows?dvr_server_ip=${selectedDvrServerIp}&sort_by=${apiSortBy}&sort_order=${sortOrder}`);
+        // MODIFIED: Pass dvr_server_port to the backend
+        const response = await fetch(`/dvr_shows?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}&sort_by=${apiSortBy}&sort_order=${sortOrder}`);
         const result = await response.json();
 
         episodesListDiv.classList.remove('loading');
@@ -614,9 +625,7 @@ function filterAndRenderShows() {
             valA = a.air_date || 0;
             valB = b.air_date || 0;
         } else if (sortBy === 'date_added') {
-            // This sort option is for Channels DVR API 'date_added'
-            // Ensure your fetched data includes 'date_added' if you want this client-side sort to be effective.
-            // For now, it's just a placeholder and might not sort correctly if data is missing.
+            // Using 'create_at' timestamp for 'date_added' data
             valA = a.date_added || 0;
             valB = b.date_added || 0;
         } else if (sortBy === 'duration') {
