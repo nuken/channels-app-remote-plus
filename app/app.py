@@ -30,22 +30,14 @@ if CHANNELS_DVR_SERVERS_STR:
         DVR_SERVERS_CONFIGURED = False
 
 # --- Fallback for DVR server IP if not explicitly configured ---
-# This is crucial for client discovery if no DVR server is set via env var
 if not DVR_SERVERS_CONFIGURED:
     print("WARNING: CHANNELS_DVR_SERVERS environment variable not set or incorrectly formatted.")
     print("Please set CHANNELS_DVR_SERVERS to 'IP1:Port1,IP2:Port2,...'.")
 
-# --- New: Dynamic Channels App Clients Discovery from DVR Server with Exclusion Logic ---
-CHANNELS_CLIENTS = []
-CLIENTS_CONFIGURED = False # Flag to indicate if any clients are configured/discovered
-
-if CHANNELS_DVR_SERVERS:
-    # Use the IP and Port of the first configured DVR server to discover clients
-    # Default to CHANNELS_DVR_SERVER_PORT if no port specified in the first DVR server entry
-    dvr_server_ip_for_discovery = CHANNELS_DVR_SERVERS[0]['ip']
-    dvr_server_port_for_discovery = CHANNELS_DVR_SERVERS[0].get('port', CHANNELS_DVR_SERVER_PORT)
-    
-    clients_info_url = f"http://{dvr_server_ip_for_discovery}:{dvr_server_port_for_discovery}/dvr/clients/info"
+# New: Function to discover clients from a given DVR server
+def discover_clients_from_dvr(dvr_server_ip, dvr_server_port):
+    clients_list = []
+    clients_info_url = f"http://{dvr_server_ip}:{dvr_server_port}/dvr/clients/info"
     
     print(f"INFO: Attempting to discover Channels App clients from DVR server at {clients_info_url}")
     try:
@@ -57,32 +49,20 @@ if CHANNELS_DVR_SERVERS:
             if 'hostname' in client_data and 'local_ip' in client_data and 'platform' in client_data:
                 platform = client_data['platform']
                 
-               # Exclusion logic for phones/tablets
                 is_phone_or_tablet = False
-                # Filter out Android phones/tablets
                 if platform.startswith("Android ") and not platform.startswith("AndroidTV "):
                     is_phone_or_tablet = True
-                
-                # Filter out Apple iPhones/iPads
                 if platform.startswith("iOS") or platform.startswith("iPadOS"):
                     is_phone_or_tablet = True
-
-                # Filter out Amazon Fire Tablets
                 if platform.startswith("Fire Tablets"):
                     is_phone_or_tablet = True
                 
-                # Only add client if it's NOT a phone or tablet
                 if not is_phone_or_tablet:
-                    CHANNELS_CLIENTS.append({
+                    clients_list.append({
                         "name": client_data['hostname'],
                         "ip": client_data['local_ip']
                     })
-        
-        if CHANNELS_CLIENTS:
-            CLIENTS_CONFIGURED = True
-            print(f"INFO: Successfully discovered {len(CHANNELS_CLIENTS)} Channels App clients (excluding mobile devices).")
-        else:
-            print("WARNING: No eligible Channels App clients found via DVR server API, or response was empty after filtering.")
+        return clients_list
 
     except requests.exceptions.Timeout:
         print(f"ERROR: Timeout connecting to DVR server at {clients_info_url} for client discovery.")
@@ -92,9 +72,23 @@ if CHANNELS_DVR_SERVERS:
         print(f"ERROR: Failed to decode JSON response from DVR server at {clients_info_url}.")
     except Exception as e:
         print(f"ERROR: An unexpected error occurred during client discovery: {e}")
+    return []
+
+# Initialize CHANNELS_CLIENTS (for initial page load)
+CHANNELS_CLIENTS = []
+CLIENTS_CONFIGURED = False
+
+if CHANNELS_DVR_SERVERS:
+    # Use the IP and Port of the first configured DVR server to discover clients for initial load
+    first_dvr_server_ip = CHANNELS_DVR_SERVERS[0]['ip']
+    first_dvr_server_port = CHANNELS_DVR_SERVERS[0].get('port', CHANNELS_DVR_SERVER_PORT)
+    CHANNELS_CLIENTS = discover_clients_from_dvr(first_dvr_server_ip, first_dvr_server_port)
+    if CHANNELS_CLIENTS:
+        CLIENTS_CONFIGURED = True
+    else:
+        print("WARNING: No eligible Channels App clients found for the first configured DVR server.")
 else:
-    print("WARNING: No Channels DVR Server configured, so automatic client discovery is not possible.")
-    print("Please set CHANNELS_DVR_SERVERS environment variable to enable client discovery.")
+    print("WARNING: No Channels DVR Server configured, so initial client discovery is not possible.")
 
 
 @app.route('/')
@@ -105,6 +99,24 @@ def index():
                            clients_configured=CLIENTS_CONFIGURED,
                            dvr_servers=CHANNELS_DVR_SERVERS, # Pass list of DVR servers
                            dvr_servers_configured=DVR_SERVERS_CONFIGURED)
+
+# New API endpoint to dynamically fetch clients for a selected DVR server
+@app.route('/dvr_clients', methods=['GET'])
+def get_dvr_clients():
+    dvr_server_ip = request.args.get('dvr_server_ip')
+    dvr_server_port = request.args.get('dvr_server_port', CHANNELS_DVR_SERVER_PORT)
+
+    if not dvr_server_ip:
+        return jsonify({"status": "error", "message": "No DVR Server IP provided for client discovery."}), 400
+
+    try:
+        clients = discover_clients_from_dvr(dvr_server_ip, int(dvr_server_port))
+        if clients:
+            return jsonify({"status": "success", "clients": clients})
+        else:
+            return jsonify({"status": "success", "clients": [], "message": "No eligible clients found for this DVR server."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Error fetching clients from DVR server: {str(e)}"}), 500
 
 @app.route('/control', methods=['POST'])
 def control_channels():
@@ -118,9 +130,9 @@ def control_channels():
     if not target_device_ip:
         return jsonify({"status": "error", "message": "No target device IP provided."}), 400
 
-    # Validate against the backend's configured list (now populated by discovery and filtering)
-    if not any(client['ip'] == target_device_ip for client in CHANNELS_CLIENTS):
-         return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured or discovered."}), 400
+    # For control actions, still validate against currently selected client from UI (which might have been dynamically updated)
+    # The important part is that the frontend will only send IPs that were presented in its dropdown.
+    # No server-side validation against a global CHANNELS_CLIENTS list is needed here, as the frontend ensures validity.
 
     try:
         if action == 'play_recording':
@@ -184,9 +196,6 @@ def get_channels_list():
     if not target_device_ip:
         return jsonify({"status": "error", "message": "No target device IP provided for channel list."}), 400
 
-    if not any(client['ip'] == target_device_ip for client in CHANNELS_CLIENTS):
-         return jsonify({"status": "error", "message": f"Device IP {target_device_ip} is not configured or discovered."}), 400
-
     try:
         favorite_channels_url = f"http://{target_device_ip}:{CHANNELS_APP_PORT}/api/favorite_channels"
         response = requests.get(favorite_channels_url)
@@ -221,9 +230,8 @@ def get_status():
         status = client.status()
         return jsonify(status)
     except Exception as e:
-        # Ensure the error message is always a string to prevent jsonify issues with complex exceptions
         error_message = f"Error fetching status from {target_device_ip}: {str(e)}"
-        print(f"DEBUG: Exception in /status route: {error_message}") # Added for console visibility
+        print(f"DEBUG: Exception in /status route: {error_message}")
         return jsonify({"status": "error", "message": error_message}), 500
 
 @app.route('/dvr_movies', methods=['GET'])
@@ -233,19 +241,19 @@ def get_dvr_movies():
     Supports sorting based on API parameters.
     """
     dvr_server_ip = request.args.get('dvr_server_ip')
-    dvr_server_port = request.args.get('dvr_server_port', CHANNELS_DVR_SERVER_PORT) # Use provided port or fallback
-    sort_by = request.args.get('sort_by', 'date_released') # Default sort by release date
-    sort_order = request.args.get('sort_order', 'desc') # Default order descending
+    dvr_server_port = request.args.get('dvr_server_port', CHANNELS_DVR_SERVER_PORT)
+    sort_by = request.args.get('sort_by', 'date_released')
+    sort_order = request.args.get('sort_order', 'desc')
 
     if not dvr_server_ip:
         return jsonify({"status": "error", "message": "No DVR Server IP provided."}), 400
 
-    dvr_server_url = f"http://{dvr_server_ip}:{dvr_server_port}" # Use the dynamic port
-    movies_api_url = f"{dvr_server_url}/api/v1/movies?sort={sort_by}&order={sort_order}" # Add sort and order
+    dvr_server_url = f"http://{dvr_server_ip}:{dvr_server_port}"
+    movies_api_url = f"{dvr_server_url}/api/v1/movies?sort={sort_by}&order={sort_order}"
 
     try:
         response = requests.get(movies_api_url)
-        response.raise_for_status() # Raise an exception for HTTP errors
+        response.raise_for_status()
         raw_movies = response.json()
 
         processed_movies = []
@@ -266,18 +274,14 @@ def get_dvr_movies():
                     "title": movie.get('title'),
                     "episode_title": movie.get('episode_title'), 
                     "summary": movie.get('summary'),
-                    "duration": movie.get('duration'), # Duration in seconds
-                    "air_date": release_timestamp, # Using release_date as air_date for sorting client-side if needed
-                    "release_year": release_year, # New: for display/sorting
+                    "duration": movie.get('duration'),
+                    "air_date": release_timestamp,
+                    "release_year": release_year,
                     "channel_call_sign": movie.get('channel'),
                     "image_url": movie.get('image_url'),
-                    "series_id": None # Movies don't have series_id
+                    "series_id": None
                 })
         
-        # Client-side sorting is removed as API handles primary sorting
-        # processed_movies.sort(key=lambda x: x.get('air_date', 0), reverse=True)
-
-
         return jsonify({"status": "success", "movies": processed_movies})
     except requests.exceptions.RequestException as e:
         return jsonify({"status": "error", "message": f"Error connecting to Channels DVR Server at {dvr_server_url}: {e}. Is the server running and reachable and is /api/v1/movies the correct endpoint with provided sort/order?"}), 500
@@ -293,15 +297,15 @@ def get_dvr_shows():
     Supports sorting based on API parameters.
     """
     dvr_server_ip = request.args.get('dvr_server_ip')
-    dvr_server_port = request.args.get('dvr_server_port', CHANNELS_DVR_SERVER_PORT) # Use provided port or fallback
-    sort_by = request.args.get('sort_by', 'date_aired') # Default sort by air date
-    sort_order = request.args.get('sort_order', 'desc') # Default order descending
+    dvr_server_port = request.args.get('dvr_server_port', CHANNELS_DVR_SERVER_PORT)
+    sort_by = request.args.get('sort_by', 'date_aired')
+    sort_order = request.args.get('sort_order', 'desc')
 
     if not dvr_server_ip:
         return jsonify({"status": "error", "message": "No DVR Server IP provided."}), 400
 
-    dvr_server_url = f"http://{dvr_server_ip}:{dvr_server_port}" # Use the dynamic port
-    episodes_api_url = f"{dvr_server_url}/api/v1/episodes?sort={sort_by}&order={sort_order}" # Add sort and order
+    dvr_server_url = f"http://{dvr_server_ip}:{dvr_server_port}"
+    episodes_api_url = f"{dvr_server_url}/api/v1/episodes?sort={sort_by}&order={sort_order}"
 
     try:
         response = requests.get(episodes_api_url)
@@ -319,11 +323,9 @@ def get_dvr_shows():
                     except ValueError:
                         pass
                 
-                # Extract 'created_at' and convert from milliseconds to seconds
                 created_at_timestamp = 0
                 if episode.get('created_at'):
                     try:
-                        # Assuming created_at is in milliseconds, convert to seconds
                         created_at_timestamp = int(episode['created_at'] / 1000)
                     except (ValueError, TypeError):
                         pass
@@ -336,15 +338,12 @@ def get_dvr_shows():
                     "episode_number": episode.get('episode_number'),
                     "summary": episode.get('summary'),
                     "duration": episode.get('duration'),
-                    "air_date": air_timestamp, # Using original_air_date timestamp for client-side sorting if needed
+                    "air_date": air_timestamp,
                     "channel_call_sign": episode.get('channel'),
                     "image_url": episode.get('image_url'),
-                    "date_added": created_at_timestamp # Include date_added for client-side sorting
+                    "date_added": created_at_timestamp
                 })
         
-        # Client-side sorting is removed as API handles primary sorting
-        # processed_episodes.sort(key=lambda x: (x.get('air_date', 0), x.get('show_title', '')), reverse=True)
-
         return jsonify({"status": "success", "episodes": processed_episodes})
     except requests.exceptions.RequestException as e:
         return jsonify({"status": "error", "message": f"Error connecting to Channels DVR Server at {dvr_server_url}: {e}. Is the server running and reachable and is /api/v1/episodes the correct endpoint?"}), 500

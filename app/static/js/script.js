@@ -22,10 +22,10 @@ const showsSortOrderSelect = document.getElementById('shows-sort-order');
 
 let selectedClientIp = '';
 let selectedDvrServerIp = '';
-let selectedDvrServerPort = ''; // NEW: To store the selected DVR server port
+let selectedDvrServerPort = '';
 let autoScrollInterval;
-let allMoviesData = []; // Store original fetched movies data for client-side filtering/sorting
-let allEpisodesData = []; // Store original fetched episodes data
+let allMoviesData = [];
+let allEpisodesData = [];
 
 function showNotification(message, isError = false) {
     if (!enablePopupsCheckbox.checked) {
@@ -59,28 +59,25 @@ function toggleControls(enable) {
 
 function applyTheme() {
     const selectedTheme = themeSelect.value;
-    console.log("applyTheme function called. Selected theme:", selectedTheme); // Debugging line
+    console.log("applyTheme function called. Selected theme:", selectedTheme);
 
-    // Clear all existing theme classes from the <html> element
-    document.documentElement.className = ''; // MODIFIED: Only clear classes from html tag
+    document.documentElement.className = '';
 
     if (selectedTheme !== 'default-light') {
-        document.documentElement.classList.add(`theme-${selectedTheme}`); // MODIFIED: Only apply to html tag
-        console.log(`applyTheme: Applied theme-${selectedTheme} to <html>.`); // Debugging line
+        document.documentElement.classList.add(`theme-${selectedTheme}`);
+        console.log(`applyTheme: Applied theme-${selectedTheme} to <html>.`);
     } else {
-        console.log("applyTheme: Reverting to default-light theme (no class added to <html>)."); // Debugging line
+        console.log("applyTheme: Reverting to default-light theme (no class added to <html>).");
     }
-    localStorage.setItem('selectedTheme', selectedTheme); // Save the selected theme
-    console.log("applyTheme: Saved selectedTheme to localStorage:", selectedTheme); // Debugging line
+    localStorage.setItem('selectedTheme', selectedTheme);
+    console.log("applyTheme: Saved selectedTheme to localStorage:", selectedTheme);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Set the themeSelect dropdown value based on localStorage
     const savedTheme = localStorage.getItem('selectedTheme') || 'default-light';
-    console.log("DOMContentLoaded: Initial savedTheme from localStorage:", savedTheme); // Debugging line
-    themeSelect.value = savedTheme; // Set the dropdown to the saved theme
-    console.log("DOMContentLoaded: Set themeSelect dropdown value to:", themeSelect.value); // Debugging line
-    // The theme class itself is applied by the inline script in index.html's head
+    console.log("DOMContentLoaded: Initial savedTheme from localStorage:", savedTheme);
+    themeSelect.value = savedTheme;
+    console.log("DOMContentLoaded: Set themeSelect dropdown value to:", themeSelect.value);
 
     const savedPopupState = localStorage.getItem('enablePopups');
     if (savedPopupState !== null) {
@@ -93,10 +90,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('enablePopups', enablePopupsCheckbox.checked);
     });
 
-    // Load last selected client IP
+    // Load last selected DVR server IP:Port first, as it's needed for client discovery
+    const lastSelectedDvrServerIpPort = localStorage.getItem('lastSelectedDvrServerIpPort');
+    let foundLastDvrServer = false;
+    if (lastSelectedDvrServerIpPort) {
+        const dvrServerOption = Array.from(dvrServerSelect.options).find(option => option.value === lastSelectedDvrServerIpPort);
+        if (dvrServerOption) {
+            dvrServerSelect.value = lastSelectedDvrServerIpPort;
+            await selectDvrServer(); // Await this as it loads clients
+            foundLastDvrServer = true;
+        }
+    }
+
+    if (!foundLastDvrServer && flaskDvrServers.length > 0) {
+        const firstDvrServerValue = `${flaskDvrServers[0].ip}:${flaskDvrServers[0].port}`;
+        const dvrServerOption = Array.from(dvrServerSelect.options).find(option => option.value === firstDvrServerValue);
+        if (dvrServerOption) {
+            dvrServerSelect.value = firstDvrServerValue;
+            await selectDvrServer(); // Await this
+        }
+    } else if (flaskDvrServers.length === 0) {
+        dvrServerSelect.disabled = true;
+        showNotification("No DVR servers configured.", true);
+    }
+
+    // Load last selected client IP after DVR server (and thus client list) is loaded
     const lastSelectedClientIp = localStorage.getItem('lastSelectedClientIp');
     let foundLastClient = false;
     if (lastSelectedClientIp) {
+        // Find in the dynamically populated clientSelect options
         const clientOption = Array.from(clientSelect.options).find(option => option.value === lastSelectedClientIp);
         if (clientOption) {
             clientSelect.value = lastSelectedClientIp;
@@ -104,46 +126,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             foundLastClient = true;
         }
     }
-
-    if (!foundLastClient && flaskClients.length > 0) {
-        clientSelect.selectedIndex = 1; // Select the first client if no saved preference or saved client not found
+    // If no last client found or clients_configured is false (meaning initial discovery failed)
+    // and there are still clients in the dropdown (from dynamic load via first DVR server)
+    if (!foundLastClient && clientSelect.options.length > 1) { // >1 because of "Select a Client" option
+        clientSelect.selectedIndex = 1; // Select the first actual client
         await selectClient();
-    } else if (flaskClients.length === 0) {
+    } else if (clientSelect.options.length <= 1) { // No clients beyond the placeholder
         toggleControls(false);
-        statusDisplay.innerText = "No Channels App clients configured. Please set CHANNELS_APP_CLIENTS environment variable.";
+        statusDisplay.innerText = "No Channels App clients configured/discovered. Please ensure a DVR server is selected and reachable.";
         nowPlayingDisplay.classList.add('hidden');
-        showNotification("No Channels App clients configured.", true);
-    }
-
-    // Load last selected DVR server IP:Port
-    const lastSelectedDvrServerIpPort = localStorage.getItem('lastSelectedDvrServerIpPort'); // MODIFIED: changed key
-    let foundLastDvrServer = false;
-    if (lastSelectedDvrServerIpPort) {
-        const dvrServerOption = Array.from(dvrServerSelect.options).find(option => option.value === lastSelectedDvrServerIpPort);
-        if (dvrServerOption) {
-            dvrServerSelect.value = lastSelectedDvrServerIpPort;
-            selectDvrServer();
-            foundLastDvrServer = true;
-        }
-    }
-
-    if (!foundLastDvrServer && flaskDvrServers.length > 0) {
-        // MODIFIED: Construct the value from ip and port
-        const firstDvrServerValue = `${flaskDvrServers[0].ip}:${flaskDvrServers[0].port}`;
-        const dvrServerOption = Array.from(dvrServerSelect.options).find(option => option.value === firstDvrServerValue);
-        if (dvrServerOption) {
-            dvrServerSelect.value = firstDvrServerValue;
-            selectDvrServer();
-        }
-    } else if (flaskDvrServers.length === 0) {
-        dvrServerSelect.disabled = true;
-        showNotification("No DVR servers configured.", true);
+        showNotification("No Channels App clients configured/discovered.", true);
     }
 
 
     setupCarouselNavigation();
 
-    // Add event listeners for search and sort
     moviesSearchInput.addEventListener('input', debounce(filterAndRenderMovies, 300));
     moviesSortBySelect.addEventListener('change', filterAndRenderMovies);
     moviesSortOrderSelect.addEventListener('change', filterAndRenderMovies);
@@ -156,13 +153,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function selectClient() {
     selectedClientIp = clientSelect.value;
     if (selectedClientIp) {
-        localStorage.setItem('lastSelectedClientIp', selectedClientIp); // Save selected client
+        localStorage.setItem('lastSelectedClientIp', selectedClientIp);
         showNotification(`Controlling: ${clientSelect.options[clientSelect.selectedIndex].text}`, false);
         toggleControls(true);
         getStatus();
         loadChannels();
     } else {
-        localStorage.removeItem('lastSelectedClientIp'); // Clear if no client is selected
+        localStorage.removeItem('lastSelectedClientIp');
         showNotification("Please select a client device.", true);
         toggleControls(false);
         statusDisplay.innerText = "Select a client and click \"Refresh Status\" to fetch.";
@@ -171,20 +168,25 @@ async function selectClient() {
     }
 }
 
-function selectDvrServer() {
-    const selectedValue = dvrServerSelect.value; // This will now be "IP:Port"
+// MODIFIED: This function now dynamically loads clients for the selected DVR server
+async function selectDvrServer() {
+    const selectedValue = dvrServerSelect.value;
     if (selectedValue) {
         const [ip, port] = selectedValue.split(':');
         selectedDvrServerIp = ip; 
-        selectedDvrServerPort = port; // Set the new port variable
-        localStorage.setItem('lastSelectedDvrServerIpPort', selectedValue); // Save the combined value
-        dvrServerIpDisplay.textContent = `Selected: ${selectedValue}`; // Display the combined value
+        selectedDvrServerPort = port;
+        localStorage.setItem('lastSelectedDvrServerIpPort', selectedValue);
+        dvrServerIpDisplay.textContent = `Selected: ${selectedValue}`;
         dvrServerIpDisplay.style.display = 'inline';
-        showNotification(``, false);
-        loadMovies(); // Automatically load movies/shows when a DVR server is selected
+        showNotification(`DVR Server selected: ${selectedValue}`, false);
+        
+        // --- NEW: Fetch and populate clients for the selected DVR server ---
+        await fetchClientsForDvrServer(selectedDvrServerIp, selectedDvrServerPort);
+
+        loadMovies();
         loadShows();
     } else {
-        localStorage.removeItem('lastSelectedDvrServerIpPort'); // Clear if no DVR server is selected
+        localStorage.removeItem('lastSelectedDvrServerIpPort');
         dvrServerIpDisplay.textContent = 'Not Selected';
         dvrServerIpDisplay.style.display = 'none';
         moviesListDiv.innerHTML = '<p>Please select a DVR server.</p>';
@@ -192,8 +194,62 @@ function selectDvrServer() {
         showNotification("Please select a DVR server.", true);
         allMoviesData = [];
         allEpisodesData = [];
+
+        // Clear and disable client select if no DVR server is selected
+        clientSelect.innerHTML = '<option value="">Select a Client</option>';
+        clientSelect.disabled = true;
+        selectedClientIp = ''; // Reset selected client
+        localStorage.removeItem('lastSelectedClientIp');
+        toggleControls(false); // Disable controls as no client is selected
+        statusDisplay.innerText = "No DVR server selected.";
+        nowPlayingDisplay.classList.add('hidden');
     }
 }
+
+// NEW FUNCTION: To fetch clients for a specific DVR server
+async function fetchClientsForDvrServer(dvrIp, dvrPort) {
+    clientSelect.innerHTML = '<option value="">Loading Clients...</option>';
+    clientSelect.disabled = true;
+    selectedClientIp = ''; // Clear previously selected client
+    localStorage.removeItem('lastSelectedClientIp');
+    toggleControls(false); // Disable controls while clients are loading
+
+    try {
+        const response = await fetch(`/dvr_clients?dvr_server_ip=${dvrIp}&dvr_server_port=${dvrPort}`);
+        const result = await response.json();
+
+        clientSelect.innerHTML = '<option value="">Select a Client</option>'; // Reset dropdown
+
+        if (result.status === 'error') {
+            showNotification(`Failed to load clients: ${result.message}`, true);
+            clientSelect.innerHTML = `<option value="">Error: ${result.message}</option>`;
+            clientSelect.disabled = true;
+        } else if (result.clients && result.clients.length > 0) {
+            result.clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.ip;
+                option.textContent = `${client.name} (${client.ip})`;
+                clientSelect.appendChild(option);
+            });
+            clientSelect.disabled = false;
+            showNotification(`Loaded ${result.clients.length} clients for ${dvrIp}:${dvrPort}.`, false);
+
+            // Auto-select the first client if available after loading
+            clientSelect.selectedIndex = 1;
+            await selectClient();
+        } else {
+            showNotification(`No eligible clients found for ${dvrIp}:${dvrPort}.`, false);
+            clientSelect.innerHTML = '<option value="">No Clients Found</option>';
+            clientSelect.disabled = true;
+        }
+    } catch (error) {
+        showNotification(`Error fetching clients for DVR server ${dvrIp}:${dvrPort}: ${error.message}`, true);
+        clientSelect.innerHTML = '<option value="">Failed to load clients.</option>';
+        clientSelect.disabled = true;
+        console.error("Error fetching clients:", error);
+    }
+}
+
 
 async function sendCommand(action, value = null, recordingId = null) {
     if (!selectedClientIp) {
@@ -398,7 +454,6 @@ function tuneToSelectedChannel() {
     }
 }
 
-// Global variable to hold debounce timeout
 let debounceTimeout;
 
 function debounce(func, delay) {
@@ -410,7 +465,7 @@ function debounce(func, delay) {
 }
 
 async function loadMovies() {
-    if (!selectedDvrServerIp || !selectedDvrServerPort) { // MODIFIED: Check for port too
+    if (!selectedDvrServerIp || !selectedDvrServerPort) {
         moviesListDiv.innerHTML = '<p>Please select a DVR server to load movies.</p>';
         showNotification("Please select a DVR server to load movies.", true);
         allMoviesData = [];
@@ -424,7 +479,6 @@ async function loadMovies() {
     const sortOrder = moviesSortOrderSelect.value;
 
     try {
-        // MODIFIED: Pass dvr_server_port to the backend
         const response = await fetch(`/dvr_movies?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}&sort_by=${sortBy}&sort_order=${sortOrder}`);
         const result = await response.json();
 
@@ -435,8 +489,8 @@ async function loadMovies() {
             showNotification(`Failed to load movies: ${result.message}`, true);
             allMoviesData = [];
         } else if (result.movies) {
-            allMoviesData = result.movies; // Store the original fetched data
-            filterAndRenderMovies(); // Filter and render based on current search/sort inputs
+            allMoviesData = result.movies;
+            filterAndRenderMovies();
             showNotification(`Loaded ${result.movies.length} movies.`, false);
         } else {
             moviesListDiv.innerHTML = '<p>No movies found on the DVR server.</p>';
@@ -467,19 +521,18 @@ function filterAndRenderMovies() {
         );
     }
 
-    // Client-side sorting, just in case API sort isn't perfect or for re-sorting filtered results
     filteredMovies.sort((a, b) => {
         let valA, valB;
         if (sortBy === 'alpha') {
             valA = a.title ? a.title.toLowerCase() : '';
             valB = b.title ? b.title.toLowerCase() : '';
         } else if (sortBy === 'date_released') {
-            valA = a.air_date || 0; // Use air_date (which is release_timestamp)
+            valA = a.air_date || 0;
             valB = b.air_date || 0;
         } else if (sortBy === 'duration') {
             valA = a.duration || 0;
             valB = b.duration || 0;
-        } else { // Default to alpha if unrecognized
+        } else {
             valA = a.title ? a.title.toLowerCase() : '';
             valB = b.title ? b.title.toLowerCase() : '';
         }
@@ -493,7 +546,7 @@ function filterAndRenderMovies() {
 }
 
 function renderMovies(moviesToRender) {
-    moviesListDiv.innerHTML = ''; // Clear existing content
+    moviesListDiv.innerHTML = '';
     if (moviesToRender.length === 0) {
         moviesListDiv.innerHTML = '<p>No movies found matching your criteria.</p>';
         checkArrowVisibility(moviesListDiv);
@@ -504,16 +557,15 @@ function renderMovies(moviesToRender) {
         const card = document.createElement('div');
         card.className = 'movie-card';
 
-        const imageUrl = movie.image_url || ''; // Set to empty string if no image URL
+        const imageUrl = movie.image_url || '';
         const hasImage = !!imageUrl; 
         
-        // Construct the image HTML block with the no-image-text div always present, but controlled by style
         const imageHtml = `
             <img src="${imageUrl}" alt="${movie.title || 'Movie'}" class="main-image"
                  style="${hasImage ? '' : 'display: none;'}" 
                  onerror="this.onerror=null; this.src='https://placehold.co/120x90/333/eee?text=No+Image';
                           this.classList.add('error-img');
-                          this.style.display='none'; /* Hide the broken image */
+                          this.style.display='none';
                           this.closest('.movie-card-image-container').querySelector('.no-image-text').style.display='block';" />
             <div class="no-image-text"
                  style="${hasImage ? 'display: none;' : 'display: block;'}">No Image Available</div>
@@ -547,7 +599,7 @@ function renderMovies(moviesToRender) {
 
 
 async function loadShows() {
-    if (!selectedDvrServerIp || !selectedDvrServerPort) { // MODIFIED: Check for port too
+    if (!selectedDvrServerIp || !selectedDvrServerPort) {
         episodesListDiv.innerHTML = '<p>Please select a DVR server to load TV shows.</p>';
         showNotification("Please select a DVR server to load TV shows.", true);
         allEpisodesData = [];
@@ -560,15 +612,12 @@ async function loadShows() {
     const sortBy = showsSortBySelect.value;
     const sortOrder = showsSortOrderSelect.value;
 
-    // Note: The API 'title' sort for episodes is for the show title.
-    // If sorting by episode_title is desired, it must be client-side.
     let apiSortBy = sortBy;
     if (sortBy === 'episode_title') {
-        apiSortBy = 'date_aired'; // Fallback to date_aired for API, then client-side sort
+        apiSortBy = 'date_aired';
     }
 
     try {
-        // MODIFIED: Pass dvr_server_port to the backend
         const response = await fetch(`/dvr_shows?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}&sort_by=${apiSortBy}&sort_order=${sortOrder}`);
         const result = await response.json();
 
@@ -579,8 +628,8 @@ async function loadShows() {
             showNotification(`Failed to load TV show episodes: ${result.message}`, true);
             allEpisodesData = [];
         } else if (result.episodes) {
-            allEpisodesData = result.episodes; // Store original fetched data
-            filterAndRenderShows(); // Filter and render based on current search/sort inputs
+            allEpisodesData = result.episodes;
+            filterAndRenderShows();
             showNotification(`Loaded ${result.episodes.length} TV show episodes.`, false);
         } else {
             episodesListDiv.innerHTML = '<p>No TV show episodes found on the DVR server.</p>';
@@ -612,10 +661,9 @@ function filterAndRenderShows() {
         );
     }
 
-    // Client-side sorting for episodes
     filteredEpisodes.sort((a, b) => {
         let valA, valB;
-        if (sortBy === 'title') { // Sort by show_title
+        if (sortBy === 'title') {
             valA = a.show_title ? a.show_title.toLowerCase() : '';
             valB = b.show_title ? b.show_title.toLowerCase() : '';
         } else if (sortBy === 'episode_title') {
@@ -625,14 +673,13 @@ function filterAndRenderShows() {
             valA = a.air_date || 0;
             valB = b.air_date || 0;
         } else if (sortBy === 'date_added') {
-            // Using 'create_at' timestamp for 'date_added' data
             valA = a.date_added || 0;
             valB = b.date_added || 0;
         } else if (sortBy === 'duration') {
             valA = a.duration || 0;
             valB = b.duration || 0;
         }
-         else { // Default to air_date if unrecognized
+         else {
             valA = a.air_date || 0;
             valB = b.air_date || 0;
         }
@@ -646,7 +693,7 @@ function filterAndRenderShows() {
 }
 
 function renderShows(episodesToRender) {
-    episodesListDiv.innerHTML = ''; // Clear existing content
+    episodesListDiv.innerHTML = '';
     if (episodesToRender.length === 0) {
         episodesListDiv.innerHTML = '<p>No TV show episodes found matching your criteria.</p>';
         checkArrowVisibility(episodesListDiv);
@@ -660,13 +707,12 @@ function renderShows(episodesToRender) {
         const imageUrl = episode.image_url || '';
         const hasImage = !!imageUrl;
 
-        // Construct the image HTML block with the no-image-text div always present, but controlled by style
         const imageHtml = `
             <img src="${imageUrl}" alt="${episode.show_title || 'Show'}" class="main-image"
                  style="${hasImage ? '' : 'display: none;'}" 
                  onerror="this.onerror=null; this.src='https://placehold.co/120x90/333/eee?text=No+Image';
                           this.classList.add('error-img');
-                          this.style.display='none'; /* Hide the broken image */
+                          this.style.display='none';
                           this.closest('.episode-card-image-container').querySelector('.no-image-text').style.display='block';" />
             <div class="no-image-text"
                  style="${hasImage ? 'display: none;' : 'display: block;'}">No Image Available</div>
@@ -732,7 +778,7 @@ function toggleSection(wrapperId, button) {
     if (currentDisplay === 'none') {
         wrapperDiv.style.display = 'block';
         button.textContent = 'Hide Content';
-        const carouselDiv = wrapperDiv.querySelector('#movies-list, #episodes-list'); // Select the actual list div
+        const carouselDiv = wrapperDiv.querySelector('#movies-list, #episodes-list');
         if (carouselDiv) checkArrowVisibility(carouselDiv);
     } else {
         wrapperDiv.style.display = 'none';
