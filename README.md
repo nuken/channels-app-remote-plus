@@ -26,6 +26,7 @@
 - **Toggleable Notifications:** Choose whether to show in-app action notifications.
 - **Responsive UI:** Fully optimized for phones, tablets, and desktops.
 - **Custom Themes:** Switch between light/dark themes to match your style.
+- **Send Notifications:** Send notifications to active clients.
 
 ---
 

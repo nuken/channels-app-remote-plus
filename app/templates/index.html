@@ -62,6 +62,23 @@
                     <p style="color: red;">No DVR servers configured. Set CHANNELS_DVR_SERVERS environment variable.</p>
                 {% endif %}
                <div id="dvr-server-ip-display" style="display: none;"></div></p>
+
+            <div class="col-md-auto d-flex align-items-center" style="margin-top: 15px;">
+                <button class="btn btn-primary" id="sendMessageButton">Send Message</button>
+            </div>
+
+            <div id="messageForm" style="display: none; margin-top: 20px;">
+                <h2>Send Notification</h2>
+                <div class="mb-3">
+                    <label for="notificationTitle" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="notificationTitle" placeholder="e.g. Alert">
+                </div>
+                <div class="mb-3">
+                    <label for="notificationBody" class="form-label">Message Body</label>
+                    <textarea class="form-control" id="notificationBody" rows="3" placeholder="e.g. Dinners Ready"></textarea>
+                </div>
+                <button class="btn btn-success" id="sendNotificationBtn">Send</button>
+            </div>
         </div>
 
         <div style="margin-bottom: 20px;">

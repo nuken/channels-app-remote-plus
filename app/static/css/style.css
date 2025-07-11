@@ -213,7 +213,10 @@ button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
 .input-group select,
 .channel-list-section select,
 .filter-sort-controls input[type="search"],
-.filter-sort-controls select {
+.filter-sort-controls select,
+/* New: Styling for notification input fields */
+#notificationTitle,
+#notificationBody {
     padding: 10px 15px; /* Slightly more horizontal padding */
     font-size: 1em;
     border: 1px solid var(--input-border-color);
@@ -223,6 +226,8 @@ button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
     transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* Subtle inner shadow for depth */
     flex-grow: 1; /* Allow inputs to grow in flex containers */
+    width: 100%; /* Ensure inputs take full width of their container */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 /* Focus state */
@@ -233,7 +238,9 @@ button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
 .input-group select:focus,
 .channel-list-section select:focus,
 .filter-sort-controls input[type="search"]:focus,
-.filter-sort-controls select:focus {
+.filter-sort-controls select:focus,
+#notificationTitle:focus,
+#notificationBody:focus {
     outline: none; /* Remove default outline */
     border-color: var(--button-hover-bg-color); /* Highlight border on focus */
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Subtle blue glow on focus */

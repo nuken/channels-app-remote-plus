@@ -352,6 +352,39 @@ def get_dvr_shows():
     except Exception as e:
         return jsonify({"status": "error", "message": f"An unexpected error occurred while fetching DVR shows: {e}"}), 500
 
+# New: Route to send notifications
+@app.route('/send_notification', methods=['POST'])
+def send_notification():
+    data = request.get_json()
+    client_id = data.get('client_id')
+    title = data.get('title', '')
+    message = data.get('message', '')
+
+    if not client_id:
+        return jsonify({'status': 'error', 'message': 'Client ID is required.'}), 400
+
+    # Channels DVR client API endpoint for notifications. Corrected to use CHANNELS_APP_PORT (57000) and /api/notify endpoint.
+    notification_url = f"http://{client_id}:{CHANNELS_APP_PORT}/api/notify"
+
+    payload = {
+        "title": title,
+        "message": message
+    }
+
+    try:
+        response = requests.post(notification_url, json=payload, timeout=5)
+        response.raise_for_status() # Raise an exception for HTTP errors
+
+        return jsonify({'status': 'success', 'message': 'Notification sent.'})
+    except requests.exceptions.ConnectionError:
+        return jsonify({'status': 'error', 'message': f'Could not connect to client {client_id}. Make sure Channels DVR is running and accessible.'}), 500
+    except requests.exceptions.Timeout:
+        return jsonify({'status': 'error', 'message': 'Request to Channels DVR client timed out.'}), 500
+    except requests.exceptions.RequestException as e:
+        return jsonify({'status': 'error', 'message': f'Error sending notification: {e}'}), 500
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'An unexpected error occurred: {e}'}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)

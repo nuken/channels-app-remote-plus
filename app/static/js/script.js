@@ -148,6 +148,62 @@ document.addEventListener('DOMContentLoaded', async () => {
     showsSearchInput.addEventListener('input', debounce(filterAndRenderShows, 300));
     showsSortBySelect.addEventListener('change', filterAndRenderShows);
     showsSortOrderSelect.addEventListener('change', filterAndRenderShows);
+
+    // New: Event listeners for Send Message button and Send Notification button
+    document.getElementById('sendMessageButton').addEventListener('click', function() {
+        var messageForm = document.getElementById('messageForm');
+        var sendMessageButton = document.getElementById('sendMessageButton'); // Get button reference
+        if (messageForm.style.display === 'none') {
+            messageForm.style.display = 'block';
+            sendMessageButton.textContent = 'Hide Message'; // Change text to "Hide Message"
+        } else {
+            messageForm.style.display = 'none';
+            sendMessageButton.textContent = 'Send Message'; // Change text back to "Send Message"
+        }
+    });
+
+    document.getElementById('sendNotificationBtn').addEventListener('click', function() {
+        var clientId = document.getElementById('client-select').value;
+        var title = document.getElementById('notificationTitle').value;
+        var message = document.getElementById('notificationBody').value;
+
+        if (!clientId) {
+            alert('Please select a client first.');
+            return;
+        }
+        if (!title && !message) {
+            alert('Please enter a title or message body.');
+            return;
+        }
+
+        fetch('/send_notification', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                client_id: clientId,
+                title: title,
+                message: message
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Notification sent successfully!');
+                document.getElementById('notificationTitle').value = '';
+                document.getElementById('notificationBody').value = '';
+                document.getElementById('messageForm').style.display = 'none';
+                document.getElementById('sendMessageButton').textContent = 'Send Message'; // Reset button text on successful send
+            } else {
+                alert('Error sending notification: ' + data.message);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Failed to send notification.');
+        });
+    });
 });
 
 async function selectClient() {
