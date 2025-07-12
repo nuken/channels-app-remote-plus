@@ -125,6 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load last selected client IP after DVR server (and thus client list) is loaded
     const lastSelectedClientIp = localStorage.getItem('lastSelectedClientIp');
+    console.log("[DEBUG] DOMContentLoaded: Initial selectedClientIp from localStorage:", lastSelectedClientIp); // ADDED LOG
     let foundLastClient = false;
     if (lastSelectedClientIp) {
         // Find in the dynamically populated clientSelect options
@@ -140,11 +141,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!foundLastClient && clientSelect.options.length > 1) { // >1 because of "Select a Client" option
         clientSelect.selectedIndex = 1; // Select the first actual client
         await selectClient();
+        console.log("[DEBUG] DOMContentLoaded: Selected first client as fallback."); // ADDED LOG
     } else if (clientSelect.options.length <= 1) { // No clients beyond the placeholder
         toggleControls(false);
         statusDisplay.innerText = "No Channels App clients configured/discovered. Please ensure a DVR server is selected and reachable.";
         nowPlayingDisplay.classList.add('hidden');
         showNotification("No Channels App clients configured/discovered.", true);
+        console.log("[DEBUG] DOMContentLoaded: No clients found, controls disabled."); // ADDED LOG
     }
 
 
@@ -286,6 +289,7 @@ async function selectClient() {
     selectedClientIp = clientSelect.value;
     if (selectedClientIp) {
         localStorage.setItem('lastSelectedClientIp', selectedClientIp);
+        console.log("[DEBUG] selectClient: Saved selectedClientIp to localStorage:", selectedClientIp); // ADDED LOG
         showNotification(`Controlling: ${clientSelect.options[clientSelect.selectedIndex].text}`, false);
         toggleControls(true);
         getStatus();
@@ -293,6 +297,7 @@ async function selectClient() {
         fetchChannelCollections(); // Re-fetch collections to update favorites based on new client
     } else {
         localStorage.removeItem('lastSelectedClientIp');
+        console.log("[DEBUG] selectClient: Cleared lastSelectedClientIp from localStorage (no client selected)."); // ADDED LOG
         showNotification("Please select a client device.", true);
         toggleControls(false);
         statusDisplay.innerText = "Select a client and click \"Refresh Status\" to fetch.";
@@ -311,6 +316,7 @@ async function selectDvrServer() {
         selectedDvrServerIp = ip; 
         selectedDvrServerPort = port;
         localStorage.setItem('lastSelectedDvrServerIpPort', selectedValue);
+        console.log("[DEBUG] selectDvrServer: Saved lastSelectedDvrServerIpPort to localStorage:", selectedValue); // ADDED LOG
         dvrServerIpDisplay.textContent = `Selected: ${selectedValue}`;
         dvrServerIpDisplay.style.display = 'inline';
         showNotification(`DVR Server selected: ${selectedValue}`, false);
@@ -324,6 +330,7 @@ async function selectDvrServer() {
         loadShows();
     } else {
         localStorage.removeItem('lastSelectedDvrServerIpPort');
+        console.log("[DEBUG] selectDvrServer: Cleared lastSelectedDvrServerIpPort from localStorage (no DVR server selected)."); // ADDED LOG
         dvrServerIpDisplay.textContent = 'Not Selected';
         dvrServerIpDisplay.style.display = 'none';
         moviesListDiv.innerHTML = '<p>Please select a DVR server to load movies.</p>';
@@ -353,9 +360,9 @@ async function selectDvrServer() {
 async function fetchClientsForDvrServer(dvrIp, dvrPort) {
     clientSelect.innerHTML = '<option value="">Loading Clients...</option>';
     clientSelect.disabled = true;
-    selectedClientIp = ''; // Clear previously selected client
-    localStorage.removeItem('lastSelectedClientIp');
+    selectedClientIp = ''; // Clear previously selected client. This does NOT clear localStorage.
     toggleControls(false); // Disable controls while clients are loading
+    console.log("[DEBUG] fetchClientsForDvrServer: Starting client discovery for", dvrIp, dvrPort); // ADDED LOG
 
     try {
         const response = await fetch(`/dvr_clients?dvr_server_ip=${dvrIp}&dvr_server_port=${dvrPort}`);
@@ -367,6 +374,7 @@ async function fetchClientsForDvrServer(dvrIp, dvrPort) {
             showNotification(`Failed to load clients: ${result.message}`, true);
             clientSelect.innerHTML = `<option value="">Error: ${result.message}</option>`;
             clientSelect.disabled = true;
+            console.log("[DEBUG] fetchClientsForDvrServer: Client discovery error:", result.message); // ADDED LOG
         } else if (result.clients && result.clients.length > 0) {
             result.clients.forEach(client => {
                 const option = document.createElement('option');
@@ -376,28 +384,45 @@ async function fetchClientsForDvrServer(dvrIp, dvrPort) {
             });
             clientSelect.disabled = false;
             showNotification(`Loaded ${result.clients.length} clients for ${dvrIp}:${dvrPort}.`, false);
+            console.log("[DEBUG] fetchClientsForDvrServer: Clients loaded. Current clientSelect.options:", Array.from(clientSelect.options).map(o => o.value)); // ADDED LOG
 
-            // Auto-select the first client if available after loading
-            // Only auto-select if no client was previously selected or found.
-            const lastSelectedClient = localStorage.getItem('lastSelectedClientIp');
-            if (!lastSelectedClient || !Array.from(clientSelect.options).find(option => option.value === lastSelectedClient)) {
-                clientSelect.selectedIndex = 1;
-                await selectClient();
-            } else {
+            const lastSelectedClient = localStorage.getItem('lastSelectedClientIp'); // Read the value AFTER clients are populated
+            const foundClientInNewList = result.clients.find(client => client.ip === lastSelectedClient);
+            console.log("[DEBUG] fetchClientsForDvrServer: Attempting re-selection. lastSelectedClient:", lastSelectedClient, "foundInNewList:", !!foundClientInNewList); // ADDED LOG
+
+            if (foundClientInNewList) {
                 clientSelect.value = lastSelectedClient; // Re-select if it was found
                 await selectClient();
+                console.log("[DEBUG] fetchClientsForDvrServer: Re-selecting last client:", lastSelectedClient); // ADDED LOG
+            } else if (result.clients.length > 0) { // If last client not found, but there are other clients
+                clientSelect.selectedIndex = 1; // Select the first available client
+                await selectClient();
+                console.log("[DEBUG] fetchClientsForDvrServer: Last client not found or no previous selection, selecting first client:", clientSelect.value); // ADDED LOG
+            } else { // No clients found in the new list (after filtering for phone/tablet)
+                 selectedClientIp = ''; // Ensure selectedClientIp is reset
+                 localStorage.removeItem('lastSelectedClientIp'); // Clear invalid selection HERE
+                 toggleControls(false); // Disable controls
+                 statusDisplay.innerText = "No eligible client selected/found.";
+                 nowPlayingDisplay.classList.add('hidden');
+                 console.log("[DEBUG] fetchClientsForDvrServer: No eligible clients found, clearing selection."); // ADDED LOG
             }
             
         } else {
             showNotification(`No eligible clients found for ${dvrIp}:${dvrPort}.`, false);
             clientSelect.innerHTML = '<option value="">No Clients Found</option>';
             clientSelect.disabled = true;
+            selectedClientIp = ''; // Ensure selectedClientIp is reset
+            localStorage.removeItem('lastSelectedClientIp'); // Clear invalid selection HERE (if result.clients is empty)
+            console.log("[DEBUG] fetchClientsForDvrServer: No clients found by discovery. Clearing selection."); // ADDED LOG
         }
     } catch (error) {
         showNotification(`Error fetching clients for DVR server ${dvrIp}:${dvrPort}: ${error.message}`, true);
         clientSelect.innerHTML = '<option value="">Failed to load clients.</option>';
         clientSelect.disabled = true;
+        selectedClientIp = ''; // Ensure selectedClientIp is reset
+        localStorage.removeItem('lastSelectedClientIp'); // Clear invalid selection HERE (on error)
         console.error("Error fetching clients:", error);
+        console.log("[DEBUG] fetchClientsForDvrServer: Error during client fetch. Clearing selection:", error); // ADDED LOG
     }
 }
 
