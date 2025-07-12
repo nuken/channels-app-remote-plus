@@ -1,6 +1,6 @@
 const clientSelect = document.getElementById('client-select');
 const dvrServerSelect = document.getElementById('dvr-server-select');
-const channelSelect = document.getElementById('channel-select');
+// const channelSelect = document.getElementById('channel-select'); // Removed from HTML, commenting out reference
 const enablePopupsCheckbox = document.getElementById('enablePopups');
 const notificationArea = document.getElementById('notification-area');
 const statusDisplay = document.getElementById('status-display');
@@ -18,11 +18,14 @@ const moviesSortOrderSelect = document.getElementById('movies-sort-order');
 
 const showsSearchInput = document.getElementById('shows-search');
 const showsSortBySelect = document.getElementById('shows-sort-by');
-const showsSortOrderSelect = document = document.getElementById('shows-sort-order');
+const showsSortOrderSelect = document.getElementById('shows-sort-order'); // Corrected typo here
 
 // New elements for Channel Collections
-const collectionSelect = document.getElementById('collection-select'); // This remains, but its direct use in displaying content changes
-const channelCollectionsList = document.getElementById('channel-collections-list'); // MODIFIED: Target the carousel list
+const collectionSelect = document.getElementById('collection-select');
+const channelCollectionsList = document.getElementById('channel-collections-list');
+const channelCollectionSortBySelect = document.getElementById('channel-collection-sort-by');
+const channelCollectionSortOrderSelect = document.getElementById('channel-collection-sort-order');
+
 
 let selectedClientIp = '';
 let selectedDvrServerIp = '';
@@ -30,6 +33,12 @@ let selectedDvrServerPort = '';
 let autoScrollInterval;
 let allMoviesData = [];
 let allEpisodesData = [];
+let allCollectionsData = []; // Store all collections including favorites
+let favoriteChannelsData = []; // Store raw favorite channels data
+
+// NEW: Global variable for channel refresh interval
+let channelRefreshIntervalId = null;
+const CHANNEL_REFRESH_INTERVAL_MS = 300000; // Refresh every 5 minutes (300000 ms)
 
 function showNotification(message, isError = false) {
     if (!enablePopupsCheckbox.checked) {
@@ -54,11 +63,7 @@ function toggleControls(enable) {
     controlButtons.forEach(button => {
         button.disabled = !enable;
     });
-    if (enable && selectedClientIp) {
-        channelSelect.disabled = false;
-    } else {
-        channelSelect.disabled = true;
-    }
+    // channelSelect is now removed from index.html, no need to toggle its disabled state here
 }
 
 function applyTheme() {
@@ -153,6 +158,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     showsSortBySelect.addEventListener('change', filterAndRenderShows);
     showsSortOrderSelect.addEventListener('change', filterAndRenderShows);
 
+    // New: Event listeners for Channel Collections sorting
+    channelCollectionSortBySelect.addEventListener('change', async () => {
+        const selectedCollectionSlug = collectionSelect.value;
+        if (selectedCollectionSlug) {
+            const selectedCollection = allCollectionsData.find(col => col.slug === selectedCollectionSlug);
+            if (selectedCollection) {
+                await displayChannelsInCollection(selectedCollection.items, selectedCollection.isFavorites);
+                startChannelRefresh(selectedCollection.items, selectedCollection.isFavorites); // Restart refresh with new sort
+            }
+        }
+    });
+    channelCollectionSortOrderSelect.addEventListener('change', async () => {
+        const selectedCollectionSlug = collectionSelect.value;
+        if (selectedCollectionSlug) {
+            const selectedCollection = allCollectionsData.find(col => col.slug === selectedCollectionSlug);
+            if (selectedCollection) {
+                await displayChannelsInCollection(selectedCollection.items, selectedCollection.isFavorites);
+                startChannelRefresh(selectedCollection.items, selectedCollection.isFavorites); // Restart refresh with new sort
+            }
+        }
+    });
+
     // New: Event listeners for Send Message button and Send Notification button
     document.getElementById('sendMessageButton').addEventListener('click', function() {
         var messageForm = document.getElementById('messageForm');
@@ -236,6 +263,24 @@ function getFullImageUrl(relativePath) {
     return relativePath; // Fallback for relative paths if DVR server info isn't available
 }
 
+// NEW: Function to start the channel refresh interval
+function startChannelRefresh(collectionItems, isFavorites) {
+    stopChannelRefresh(); // Clear any existing interval
+    channelRefreshIntervalId = setInterval(async () => {
+        console.log("Automatically refreshing channel collection data...");
+        await displayChannelsInCollection(collectionItems, isFavorites);
+    }, CHANNEL_REFRESH_INTERVAL_MS);
+}
+
+// NEW: Function to stop the channel refresh interval
+function stopChannelRefresh() {
+    if (channelRefreshIntervalId) {
+        clearInterval(channelRefreshIntervalId);
+        channelRefreshIntervalId = null;
+        console.log("Stopped channel collection auto-refresh.");
+    }
+}
+
 
 async function selectClient() {
     selectedClientIp = clientSelect.value;
@@ -244,14 +289,17 @@ async function selectClient() {
         showNotification(`Controlling: ${clientSelect.options[clientSelect.selectedIndex].text}`, false);
         toggleControls(true);
         getStatus();
-        loadChannels();
+        // loadChannels() is now removed, no call here
+        fetchChannelCollections(); // Re-fetch collections to update favorites based on new client
     } else {
         localStorage.removeItem('lastSelectedClientIp');
         showNotification("Please select a client device.", true);
         toggleControls(false);
         statusDisplay.innerText = "Select a client and click \"Refresh Status\" to fetch.";
         nowPlayingDisplay.classList.add('hidden');
-        channelSelect.innerHTML = '<option value="">Select a Client First</option>';
+        // channelSelect.innerHTML = '<option value="">Select a Client First</option>'; // No longer needed
+        fetchChannelCollections(); // Re-fetch collections to clear favorites if client unselected
+        stopChannelRefresh(); // Stop refresh if client is deselected
     }
 }
 
@@ -295,6 +343,9 @@ async function selectDvrServer() {
         channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel collections.</p>'; // Clear collections
         collectionSelect.innerHTML = '<option value="">Select a Collection</option>'; // Clear collection dropdown
         collectionSelect.disabled = true; // Disable collection dropdown
+        channelCollectionSortBySelect.disabled = true; // Disable sort dropdowns
+        channelCollectionSortOrderSelect.disabled = true;
+        stopChannelRefresh(); // Stop refresh if DVR server is deselected
     }
 }
 
@@ -327,8 +378,16 @@ async function fetchClientsForDvrServer(dvrIp, dvrPort) {
             showNotification(`Loaded ${result.clients.length} clients for ${dvrIp}:${dvrPort}.`, false);
 
             // Auto-select the first client if available after loading
-            clientSelect.selectedIndex = 1;
-            await selectClient();
+            // Only auto-select if no client was previously selected or found.
+            const lastSelectedClient = localStorage.getItem('lastSelectedClientIp');
+            if (!lastSelectedClient || !Array.from(clientSelect.options).find(option => option.value === lastSelectedClient)) {
+                clientSelect.selectedIndex = 1;
+                await selectClient();
+            } else {
+                clientSelect.value = lastSelectedClient; // Re-select if it was found
+                await selectClient();
+            }
+            
         } else {
             showNotification(`No eligible clients found for ${dvrIp}:${dvrPort}.`, false);
             clientSelect.innerHTML = '<option value="">No Clients Found</option>';
@@ -504,50 +563,11 @@ async function getStatus() {
     }
 }
 
-async function loadChannels() {
-    if (!selectedClientIp) {
-        channelSelect.innerHTML = '<option value="">Select a Client First</option>';
-        channelSelect.disabled = true;
-        return;
-    }
+// Removed: loadChannels function is no longer needed here as favorites are integrated into collections
+// async function loadChannels() { ... }
 
-    channelSelect.innerHTML = '<option value="">Loading Channels...</option>';
-    channelSelect.disabled = true;
-
-    try {
-        const response = await fetch(`/channels_list?device_ip=${selectedClientIp}`);
-        const channels = await response.json();
-
-        channelSelect.innerHTML = '<option value="">Select a Channel</option>';
-
-        if (channels.status === 'error') {
-            showNotification(`Failed to load favorite channels: ${channels.message}`, true);
-            channelSelect.innerHTML = `<option value="">Error: ${channels.message}</option>`;
-        } else if (channels.length === 0) {
-             channelSelect.innerHTML = '<option value="">No favorite channels found.</option>';
-        } else {
-            channels.forEach(channel => {
-                const option = document.createElement('option');
-                option.value = channel.channel_number;
-                option.textContent = `${channel.channel_number} - ${channel.name}`;
-                channelSelect.appendChild(option);
-            });
-            channelSelect.disabled = false;
-            showNotification(`Favorite channels loaded for ${selectedClientIp}.`, false);
-        }
-
-    } catch (error) {
-        showNotification(`Failed to fetch favorite channel list: ${error.message}`, true);
-        channelSelect.innerHTML = '<option value="">Failed to load channels.</option>';
-    }
-}
-
-function tuneToSelectedChannel() {
-    const selectedChannel = channelSelect.value;
-    if (selectedChannel) {
-        sendCommand('play_channel', selectedChannel);
-    }
-}
+// Removed: tuneToSelectedChannel function is no longer needed here
+// function tuneToSelectedChannel() { ... }
 
 let debounceTimeout;
 
@@ -956,56 +976,94 @@ function setupCarouselNavigation() {
     });
 }
 
-// Function to fetch and display channel collections
+// Function to fetch and display channel collections (MODIFIED to include favorites)
 const fetchChannelCollections = async () => {
     if (!selectedDvrServerIp || !selectedDvrServerPort) {
         channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel collections.</p>';
         collectionSelect.innerHTML = '<option value="">Select a Collection</option>';
         collectionSelect.disabled = true;
+        channelCollectionSortBySelect.disabled = true;
+        channelCollectionSortOrderSelect.disabled = true;
         showNotification("Please select a DVR server to load channel collections.", true);
+        stopChannelRefresh(); // Stop refresh if no DVR server is selected
         return;
     }
 
+    channelCollectionsList.innerHTML = '<p>Loading collections...</p>';
+    
     try {
         const collectionsResponse = await fetch(`/collections_list?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}`);
-        
         if (!collectionsResponse.ok) {
             const errorData = await collectionsResponse.json();
-            throw new Error(`Server error: ${collectionsResponse.status} - ${errorData.message || collectionsResponse.statusText}`);
+            throw new Error(`Server error fetching collections: ${collectionsResponse.status} - ${errorData.message || collectionsResponse.statusText}`);
+        }
+        let collections = await collectionsResponse.json();
+
+        // Fetch favorite channels if a client is selected
+        if (selectedClientIp) {
+            const favoritesResponse = await fetch(`/channels_list?device_ip=${selectedClientIp}`);
+            if (!favoritesResponse.ok) {
+                const errorData = await favoritesResponse.json();
+                console.warn(`Failed to load favorite channels: ${errorData.message}`);
+                showNotification(`Warning: Failed to load favorite channels: ${errorData.message}`, true);
+                favoriteChannelsData = []; // Ensure it's cleared if fetch fails
+            } else {
+                favoriteChannelsData = await favoritesResponse.json();
+                // Create a synthetic "Favorites" collection
+                const favoriteChannelNumbers = favoriteChannelsData.map(c => c.number); // Use 'number' from favorite_channels response
+                collections.unshift({ // Add to the beginning of the list
+                    name: "Favorites",
+                    slug: "favorites",
+                    items: favoriteChannelNumbers,
+                    isFavorites: true // Custom flag to identify this collection
+                });
+            }
+        } else {
+             // Clear favorites if no client selected or if previous client was deselected
+             favoriteChannelsData = []; 
+             console.log("No client selected, skipping favorite channels fetch for collections.");
         }
 
-        const collections = await collectionsResponse.json();
+
+        allCollectionsData = collections; // Store all collections for sorting/filtering
 
         // Populate the dropdown
         collectionSelect.innerHTML = '<option value="">Select a Collection</option>';
-        collections.forEach(collection => {
+        allCollectionsData.forEach(collection => {
             const option = document.createElement('option');
             option.value = collection.slug;
             option.textContent = collection.name;
             collectionSelect.appendChild(option);
         });
         collectionSelect.disabled = false;
+        channelCollectionSortBySelect.disabled = false;
+        channelCollectionSortOrderSelect.disabled = false;
 
 
-        // Event listener for dropdown change
-        collectionSelect.addEventListener('change', async (event) => {
-            const selectedCollectionSlug = event.target.value;
-            if (selectedCollectionSlug) {
-                const selectedCollection = collections.find(col => col.slug === selectedCollectionSlug);
-                if (selectedCollection) {
-                    await displayChannelsInCollection(selectedCollection.items);
-                }
+        // Event listener for dropdown change - ensures it's added only once
+        // Remove existing listener to prevent duplicates if function is called multiple times
+        collectionSelect.removeEventListener('change', onCollectionSelectChange);
+        collectionSelect.addEventListener('change', onCollectionSelectChange);
+        
+        // Auto-select the first collection (or Favorites if available)
+        if (allCollectionsData.length > 0) {
+            // Find the "Favorites" collection first
+            const favoritesCollection = allCollectionsData.find(col => col.slug === 'favorites');
+            if (favoritesCollection) {
+                collectionSelect.value = favoritesCollection.slug;
+                await displayChannelsInCollection(favoritesCollection.items, true);
+                startChannelRefresh(favoritesCollection.items, true); // Start refresh for favorites
             } else {
-                channelCollectionsList.innerHTML = ''; // Clear content if no collection is selected
+                collectionSelect.value = allCollectionsData[0].slug;
+                await displayChannelsInCollection(allCollectionsData[0].items, allCollectionsData[0].isFavorites);
+                startChannelRefresh(allCollectionsData[0].items, allCollectionsData[0].isFavorites); // Start refresh for first collection
             }
-        });
-
-        // Automatically load the first collection if available
-        if (collections.length > 0) {
-            collectionSelect.value = collections[0].slug;
-            await displayChannelsInCollection(collections[0].items);
         } else {
             channelCollectionsList.innerHTML = '<p>No channel collections found on this DVR server.</p>';
+            collectionSelect.disabled = true;
+            channelCollectionSortBySelect.disabled = true;
+            channelCollectionSortOrderSelect.disabled = true;
+            stopChannelRefresh(); // Stop refresh if no collections found
         }
 
     } catch (error) {
@@ -1013,36 +1071,104 @@ const fetchChannelCollections = async () => {
         channelCollectionsList.innerHTML = `<p>Error loading channel collections: ${error.message}. Please ensure the DVR server is running and accessible.</p>`;
         collectionSelect.innerHTML = '<option value="">Error loading collections</option>';
         collectionSelect.disabled = true;
+        channelCollectionSortBySelect.disabled = true;
+        channelCollectionSortOrderSelect.disabled = true;
         showNotification(`Error loading collections: ${error.message}`, true);
+        stopChannelRefresh(); // Stop refresh on error
     }
 };
 
-// Function to display channels within a selected collection
-const displayChannelsInCollection = async (channelIds) => {
+// New handler for collection select change
+async function onCollectionSelectChange(event) {
+    const selectedCollectionSlug = event.target.value;
+    stopChannelRefresh(); // Stop current refresh when collection changes
+    if (selectedCollectionSlug) {
+        const selectedCollection = allCollectionsData.find(col => col.slug === selectedCollectionSlug);
+        if (selectedCollection) {
+            await displayChannelsInCollection(selectedCollection.items, selectedCollection.isFavorites);
+            startChannelRefresh(selectedCollection.items, selectedCollection.isFavorites); // Start refresh for new collection
+        }
+    } else {
+        channelCollectionsList.innerHTML = ''; // Clear content if no collection is selected
+    }
+}
+
+
+// Function to display channels within a selected collection (MODIFIED for sorting and favorites)
+const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollection = false) => {
     if (!selectedDvrServerIp || !selectedDvrServerPort) {
         channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel information.</p>';
         showNotification("Please select a DVR server to load channel information.", true);
+        stopChannelRefresh(); // Stop refresh if no DVR server is selected
         return;
     }
+    if (!selectedClientIp && isFavoritesCollection) {
+        channelCollectionsList.innerHTML = '<p>Please select a Channels App client to view Favorite Channels.</p>';
+        stopChannelRefresh(); // Stop refresh if favorites selected but no client
+        return;
+    }
+
 
     channelCollectionsList.innerHTML = '<p>Loading channels...</p>';
     channelCollectionsList.classList.add('loading');
     
     try {
         const nowPlayingResponse = await fetch(`/now_playing_data?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}`);
-        
         if (!nowPlayingResponse.ok) {
             const errorData = await nowPlayingResponse.json();
-            throw new Error(`Server error: ${nowPlayingResponse.status} - ${errorData.message || nowPlayingResponse.statusText}`);
+            throw new Error(`Server error fetching now playing data: ${nowPlayingResponse.status} - ${errorData.message || nowPlayingResponse.statusText}`);
         }
-
         const nowPlayingData = await nowPlayingResponse.json();
 
-        const channelsToDisplay = nowPlayingData.filter(item =>
-            channelIds.includes(item.Channel.ChannelID) ||
-            channelIds.includes(item.Channel.Number) ||
-            channelIds.includes(item.Channel.Name) // Adding flexibility to match based on ID, Number or Name
-        );
+        let channelsToDisplay = [];
+
+        if (isFavoritesCollection) {
+            // Filter nowPlayingData to include only favorite channels
+            const favoriteChannelNumbers = favoriteChannelsData.map(fav => fav.number);
+            channelsToDisplay = nowPlayingData.filter(item => 
+                favoriteChannelNumbers.includes(item.Channel.Number)
+            ).map(item => {
+                // Merge with favorite channel data for image_url if not present in nowPlaying
+                const favChannel = favoriteChannelsData.find(fav => fav.number === item.Channel.Number);
+                // MODIFIED: Prioritize Airings[0].Image, then favChannel.image_url, then Channel.Image
+                const imageUrl = (item.Airings[0] && item.Airings[0].Image) || (favChannel ? favChannel.image_url : '') || item.Channel.Image;
+                return { ...item,
+                    Channel: { ...item.Channel, Image: imageUrl },
+                    Airings: item.Airings || [] // Ensure Airings is an array
+                };
+            });
+
+        } else {
+            channelsToDisplay = nowPlayingData.filter(item =>
+                channelIdentifiers.includes(item.Channel.ChannelID) ||
+                channelIdentifiers.includes(item.Channel.Number) ||
+                channelIdentifiers.includes(item.Channel.Name)
+            );
+        }
+
+        // Apply sorting
+        const sortBy = channelCollectionSortBySelect.value;
+        const sortOrder = channelCollectionSortOrderSelect.value;
+
+        channelsToDisplay.sort((a, b) => {
+            let valA, valB;
+
+            if (sortBy === 'number') {
+                valA = parseFloat(a.Channel.Number);
+                valB = parseFloat(b.Channel.Number);
+            } else if (sortBy === 'name') {
+                valA = a.Channel.Name.toLowerCase();
+                valB = b.Channel.Name.toLowerCase();
+            } else if (sortBy === 'title') {
+                valA = a.Airings[0] && a.Airings[0].Title ? a.Airings[0].Title.toLowerCase() : '';
+                valB = b.Airings[0] && b.Airings[0].Title ? b.Airings[0].Title.toLowerCase() : '';
+            }
+
+            if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+            if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+            return 0;
+        });
+
 
         channelCollectionsList.innerHTML = ''; // Clear loading message
         channelCollectionsList.classList.remove('loading');
@@ -1054,8 +1180,8 @@ const displayChannelsInCollection = async (channelIds) => {
                 card.classList.add('channel-card'); // Add channel-card class
                 card.classList.add('movie-card'); // Add movie-card to inherit carousel styles
 
-                // MODIFIED: Use Airings[0].Image for the image source
-                const imageUrl = item.Airings[0] && item.Airings[0].Image ? getFullImageUrl(item.Airings[0].Image) : '';
+                // MODIFIED: Prioritize Airings[0].Image for the image source
+                const imageUrl = getFullImageUrl((item.Airings[0] && item.Airings[0].Image) || item.Channel.Image);
                 const hasImage = !!imageUrl;
 
                 const imageHtml = `
@@ -1095,6 +1221,7 @@ const displayChannelsInCollection = async (channelIds) => {
         channelCollectionsList.innerHTML = `<p>Error loading channel information: ${error.message}. Please ensure the DVR server is running and accessible.</p>`;
         channelCollectionsList.classList.remove('loading');
         showNotification(`Error loading channel info: ${error.message}`, true);
+        stopChannelRefresh(); // Stop refresh on error
     }
 };
 

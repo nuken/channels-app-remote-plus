@@ -201,18 +201,9 @@ def get_channels_list():
         response = requests.get(favorite_channels_url)
         response.raise_for_status()
         favorite_channels_data = response.json()
-
-        channels_for_gui = []
-        for channel in favorite_channels_data:
-            if 'number' in channel and 'name' in channel:
-                channels_for_gui.append({
-                    "channel_number": channel['number'],
-                    "name": channel['name']
-                })
-
-        channels_for_gui.sort(key=lambda x: float(x['channel_number']))
-
-        return jsonify(channels_for_gui)
+        
+        # MODIFIED: Return raw data, processing and sorting moved to frontend
+        return jsonify(favorite_channels_data)
     except requests.exceptions.RequestException as e:
         return jsonify({"status": "error", "message": f"Error fetching favorite channels from {target_device_ip}: {e}. Is the app running on this device?"}), 500
     except Exception as e:

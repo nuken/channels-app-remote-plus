@@ -109,16 +109,7 @@
             <input type="number" id="manual_channel_input" placeholder="Enter Channel #"> <button class="control-button" onclick="sendCommand('play_channel', document.getElementById('manual_channel_input').value)">Go</button>
         </div>
 
-        <div class="channel-list-section">
-            <h2>Live TV Favorite Channels</h2>
-            <select id="channel-select" class="control-button" onchange="tuneToSelectedChannel()">
-                <option value="">Select a Channel</option>
-                </select>
-            <div class="refresh-button-container">
-                <button class="control-button" onclick="loadChannels()">Refresh Favorites</button>
-            </div>
-            <p style="font-size: 0.8em; margin-top: 5px;">Fetches favorite channels directly from the selected Channels App client.</p>
-        </div>
+        {# REMOVED: Old Live TV Favorite Channels section #}
 
         <h2>Navigation</h2>
         <div class="button-grid">
@@ -135,9 +126,23 @@
                     <button class="section-toggle-button" onclick="toggleSection('channel-collections-carousel-wrapper', this)">Hide Content</button>
                 </div>
             </div>
-            {# MODIFIED: Moved collection-select here, outside of section-actions #}
-            <div class="collection-dropdown-container" style="margin-top: 15px; margin-bottom: 15px;">
+            {# MODIFIED: Moved collection-select here, outside of section-actions, and added sort dropdowns #}
+            <div class="filter-sort-controls" style="margin-top: 15px; margin-bottom: 15px;">
+                <label for="collection-select">Select Collection:</label>
                 <select id="collection-select" class="collection-dropdown"></select>
+                
+                <label for="channel-collection-sort-by">Sort By:</label>
+                <select id="channel-collection-sort-by">
+                    <option value="number">Channel Number</option>
+                    <option value="name">Channel Name</option>
+                    <option value="title">Program Title</option>
+                </select>
+
+                <label for="channel-collection-sort-order">Order:</label>
+                <select id="channel-collection-sort-order">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
             </div>
             <div id="channel-collections-carousel-wrapper" class="carousel-wrapper">
                 <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('channel-collections-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('channel-collections-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>

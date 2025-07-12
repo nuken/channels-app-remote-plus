@@ -20,7 +20,7 @@
 - **Channel Surfing:** Jump to Previous, Channel Up/Down, or tune to specific channels — plus easy access to favorite channels.
 - **Smart Seek:** Jump forward/backward with custom step sizes.
 - **Direct App Navigation:** Switch to Live TV, Guide, Library, or Search in one tap.
-- **Browse Collections:** Switch between your Channels Collections and watch from Now Playing.
+- **Browse Collections:** Switch between your Channels Collections, including Favorites, and watch from Now Playing.
 - **Browse DVR Movies:** Search, sort, and play recorded films from the DVR server.
 - **Browse Recent TV Episodes:** Quickly find and launch recent recordings.
 - **Now Playing Status:** See real-time playback info for the selected client.
