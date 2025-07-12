@@ -86,6 +86,11 @@
             <label for="enablePopups">Show Status Notifications (Recommended: Off for mobile)</label>
         </div>
 
+        {# NEW: Expand button section #}
+        <div style="margin-bottom: 20px;">
+            <button id="expandButton">Expand Layout</button>
+        </div>
+
 
         <h2>Playback Controls</h2>
         <div class="button-grid">
@@ -208,7 +213,7 @@
                 </select>
             </div>
             <div id="episodes-carousel-wrapper" class="carousel-wrapper">
-                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('episodes-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
+                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('episodes-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
                 <div id="episodes-list">
                 </div>
                 <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('episodes-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>

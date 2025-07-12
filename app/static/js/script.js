@@ -26,6 +26,9 @@ const channelCollectionsList = document.getElementById('channel-collections-list
 const channelCollectionSortBySelect = document.getElementById('channel-collection-sort-by');
 const channelCollectionSortOrderSelect = document.getElementById('channel-collection-sort-order');
 
+// NEW: Elements for expand button
+const expandButton = document.getElementById('expandButton');
+
 
 let selectedClientIp = '';
 let selectedDvrServerIp = '';
@@ -82,6 +85,17 @@ function applyTheme() {
     console.log("applyTheme: Saved selectedTheme to localStorage:", selectedTheme);
 }
 
+// NEW: Function to toggle expanded layout
+function toggleExpandedLayout() {
+    const isExpanded = document.body.classList.toggle('expanded');
+    localStorage.setItem('isExpandedLayout', isExpanded);
+    expandButton.textContent = isExpanded ? 'Shrink Layout' : 'Expand Layout';
+
+    // Trigger re-check of carousel arrows after layout change
+    setupCarouselNavigation();
+}
+
+
 document.addEventListener('DOMContentLoaded', async () => {
     const savedTheme = localStorage.getItem('selectedTheme') || 'default-light';
     console.log("DOMContentLoaded: Initial savedTheme from localStorage:", savedTheme);
@@ -98,6 +112,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     enablePopupsCheckbox.addEventListener('change', () => {
         localStorage.setItem('enablePopups', enablePopupsCheckbox.checked);
     });
+
+    // NEW: Load saved expanded layout state
+    const isExpandedLayout = localStorage.getItem('isExpandedLayout');
+    if (isExpandedLayout === 'true') {
+        document.body.classList.add('expanded');
+        expandButton.textContent = 'Shrink Layout';
+    } else {
+        expandButton.textContent = 'Expand Layout';
+    }
+    expandButton.addEventListener('click', toggleExpandedLayout);
+
 
     // Load last selected DVR server IP:Port first, as it's needed for client discovery and collections
     const lastSelectedDvrServerIpPort = localStorage.getItem('lastSelectedDvrServerIpPort');
@@ -375,6 +400,9 @@ async function fetchClientsForDvrServer(dvrIp, dvrPort) {
             clientSelect.innerHTML = `<option value="">Error: ${result.message}</option>`;
             clientSelect.disabled = true;
             console.log("[DEBUG] fetchClientsForDvrServer: Client discovery error:", result.message); // ADDED LOG
+            // MODIFIED: Clear localStorage and selectedClientIp on error as well
+            selectedClientIp = '';
+            localStorage.removeItem('lastSelectedClientIp');
         } else if (result.clients && result.clients.length > 0) {
             result.clients.forEach(client => {
                 const option = document.createElement('option');
@@ -394,20 +422,22 @@ async function fetchClientsForDvrServer(dvrIp, dvrPort) {
                 clientSelect.value = lastSelectedClient; // Re-select if it was found
                 await selectClient();
                 console.log("[DEBUG] fetchClientsForDvrServer: Re-selecting last client:", lastSelectedClient); // ADDED LOG
-            } else if (result.clients.length > 0) { // If last client not found, but there are other clients
-                clientSelect.selectedIndex = 1; // Select the first available client
-                await selectClient();
-                console.log("[DEBUG] fetchClientsForDvrServer: Last client not found or no previous selection, selecting first client:", clientSelect.value); // ADDED LOG
-            } else { // No clients found in the new list (after filtering for phone/tablet)
-                 selectedClientIp = ''; // Ensure selectedClientIp is reset
-                 localStorage.removeItem('lastSelectedClientIp'); // Clear invalid selection HERE
-                 toggleControls(false); // Disable controls
-                 statusDisplay.innerText = "No eligible client selected/found.";
-                 nowPlayingDisplay.classList.add('hidden');
-                 console.log("[DEBUG] fetchClientsForDvrServer: No eligible clients found, clearing selection."); // ADDED LOG
+            } else { // If last client not found or no previous selection, select first available if any
+                if (result.clients.length > 0) {
+                    clientSelect.selectedIndex = 1; // Select the first actual client (index 0 is "Select a Client")
+                    await selectClient();
+                    console.log("[DEBUG] fetchClientsForDvrServer: Last client not found or no previous selection, selecting first client:", clientSelect.value); // ADDED LOG
+                } else { // Should not happen if result.clients.length > 0 but good for robustness
+                    selectedClientIp = ''; // Ensure selectedClientIp is reset
+                    localStorage.removeItem('lastSelectedClientIp'); // Clear invalid selection HERE
+                    toggleControls(false); // Disable controls
+                    statusDisplay.innerText = "No eligible client selected/found.";
+                    nowPlayingDisplay.classList.add('hidden');
+                    console.log("[DEBUG] fetchClientsForDvrServer: No eligible clients found, clearing selection."); // ADDED LOG
+                }
             }
             
-        } else {
+        } else { // No clients found by discovery at all
             showNotification(`No eligible clients found for ${dvrIp}:${dvrPort}.`, false);
             clientSelect.innerHTML = '<option value="">No Clients Found</option>';
             clientSelect.disabled = true;
@@ -868,7 +898,7 @@ function renderShows(episodesToRender) {
             if (episode.episode_title) {
                 episodeDetails += `: ${episode.episode_title}</p>`;
             } else {
-                episodeDetails += `</p>`;
+                episodeDetails += `</p`;
             }
         } else if (episode.episode_title) {
             episodeDetails += `<p class="episode-details">${episode.episode_title}</p>`;
