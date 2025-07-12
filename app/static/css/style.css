@@ -315,6 +315,32 @@ pre {
 .notification.error { background-color: var(--notification-error-bg); }
 .notification.show { opacity: 1; }
 
+/* New styles for combined Channel Up/Down buttons */
+.channel-nav-group {
+    display: flex;
+    /* Remove gap between internal buttons */
+    gap: 0;
+    /* Ensure it occupies the full width of its grid cell */
+    width: 100%;
+}
+
+.channel-nav-group .control-button {
+    flex-grow: 1; /* Make both buttons equally share the space */
+    border-radius: 0; /* Remove default button border-radius for combining */
+}
+
+.channel-nav-group .channel-up-btn {
+    border-top-left-radius: 5px; /* Apply rounded corners only to the left side */
+    border-bottom-left-radius: 5px;
+    border-right: 1px solid var(--input-border-color); /* Add a subtle divider */
+}
+
+.channel-nav-group .channel-down-btn {
+    border-top-right-radius: 5px; /* Apply rounded corners only to the right side */
+    border-bottom-right-radius: 5px;
+    border-left: none; /* Remove duplicate inner border */
+}
+
 /* Styling for Now Playing display */
 #now-playing-display {
     display: flex;

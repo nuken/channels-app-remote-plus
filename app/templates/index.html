@@ -93,15 +93,18 @@
 
 
         <h2>Playback Controls</h2>
-        <div class="button-grid">
+       <div class="button-grid">
             <button class="control-button" onclick="sendCommand('toggle_pause')">Play/Pause</button>
             <button class="control-button" onclick="sendCommand('stop')">Stop</button>
             <button class="control-button" onclick="sendCommand('toggle_mute')">Mute</button>
             <button class="control-button" onclick="sendCommand('toggle_cc')">CC</button>
             <button class="control-button" onclick="toggleCcAndMute()">CC/Mute</button>
             <button class="control-button" onclick="rewindAndEnableCC()">Back 15/CC</button>
-            <button class="control-button" onclick="sendCommand('channel_up')">Ch Up</button>
-            <button class="control-button" onclick="sendCommand('channel_down')">Ch Down</button>
+            {# Combined Channel Up/Down Button Group #}
+            <div class="channel-nav-group">
+                <button class="control-button channel-up-btn" onclick="sendCommand('channel_up')">Ch Up</button>
+                <button class="control-button channel-down-btn" onclick="sendCommand('channel_down')">Ch Dn</button>
+            </div>
             <button class="control-button" onclick="sendCommand('previous_channel')">Previous Ch</button>
         </div>
 
