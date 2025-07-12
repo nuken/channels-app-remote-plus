@@ -974,6 +974,9 @@ function startAutoScroll(carouselElement, direction, event) {
         event.preventDefault();
     }
     stopAutoScroll();
+    // Perform an immediate scroll when the mouse button is pressed down
+    scrollCarousel(carouselElement, direction);
+    // Then, start the interval for continuous scrolling if the button is held
     autoScrollInterval = setInterval(() => {
         scrollCarousel(carouselElement, direction);
     }, 75);
