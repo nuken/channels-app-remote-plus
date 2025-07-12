@@ -190,12 +190,68 @@ h1, h2 {
     font-size: inherit;
 }
 
+/* Remove or modify the existing .button-grid if it's no longer the primary layout for ALL controls */
 .button-grid {
+    /* Keep this if you want some buttons to still use a grid directly */
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
     gap: 10px;
     margin-bottom: 20px;
 }
+
+/* NEW: Styles for the overall playback controls container */
+.playback-controls-container {
+    display: grid;
+    /* Define grid columns for your groups. Example: 3 columns for 3 groups */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjust minmax as needed */
+    gap: 20px; /* Space between groups */
+    margin-bottom: 20px;
+    align-items: start; /* Align items to the start of their grid cell */
+}
+
+/* NEW: Styles for generic button groups */
+.button-group {
+    display: flex;
+    flex-direction: column; /* Default to column for vertical stacking within groups */
+    gap: 8px; /* Space between buttons within a group */
+    background-color: var(--config-info-bg); /* Use a subtle background for grouping */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    justify-content: center;
+    align-items: stretch; /* Make buttons stretch to fill group width */
+}
+
+/* Specific adjustment for horizontal groups if you have them */
+.button-group.playback-group,
+.button-group.audio-video-group,
+.button-group.channel-misc-group { /* NEW: Add channel-misc-group here */
+    flex-direction: row; /* Arrange these buttons horizontally */
+    flex-wrap: wrap; /* Allow wrapping if space is tight */
+    justify-content: center; /* Center buttons horizontally */
+}
+
+/* NEW: Styles for larger channel buttons and their vertical stack */
+.channel-group.vertical-stack {
+    flex-direction: column; /* Explicitly stack vertically */
+    gap: 15px; /* More space between stacked channel buttons */
+    /* You might want to remove padding or adjust it if the buttons fill it completely */
+}
+
+.large-channel-button {
+    min-height: 60px; /* Make the buttons taller */
+    font-size: 1.2em; /* Increase font size */
+    padding: 15px 20px; /* Adjust padding for larger size */
+}
+
+/* Remove old combined channel nav group styles if no longer used */
+.channel-nav-group {
+    /* This can be removed or commented out if you switch to the new structure */
+    display: none;
+}
+
+
+/* Adjust button padding/size as a general rule if needed */
 button {
     padding: 12px 15px;
     font-size: 1em;
@@ -314,32 +370,6 @@ pre {
 }
 .notification.error { background-color: var(--notification-error-bg); }
 .notification.show { opacity: 1; }
-
-/* New styles for combined Channel Up/Down buttons */
-.channel-nav-group {
-    display: flex;
-    /* Remove gap between internal buttons */
-    gap: 0;
-    /* Ensure it occupies the full width of its grid cell */
-    width: 100%;
-}
-
-.channel-nav-group .control-button {
-    flex-grow: 1; /* Make both buttons equally share the space */
-    border-radius: 0; /* Remove default button border-radius for combining */
-}
-
-.channel-nav-group .channel-up-btn {
-    border-top-left-radius: 5px; /* Apply rounded corners only to the left side */
-    border-bottom-left-radius: 5px;
-    border-right: 1px solid var(--input-border-color); /* Add a subtle divider */
-}
-
-.channel-nav-group .channel-down-btn {
-    border-top-right-radius: 5px; /* Apply rounded corners only to the right side */
-    border-bottom-right-radius: 5px;
-    border-left: none; /* Remove duplicate inner border */
-}
 
 /* Styling for Now Playing display */
 #now-playing-display {
@@ -468,7 +498,6 @@ pre {
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: opacity 0.3s ease;
 }
 
 .movie-card-image-container img.error-img, .episode-card-image-container img.error-img, .channel-card-image-container img.error-img {
@@ -710,6 +739,12 @@ html.theme-dark-green .collection-dropdown { /* MODIFIED: Added .collection-drop
 
 
 /* Media queries */
+@media (max-width: 768px) {
+    .playback-controls-container {
+        grid-template-columns: 1fr; /* Stack groups vertically on smaller screens */
+    }
+}
+
 @media (max-width: 600px) and (any-hover: none) {
     .movie-card, .episode-card, .channel-card {
         width: 85%;

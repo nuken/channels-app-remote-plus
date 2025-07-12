@@ -93,19 +93,28 @@
 
 
         <h2>Playback Controls</h2>
-       <div class="button-grid">
-            <button class="control-button" onclick="sendCommand('toggle_pause')">Play/Pause</button>
-            <button class="control-button" onclick="sendCommand('stop')">Stop</button>
-            <button class="control-button" onclick="sendCommand('toggle_mute')">Mute</button>
-            <button class="control-button" onclick="sendCommand('toggle_cc')">CC</button>
-            <button class="control-button" onclick="toggleCcAndMute()">CC/Mute</button>
-            <button class="control-button" onclick="rewindAndEnableCC()">Back 15/CC</button>
-            {# Combined Channel Up/Down Button Group #}
-            <div class="channel-nav-group">
-                <button class="control-button channel-up-btn" onclick="sendCommand('channel_up')">Ch Up</button>
-                <button class="control-button channel-down-btn" onclick="sendCommand('channel_down')">Ch Dn</button>
+        <div class="playback-controls-container">
+            <div class="button-group playback-group">
+                <button class="control-button" onclick="sendCommand('toggle_pause')">Play/Pause</button>
+                <button class="control-button" onclick="sendCommand('stop')">Stop</button>
             </div>
-            <button class="control-button" onclick="sendCommand('previous_channel')">Previous Ch</button>
+
+            <div class="button-group audio-video-group">
+                <button class="control-button" onclick="sendCommand('toggle_mute')">Mute</button>
+                <button class="control-button" onclick="sendCommand('toggle_cc')">CC</button>
+                <button class="control-button" onclick="toggleCcAndMute()">CC/Mute</button>
+            </div>
+
+            <div class="button-group channel-misc-group"> {# NEW: 4th Group for channel miscellaneous buttons #}
+                <button class="control-button" onclick="sendCommand('previous_channel')">Previous Ch</button>
+                <button class="control-button" onclick="rewindAndEnableCC()">Back 15/CC</button>
+            </div>
+
+            <div class="button-group channel-group vertical-stack">
+                <button class="control-button" onclick="sendCommand('channel_up')">Ch Up</button>
+                <button class="control-button" onclick="sendCommand('channel_down')">Ch Dn</button>
+            </div>
+
         </div>
 
         <div class="seek-controls input-group">
