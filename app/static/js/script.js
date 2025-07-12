@@ -960,7 +960,9 @@ function toggleSection(wrapperId, button) {
 }
 
 function scrollCarousel(carouselElement, direction) {
-    const scrollAmount = 150;
+    // MODIFIED: Calculate scrollAmount dynamically based on the visible width of the carousel.
+    // This will make the carousel scroll by roughly one "page" of content.
+    const scrollAmount = carouselElement.clientWidth * 0.8; // Scroll 80% of the visible width for a smoother experience
     carouselElement.scrollBy({
         left: direction * scrollAmount,
         behavior: 'smooth'
