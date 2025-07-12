@@ -35,12 +35,12 @@
 }
 
 /* Dark Theme 1: Default Dark with Gray Buttons */
-html.theme-dark-gray { /* MODIFIED: Target html instead of body */
+html.theme-dark-gray {
     --body-bg-color: #2c2c2c;
     --text-color: #e0e0e0;
     --container-bg-color: #3a3a3a;
     --box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    --header-color: #7dd3fc; /* Light blue for headers */
+    --header-color: #7dd3fc;
     --config-info-bg: #4a4a4a;
 
     --button-bg-color: #555555;
@@ -70,15 +70,15 @@ html.theme-dark-gray { /* MODIFIED: Target html instead of body */
 }
 
 /* Dark Theme 2: Dark with Green Buttons */
-html.theme-dark-green { /* MODIFIED: Target html instead of body */
+html.theme-dark-green {
     --body-bg-color: #1e1e1e;
     --text-color: #e0e0e0;
     --container-bg-color: #2b2b2b;
     --box-shadow: 0 2px 15px rgba(0,0,0,0.4);
-    --header-color: #a7f3d0; /* Light green for headers */
+    --header-color: #a7f3d0;
     --config-info-bg: #3c3c3c;
 
-    --button-bg-color: #28a745; /* Green */
+    --button-bg-color: #28a745;
     --button-hover-bg-color: #218838;
     --button-active-bg-color: #1e7e34;
     --button-text-color: #ffffff;
@@ -105,15 +105,15 @@ html.theme-dark-green { /* MODIFIED: Target html instead of body */
 }
 
 /* Light Theme 2: Light with Purple Buttons */
-html.theme-light-purple { /* MODIFIED: Target html instead of body */
+html.theme-light-purple {
     --body-bg-color: #f0f2f5;
     --text-color: #333;
     --container-bg-color: #ffffff;
     --box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    --header-color: #6f42c1; /* Purple for headers */
+    --header-color: #6f42c1;
     --config-info-bg: #e6eaf0;
 
-    --button-bg-color: #6f42c1; /* Purple */
+    --button-bg-color: #6f42c1;
     --button-hover-bg-color: #5c37a7;
     --button-active-bg-color: #4b2e8a;
     --button-text-color: white;
@@ -144,8 +144,8 @@ html.theme-light-purple { /* MODIFIED: Target html instead of body */
 body {
     font-family: sans-serif;
     margin: 20px;
-    background-color: var(--body-bg-color); /* Uses CSS variable */
-    color: var(--text-color); /* Uses CSS variable */
+    background-color: var(--body-bg-color);
+    color: var(--text-color);
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 .container {
@@ -171,15 +171,15 @@ h1, h2 {
 }
 /* Styling for "Configured Clients" and "Select Channels DVR Server" labels */
 .config-info p strong {
-    display: block; /* Make it a block element to control margins */
-    font-size: 0.95em; /* Consistent size */
-    margin-bottom: 5px; /* Space between label and select box */
-    color: var(--text-color); /* Ensure consistent text color */
+    display: block;
+    font-size: 0.95em;
+    margin-bottom: 5px;
+    color: var(--text-color);
 }
 /* Consistent margin-top for subsequent sections within config-info */
-.config-info p:nth-of-type(2) { /* Target the second p tag in config-info (for DVR Server) */
-    margin-top: 15px; /* Consistent spacing between sections in config-info */
-    font-size: inherit; /* Inherit font size from parent, overriding any inline styles */
+.config-info p:nth-of-type(2) {
+    margin-top: 15px;
+    font-size: inherit;
 }
 
 .button-grid {
@@ -207,43 +207,42 @@ button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
 
 /* General input and select styling for a modern look */
 .input-group input,
-#theme-select, /* Added theme select to general input/select styling */
-#client-select, /* Added client select */
-#dvr-server-select, /* Added dvr server select */
+#theme-select,
+#client-select,
+#dvr-server-select,
 .input-group select,
 .channel-list-section select,
 .filter-sort-controls input[type="search"],
 .filter-sort-controls select,
-/* New: Styling for notification input fields */
 #notificationTitle,
 #notificationBody {
-    padding: 10px 15px; /* Slightly more horizontal padding */
+    padding: 10px 15px;
     font-size: 1em;
     border: 1px solid var(--input-border-color);
-    border-radius: 6px; /* Slightly more rounded corners */
+    border-radius: 6px;
     background-color: var(--container-bg-color);
     color: var(--text-color);
     transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* Subtle inner shadow for depth */
-    flex-grow: 1; /* Allow inputs to grow in flex containers */
-    width: 100%; /* Ensure inputs take full width of their container */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+    flex-grow: 1;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Focus state */
 .input-group input:focus,
-#theme-select:focus, /* Added theme select focus */
-#client-select:focus, /* Added client select focus */
-#dvr-server-select:focus, /* Added dvr server select focus */
+#theme-select:focus,
+#client-select:focus,
+#dvr-server-select:focus,
 .input-group select:focus,
 .channel-list-section select:focus,
 .filter-sort-controls input[type="search"]:focus,
 .filter-sort-controls select:focus,
 #notificationTitle:focus,
 #notificationBody:focus {
-    outline: none; /* Remove default outline */
-    border-color: var(--button-hover-bg-color); /* Highlight border on focus */
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Subtle blue glow on focus */
+    outline: none;
+    border-color: var(--button-hover-bg-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 
@@ -278,7 +277,7 @@ pre {
 .status-section { margin-top: 25px; }
 .channel-list-section { margin-top: 25px; }
 .channel-list-section select {
-    width: 100%; /* Keep width 100% for this specific select */
+    width: 100%;
     margin-bottom: 10px;
 }
 .channel-list-section .refresh-button-container { text-align: right; margin-top: 5px; }
@@ -359,49 +358,47 @@ pre {
 }
 
 /* New styles for DVR movies and shows section */
-#movies-list-section, #shows-list-section {
+#movies-list-section, #shows-list-section, #channel-collections-section {
     margin-top: 25px;
 }
 
 /* Wrapper for horizontal scrolling + arrows */
 .carousel-wrapper {
-    position: relative; /* For positioning arrows */
+    position: relative;
     margin-top: 15px;
-    /* Ensure the wrapper doesn't expand beyond its parent visually */
     max-width: 100%;
-    overflow: hidden; /* Hide arrows that are outside the bounds of the wrapper */
+    overflow: hidden;
 }
 
 /* MODIFIED for Horizontal Scrolling */
-#movies-list, #episodes-list {
-    display: flex; /* Change from grid to flex */
-    flex-wrap: nowrap; /* Prevent wrapping */
-    overflow-x: auto; /* Enable horizontal scrolling */
-    overflow-y: hidden; /* Hide vertical scrollbar */
-    -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
-    gap: 20px; /* Spacing between cards */
-    padding-bottom: 20px; /* Add some padding at the bottom for scrollbar visibility if not hidden */
-    padding-left: 10px; /* Padding for the start of the list within wrapper */
-    padding-right: 10px; /* Padding for the end of the list within wrapper */
+#movies-list, #episodes-list, #channel-collections-list {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    gap: 20px;
+    padding-bottom: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
 
 
-    /* Optional: For a smoother "snap" effect like a real carousel */
-    scroll-snap-type: x mandatory; /* Snap points along the x-axis */
-    scroll-padding-left: 10px; /* Padding for the snapping area at the start */
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 10px;
 
 
-    /* Optional: Hide scrollbar for a cleaner look */
-    scrollbar-width: none; /* For Firefox */
-    -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 /* Hide scrollbar for WebKit browsers (Chrome, Safari) */
 #movies-list::-webkit-scrollbar,
-#episodes-list::-webkit-scrollbar {
+#episodes-list::-webkit-scrollbar,
+#channel-collections-list::-webkit-scrollbar {
     display: none;
 }
 
-.movie-card, .episode-card {
+.movie-card, .episode-card, .channel-card {
     background-color: var(--recording-card-bg);
     border: 1px solid var(--recording-card-border);
     border-radius: 8px;
@@ -411,21 +408,20 @@ pre {
     flex-direction: column;
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
 
-    /* MODIFIED for Horizontal Scrolling */
-    flex-shrink: 0; /* Prevents cards from shrinking */
-    width: 280px; /* Fixed width for cards */
-    scroll-snap-align: start; /* Align card to snap point */
+    flex-shrink: 0;
+    width: 280px;
+    scroll-snap-align: start;
 }
 
-.movie-card:hover, .episode-card:hover {
+.movie-card:hover, .episode-card:hover, .channel-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.movie-card-image-container, .episode-card-image-container {
+.movie-card-image-container, .episode-card-image-container, .channel-card-image-container {
     width: 100%;
-    height: 160px; /* Fixed height for image area */
-    background-color: #333; /* Placeholder background */
+    height: 160px;
+    background-color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -433,19 +429,19 @@ pre {
     position: relative;
 }
 
-.movie-card-image-container img, .episode-card-image-container img {
+.movie-card-image-container img, .episode-card-image-container img, .channel-card-image-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Cover the area, crop if necessary */
+    object-fit: cover;
     display: block;
     transition: opacity 0.3s ease;
 }
 
-.movie-card-image-container img.error-img, .episode-card-image-container img.error-img {
-    display: none; /* Hide if error occurs */
+.movie-card-image-container img.error-img, .episode-card-image-container img.error-img, .channel-card-image-container img.error-img {
+    display: none;
 }
 
-.movie-card-image-container .no-image-text, .episode-card-image-container .no-image-text {
+.movie-card-image-container .no-image-text, .episode-card-image-container .no-image-text, .channel-card-image-container .no-image-text {
     color: #fff;
     font-size: 0.9em;
     text-align: center;
@@ -456,14 +452,14 @@ pre {
     transform: translate(-50%, -50%);
 }
 
-.movie-card-content, .episode-card-content {
+.movie-card-content, .episode-card-content, .channel-card-content {
     padding: 15px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
-.movie-card-content h3, .episode-card-content h3 {
+.movie-card-content h3, .episode-card-content h3, .channel-card-content h3 {
     margin-top: 0;
     margin-bottom: 5px;
     font-size: 1.1em;
@@ -471,37 +467,37 @@ pre {
     transition: color 0.3s ease;
 }
 
-.movie-card-content .episode-details, .episode-card-content .episode-details {
+.movie-card-content .episode-details, .episode-card-content .episode-details, .channel-card-content .episode-details {
     font-size: 0.85em;
     color: var(--recording-episode-color);
     margin-bottom: 8px;
     transition: color 0.3s ease;
 }
 
-.movie-card-content .summary, .episode-card-content .summary {
+.movie-card-content .summary, .episode-card-content .summary, .channel-card-content .summary {
     font-size: 0.8em;
     color: var(--recording-summary-color);
     margin-bottom: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Limit to 3 lines */
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     transition: color 0.3s ease;
 }
 
-.movie-card-content .play-button-container, .episode-card-content .play-button-container {
-    margin-top: auto; /* Push button to the bottom */
+.movie-card-content .play-button-container, .episode-card-content .play-button-container, .channel-card-content .play-button-container {
+    margin-top: auto;
     text-align: center;
 }
 
-.movie-card-content .play-button, .episode-card-content .play-button {
+.movie-card-content .play-button, .episode-card-content .play-button, .channel-card-content .play-button {
     padding: 8px 15px;
     font-size: 0.9em;
     width: 100%;
 }
 
-#movies-list.loading::after, #episodes-list.loading::after {
+#movies-list.loading::after, #episodes-list.loading::after, #channel-collections-list.loading::after {
     content: "Loading...";
     display: block;
     width: 100%;
@@ -510,8 +506,8 @@ pre {
     color: var(--text-color);
 }
 
-#movies-list.loading .movie-card, #episodes-list.loading .episode-card {
-    opacity: 0.5; /* Dim cards while loading */
+#movies-list.loading .movie-card, #episodes-list.loading .episode-card, #channel-collections-list.loading .channel-card {
+    opacity: 0.5;
 }
 
 .section-header {
@@ -529,7 +525,7 @@ pre {
 .section-toggle-button {
     padding: 8px 12px;
     font-size: 0.85em;
-    background-color: #6c757d; /* A neutral gray */
+    background-color: #6c757d;
     color: white;
     border: none;
     border-radius: 5px;
@@ -548,22 +544,22 @@ pre {
     transform: translateY(-50%);
     width: 40px;
     height: 40px;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.5);
     color: white;
     border: none;
-    border-radius: 50%; /* Make them round */
+    border-radius: 50%;
     font-size: 1.5em;
     font-weight: bold;
     cursor: pointer;
-    z-index: 10; /* Ensure they are above content */
+    z-index: 10;
     opacity: 0.8;
     transition: opacity 0.3s ease, background-color 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    user-select: none; /* Prevent text selection */
+    user-select: none;
     -webkit-user-select: none;
-    touch-action: none; /* Add this line */
+    touch-action: none;
 }
 
 .scroll-arrow:hover {
@@ -572,119 +568,120 @@ pre {
 }
 
 .scroll-arrow.left {
-    left: 5px; /* Adjust as needed */
+    left: 5px;
 }
 
 .scroll-arrow.right {
-    right: 5px; /* Adjust as needed */
+    right: 5px;
 }
 
 .scroll-arrow.hidden {
     display: none;
 }
 
-.filter-sort-controls { /* New: Style for search/sort group */
+.filter-sort-controls {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
-    flex-wrap: wrap; /* Allow wrapping on small screens */
+    flex-wrap: wrap;
     align-items: center;
 }
 .filter-sort-controls label {
     white-space: nowrap;
 }
 .filter-sort-controls input[type="search"] {
-    min-width: 220px; /* Increased from 150px to provide more space */
-    flex-grow: 1; /* Allow it to grow beyond min-width if space is available */
+    min-width: 220px;
+    flex-grow: 1;
 }
 .filter-sort-controls select {
     min-width: 100px;
 }
 
 /* Specific styling for selects (to try to control default arrow better) */
-#theme-select, /* Added theme select */
-#client-select, /* Added client select */
-#dvr-server-select, /* Added dvr server select */
+#theme-select,
+#client-select,
+#dvr-server-select,
 .input-group select,
 .channel-list-section select,
-.filter-sort-controls select {
-    padding: 10px 15px; /* Slightly more horizontal padding */
+.filter-sort-controls select,
+.collection-dropdown { /* MODIFIED: Added .collection-dropdown here */
+    padding: 10px 15px;
     font-size: 1em;
     border: 1px solid var(--input-border-color);
-    border-radius: 6px; /* Slightly more rounded corners */
+    border-radius: 6px;
     background-color: var(--container-bg-color);
     color: var(--text-color);
     transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* Subtle inner shadow for depth */
-    flex-grow: 1; /* Allow inputs to grow in flex containers */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+    flex-grow: 1;
 
-    -webkit-appearance: none; /* Remove default arrow on WebKit */
-    -moz-appearance: none;    /* Remove default arrow on Firefox */
-    appearance: none;         /* Remove default arrow */
-    /* Using a data URI for a simple SVG arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
     background-repeat: no-repeat;
-    background-position: right 8px center; /* Position custom arrow */
-    background-size: 18px; /* Size custom arrow */
-    padding-right: 30px; /* Make space for the arrow */
-    flex-grow: 0; /* Override flex-grow:1 for selects generally to prevent stretching */
+    background-position: right 8px center;
+    background-size: 18px;
+    padding-right: 30px;
+    flex-grow: 0;
 }
 
 /* Focus state */
 .input-group input:focus,
-#theme-select:focus, /* Added theme select focus */
-#client-select:focus, /* Added client select focus */
-#dvr-server-select:focus, /* Added dvr server select focus */
+#theme-select:focus,
+#client-select:focus,
+#dvr-server-select:focus,
 .input-group select:focus,
 .channel-list-section select:focus,
 .filter-sort-controls input[type="search"]:focus,
-.filter-sort-controls select:focus {
-    outline: none; /* Remove default outline */
-    border-color: var(--button-hover-bg-color); /* Highlight border on focus */
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Subtle blue glow on focus */
+.filter-sort-controls select:focus,
+.collection-dropdown:focus { /* MODIFIED: Added .collection-dropdown here */
+    outline: none;
+    border-color: var(--button-hover-bg-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 
 /* Adjust arrow color for dark themes */
-html.theme-dark-gray #theme-select, /* MODIFIED: Target html instead of body */
-html.theme-dark-gray #client-select, /* MODIFIED: Target html instead of body */
-html.theme-dark-gray #dvr-server-select, /* MODIFIED: Target html instead of body */
-html.theme-dark-gray .input-group select, /* MODIFIED: Target html instead of body */
-html.theme-dark-gray .channel-list-section select, /* MODIFIED: Target html instead of body */
-html.theme-dark-gray .filter-sort-controls select, /* MODIFIED: Target html instead of body */
-html.theme-dark-green #theme-select, /* MODIFIED: Target html instead of body */
-html.theme-dark-green #client-select, /* MODIFIED: Target html instead of body */
-html.theme-dark-green #dvr-server-select, /* MODIFIED: Target html instead of body */
-html.theme-dark-green .input-group select, /* MODIFIED: Target html instead of body */
-html.theme-dark-green .channel-list-section select, /* MODIFIED: Target html instead of body */
-html.theme-dark-green .filter-sort-controls select { /* MODIFIED: Target html instead of body */
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* White arrow for dark themes */
+html.theme-dark-gray #theme-select,
+html.theme-dark-gray #client-select,
+html.theme-dark-gray #dvr-server-select,
+html.theme-dark-gray .input-group select,
+html.theme-dark-gray .channel-list-section select,
+html.theme-dark-gray .filter-sort-controls select,
+html.theme-dark-gray .collection-dropdown, /* MODIFIED: Added .collection-dropdown here */
+html.theme-dark-green #theme-select,
+html.theme-dark-green #client-select,
+html.theme-dark-green #dvr-server-select,
+html.theme-dark-green .input-group select,
+html.theme-dark-green .channel-list-section select,
+html.theme-dark-green .filter-sort-controls select,
+html.theme-dark-green .collection-dropdown { /* MODIFIED: Added .collection-dropdown here */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
 }
 
 /* Styling for the selected DVR server display */
 #dvr-server-ip-display {
-    display: inline-block; /* Allow padding and border */
-    padding: 8px 12px; /* Consistent with other small inputs/buttons */
-    margin-left: 10px; /* Space from the select box */
+    display: inline-block;
+    padding: 8px 12px;
+    margin-left: 10px;
     border: 1px solid var(--input-border-color);
     border-radius: 6px;
-    background-color: var(--config-info-bg); /* Use a subtle background, perhaps config-info's background */
+    background-color: var(--config-info-bg);
     color: var(--text-color);
-    font-size: 0.95em; /* Consistent with the labels */
+    font-size: 0.95em;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
-    vertical-align: middle; /* Align nicely with dropdown */
+    vertical-align: middle;
 }
 
 
 /* Media queries */
 @media (max-width: 600px) and (any-hover: none) {
-    .movie-card, .episode-card {
-        /* Make cards narrower to show part of the next card */
-        width: 85%; /* Adjust this percentage as needed to show more or less of the next card */
+    .movie-card, .episode-card, .channel-card {
+        width: 85%;
     }
-    /* Hide scroll arrows on phone-like devices */
     .scroll-arrow {
-        display: none; /* This will hide the arrows */
+        display: none;
     }
     .filter-sort-controls {
         flex-direction: column;
@@ -694,4 +691,90 @@ html.theme-dark-green .filter-sort-controls select { /* MODIFIED: Target html in
     .filter-sort-controls select {
         width: 100%;
     }
+}
+
+/* Specific adjustments for .channel-card to ensure carousel display */
+.channel-card {
+    flex-shrink: 0;
+    width: 280px;
+}
+
+.channel-card-image-container {
+    width: 100%;
+    height: 160px;
+    background-color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.channel-card-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.channel-card-image-container img.error-img {
+    display: none;
+}
+
+.channel-card-image-container .no-image-text {
+    color: #fff;
+    font-size: 0.9em;
+    text-align: center;
+    padding: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.channel-card-content {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.channel-card-content h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+    color: var(--recording-title-color);
+}
+
+.channel-card-content .episode-details {
+    font-size: 0.85em;
+    color: var(--recording-episode-color);
+    margin-bottom: 8px;
+}
+
+.channel-card-content .summary {
+    font-size: 0.8em;
+    color: var(--recording-summary-color);
+    margin-bottom: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.channel-card-content .play-button-container {
+    margin-top: auto;
+    text-align: center;
+}
+
+.channel-card-content .play-button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    width: 100%;
+}
+
+/* Specific styling for the collection dropdown to push it left */
+.collection-dropdown {
+    margin-right: auto; /* Pushes the dropdown to the left within its flex container */
 }

@@ -385,6 +385,51 @@ def send_notification():
     except Exception as e:
         return jsonify({'status': 'error', 'message': f'An unexpected error occurred: {e}'}), 500
 
+@app.route('/collections_list', methods=['GET'])
+def get_collections_list():
+    dvr_server_ip = request.args.get('dvr_server_ip')
+    dvr_server_port = request.args.get('dvr_server_port', CHANNELS_DVR_SERVER_PORT)
+
+    if not dvr_server_ip:
+        return jsonify({"status": "error", "message": "No DVR Server IP provided."}), 400
+
+    collections_api_url = f"http://{dvr_server_ip}:{dvr_server_port}/dvr/collections/channels"
+    
+    try:
+        response = requests.get(collections_api_url, timeout=5)
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+        return jsonify(response.json())
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": f"Timeout connecting to DVR server at {dvr_server_ip}:{dvr_server_port} for collections."}), 500
+    except requests.exceptions.RequestException as e:
+        return jsonify({"status": "error", "message": f"Error fetching collections from DVR server ({dvr_server_ip}:{dvr_server_port}): {e}"}), 500
+    except json.JSONDecodeError:
+        return jsonify({"status": "error", "message": f"Failed to decode JSON response from DVR server at {collections_api_url}."}), 500
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"An unexpected error occurred while fetching collections: {e}"}), 500
+
+@app.route('/now_playing_data', methods=['GET'])
+def get_now_playing_data():
+    dvr_server_ip = request.args.get('dvr_server_ip')
+    dvr_server_port = request.args.get('dvr_server_port', CHANNELS_DVR_SERVER_PORT)
+
+    if not dvr_server_ip:
+        return jsonify({"status": "error", "message": "No DVR Server IP provided."}), 400
+
+    now_playing_api_url = f"http://{dvr_server_ip}:{dvr_server_port}/devices/ANY/guide/now"
+    
+    try:
+        response = requests.get(now_playing_api_url, timeout=5)
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+        return jsonify(response.json())
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": f"Timeout connecting to DVR server at {dvr_server_ip}:{dvr_server_port} for now playing data."}), 500
+    except requests.exceptions.RequestException as e:
+        return jsonify({"status": "error", "message": f"Error fetching now playing data from DVR server ({dvr_server_ip}:{dvr_server_port}): {e}"}), 500
+    except json.JSONDecodeError:
+        return jsonify({"status": "error", "message": f"Failed to decode JSON response from DVR server at {now_playing_api_url}."}), 500
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"An unexpected error occurred while fetching now playing data: {e}"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)

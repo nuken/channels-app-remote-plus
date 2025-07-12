@@ -120,13 +120,31 @@
             <p style="font-size: 0.8em; margin-top: 5px;">Fetches favorite channels directly from the selected Channels App client.</p>
         </div>
 
-
         <h2>Navigation</h2>
         <div class="button-grid">
             <button class="control-button" onclick="sendCommand('navigate', 'Live TV')">Go to Live TV</button>
             <button class="control-button" onclick="sendCommand('navigate', 'Guide')">Go to Guide</button>
             <button class="control-button" onclick="sendCommand('navigate', 'Library')">Go to Library</button>
             <button class="control-button" onclick="sendCommand('navigate', 'Search')">Go to Search</button>
+        </div>
+
+        <div id="channel-collections-section">
+            <div class="section-header">
+                <h2>Channel Collections</h2>
+                <div class="section-actions">
+                    <button class="section-toggle-button" onclick="toggleSection('channel-collections-carousel-wrapper', this)">Hide Content</button>
+                </div>
+            </div>
+            {# MODIFIED: Moved collection-select here, outside of section-actions #}
+            <div class="collection-dropdown-container" style="margin-top: 15px; margin-bottom: 15px;">
+                <select id="collection-select" class="collection-dropdown"></select>
+            </div>
+            <div id="channel-collections-carousel-wrapper" class="carousel-wrapper">
+                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('channel-collections-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('channel-collections-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
+                <div id="channel-collections-list">
+                    </div>
+                <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('channel-collections-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('channel-collections-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
+            </div>
         </div>
 
         <div id="movies-list-section">

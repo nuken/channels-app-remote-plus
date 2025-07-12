@@ -18,7 +18,11 @@ const moviesSortOrderSelect = document.getElementById('movies-sort-order');
 
 const showsSearchInput = document.getElementById('shows-search');
 const showsSortBySelect = document.getElementById('shows-sort-by');
-const showsSortOrderSelect = document.getElementById('shows-sort-order');
+const showsSortOrderSelect = document = document.getElementById('shows-sort-order');
+
+// New elements for Channel Collections
+const collectionSelect = document.getElementById('collection-select'); // This remains, but its direct use in displaying content changes
+const channelCollectionsList = document.getElementById('channel-collections-list'); // MODIFIED: Target the carousel list
 
 let selectedClientIp = '';
 let selectedDvrServerIp = '';
@@ -90,14 +94,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('enablePopups', enablePopupsCheckbox.checked);
     });
 
-    // Load last selected DVR server IP:Port first, as it's needed for client discovery
+    // Load last selected DVR server IP:Port first, as it's needed for client discovery and collections
     const lastSelectedDvrServerIpPort = localStorage.getItem('lastSelectedDvrServerIpPort');
     let foundLastDvrServer = false;
     if (lastSelectedDvrServerIpPort) {
         const dvrServerOption = Array.from(dvrServerSelect.options).find(option => option.value === lastSelectedDvrServerIpPort);
         if (dvrServerOption) {
             dvrServerSelect.value = lastSelectedDvrServerIpPort;
-            await selectDvrServer(); // Await this as it loads clients
+            await selectDvrServer(); // Await this as it loads clients and sets selectedDvrServerIp/Port
             foundLastDvrServer = true;
         }
     }
@@ -204,7 +208,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert('Failed to send notification.');
         });
     });
+
+    // New: Call fetchChannelCollections here after selectedDvrServerIp/Port are likely set
+    if (selectedDvrServerIp && selectedDvrServerPort) {
+        fetchChannelCollections();
+    } else {
+        // If no DVR server is selected on load, set a listener to load collections later
+        dvrServerSelect.addEventListener('change', () => {
+            if (selectedDvrServerIp && selectedDvrServerPort) {
+                fetchChannelCollections();
+            }
+        }, { once: true }); // Only run once to avoid multiple fetches on subsequent changes
+    }
 });
+
+// Helper function to get full image URL, handling relative vs absolute paths
+function getFullImageUrl(relativePath) {
+    if (!relativePath) return '';
+    // Check if the path is already an absolute URL (starts with http, https, or //)
+    if (relativePath.startsWith('http://') || relativePath.startsWith('https://') || relativePath.startsWith('//')) {
+        return relativePath;
+    }
+    // If it's a relative path, and DVR server info is available, prepend the DVR server base URL
+    if (selectedDvrServerIp && selectedDvrServerPort) {
+        return `http://${selectedDvrServerIp}:${selectedDvrServerPort}${relativePath}`;
+    }
+    return relativePath; // Fallback for relative paths if DVR server info isn't available
+}
+
 
 async function selectClient() {
     selectedClientIp = clientSelect.value;
@@ -224,7 +255,7 @@ async function selectClient() {
     }
 }
 
-// MODIFIED: This function now dynamically loads clients for the selected DVR server
+// MODIFIED: This function now dynamically loads clients for the selected DVR server AND triggers collection/movie/show loads
 async function selectDvrServer() {
     const selectedValue = dvrServerSelect.value;
     if (selectedValue) {
@@ -239,14 +270,16 @@ async function selectDvrServer() {
         // --- NEW: Fetch and populate clients for the selected DVR server ---
         await fetchClientsForDvrServer(selectedDvrServerIp, selectedDvrServerPort);
 
+        // Now that DVR server is selected, fetch collections, movies, and shows
+        fetchChannelCollections();
         loadMovies();
         loadShows();
     } else {
         localStorage.removeItem('lastSelectedDvrServerIpPort');
         dvrServerIpDisplay.textContent = 'Not Selected';
         dvrServerIpDisplay.style.display = 'none';
-        moviesListDiv.innerHTML = '<p>Please select a DVR server.</p>';
-        episodesListDiv.innerHTML = '<p>Please select a DVR server.</p>';
+        moviesListDiv.innerHTML = '<p>Please select a DVR server to load movies.</p>';
+        episodesListDiv.innerHTML = '<p>Please select a DVR server to load episodes.</p>';
         showNotification("Please select a DVR server.", true);
         allMoviesData = [];
         allEpisodesData = [];
@@ -259,6 +292,9 @@ async function selectDvrServer() {
         toggleControls(false); // Disable controls as no client is selected
         statusDisplay.innerText = "No DVR server selected.";
         nowPlayingDisplay.classList.add('hidden');
+        channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel collections.</p>'; // Clear collections
+        collectionSelect.innerHTML = '<option value="">Select a Collection</option>'; // Clear collection dropdown
+        collectionSelect.disabled = true; // Disable collection dropdown
     }
 }
 
@@ -441,8 +477,11 @@ async function getStatus() {
                     episodeDetails += np.episode_title;
                 }
 
+                // MODIFIED: Use getFullImageUrl helper
+                const imageUrl = getFullImageUrl(np.image_url);
+
                 nowPlayingDisplay.innerHTML = `
-                    ${np.image_url ? `<img src="${np.image_url}" alt="Now Playing Image">` : ''}
+                    ${imageUrl ? `<img src="${imageUrl}" alt="Now Playing Image">` : ''}
                     <div id="now-playing-info">
                         <h3>${np.title}</h3>
                         ${episodeDetails ? `<p class="episode-details">${episodeDetails}</p>` : ''}
@@ -554,7 +593,8 @@ async function loadMovies() {
             allMoviesData = [];
         }
         checkArrowVisibility(moviesListDiv);
-    } catch (error) {
+    }
+    catch (error) {
         moviesListDiv.innerHTML = `<p style="color: red;">Error fetching movies: ${error.message}</p>`;
         moviesListDiv.classList.remove('loading');
         showNotification(`Error fetching movies: ${error.message}`, true);
@@ -613,7 +653,8 @@ function renderMovies(moviesToRender) {
         const card = document.createElement('div');
         card.className = 'movie-card';
 
-        const imageUrl = movie.image_url || '';
+        // MODIFIED: Use getFullImageUrl helper
+        const imageUrl = getFullImageUrl(movie.image_url);
         const hasImage = !!imageUrl; 
         
         const imageHtml = `
@@ -760,7 +801,8 @@ function renderShows(episodesToRender) {
         const card = document.createElement('div');
         card.className = 'episode-card';
 
-        const imageUrl = episode.image_url || '';
+        // MODIFIED: Use getFullImageUrl helper
+        const imageUrl = getFullImageUrl(episode.image_url);
         const hasImage = !!imageUrl;
 
         const imageHtml = `
@@ -834,7 +876,7 @@ function toggleSection(wrapperId, button) {
     if (currentDisplay === 'none') {
         wrapperDiv.style.display = 'block';
         button.textContent = 'Hide Content';
-        const carouselDiv = wrapperDiv.querySelector('#movies-list, #episodes-list');
+        const carouselDiv = wrapperDiv.querySelector('#movies-list, #episodes-list, #channel-collections-list');
         if (carouselDiv) checkArrowVisibility(carouselDiv);
     } else {
         wrapperDiv.style.display = 'none';
@@ -892,6 +934,7 @@ function checkArrowVisibility(carouselElement) {
 function setupCarouselNavigation() {
     const movieCarousel = document.getElementById('movies-list');
     const episodeCarousel = document.getElementById('episodes-list');
+    const channelCollectionsCarousel = document.getElementById('channel-collections-list');
 
     if (movieCarousel) {
         movieCarousel.addEventListener('scroll', () => checkArrowVisibility(movieCarousel));
@@ -901,9 +944,167 @@ function setupCarouselNavigation() {
         episodeCarousel.addEventListener('scroll', () => checkArrowVisibility(episodeCarousel));
         checkArrowVisibility(episodeCarousel);
     }
+    if (channelCollectionsCarousel) {
+        channelCollectionsCarousel.addEventListener('scroll', () => checkArrowVisibility(channelCollectionsCarousel));
+        checkArrowVisibility(channelCollectionsCarousel);
+    }
 
     window.addEventListener('resize', () => {
         if (movieCarousel) checkArrowVisibility(movieCarousel);
         if (episodeCarousel) checkArrowVisibility(episodeCarousel);
+        if (channelCollectionsCarousel) checkArrowVisibility(channelCollectionsCarousel);
     });
 }
+
+// Function to fetch and display channel collections
+const fetchChannelCollections = async () => {
+    if (!selectedDvrServerIp || !selectedDvrServerPort) {
+        channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel collections.</p>';
+        collectionSelect.innerHTML = '<option value="">Select a Collection</option>';
+        collectionSelect.disabled = true;
+        showNotification("Please select a DVR server to load channel collections.", true);
+        return;
+    }
+
+    try {
+        const collectionsResponse = await fetch(`/collections_list?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}`);
+        
+        if (!collectionsResponse.ok) {
+            const errorData = await collectionsResponse.json();
+            throw new Error(`Server error: ${collectionsResponse.status} - ${errorData.message || collectionsResponse.statusText}`);
+        }
+
+        const collections = await collectionsResponse.json();
+
+        // Populate the dropdown
+        collectionSelect.innerHTML = '<option value="">Select a Collection</option>';
+        collections.forEach(collection => {
+            const option = document.createElement('option');
+            option.value = collection.slug;
+            option.textContent = collection.name;
+            collectionSelect.appendChild(option);
+        });
+        collectionSelect.disabled = false;
+
+
+        // Event listener for dropdown change
+        collectionSelect.addEventListener('change', async (event) => {
+            const selectedCollectionSlug = event.target.value;
+            if (selectedCollectionSlug) {
+                const selectedCollection = collections.find(col => col.slug === selectedCollectionSlug);
+                if (selectedCollection) {
+                    await displayChannelsInCollection(selectedCollection.items);
+                }
+            } else {
+                channelCollectionsList.innerHTML = ''; // Clear content if no collection is selected
+            }
+        });
+
+        // Automatically load the first collection if available
+        if (collections.length > 0) {
+            collectionSelect.value = collections[0].slug;
+            await displayChannelsInCollection(collections[0].items);
+        } else {
+            channelCollectionsList.innerHTML = '<p>No channel collections found on this DVR server.</p>';
+        }
+
+    } catch (error) {
+        console.error('Error fetching channel collections:', error);
+        channelCollectionsList.innerHTML = `<p>Error loading channel collections: ${error.message}. Please ensure the DVR server is running and accessible.</p>`;
+        collectionSelect.innerHTML = '<option value="">Error loading collections</option>';
+        collectionSelect.disabled = true;
+        showNotification(`Error loading collections: ${error.message}`, true);
+    }
+};
+
+// Function to display channels within a selected collection
+const displayChannelsInCollection = async (channelIds) => {
+    if (!selectedDvrServerIp || !selectedDvrServerPort) {
+        channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel information.</p>';
+        showNotification("Please select a DVR server to load channel information.", true);
+        return;
+    }
+
+    channelCollectionsList.innerHTML = '<p>Loading channels...</p>';
+    channelCollectionsList.classList.add('loading');
+    
+    try {
+        const nowPlayingResponse = await fetch(`/now_playing_data?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}`);
+        
+        if (!nowPlayingResponse.ok) {
+            const errorData = await nowPlayingResponse.json();
+            throw new Error(`Server error: ${nowPlayingResponse.status} - ${errorData.message || nowPlayingResponse.statusText}`);
+        }
+
+        const nowPlayingData = await nowPlayingResponse.json();
+
+        const channelsToDisplay = nowPlayingData.filter(item =>
+            channelIds.includes(item.Channel.ChannelID) ||
+            channelIds.includes(item.Channel.Number) ||
+            channelIds.includes(item.Channel.Name) // Adding flexibility to match based on ID, Number or Name
+        );
+
+        channelCollectionsList.innerHTML = ''; // Clear loading message
+        channelCollectionsList.classList.remove('loading');
+
+
+        if (channelsToDisplay.length > 0) {
+            channelsToDisplay.forEach(item => {
+                const card = document.createElement('div');
+                card.classList.add('channel-card'); // Add channel-card class
+                card.classList.add('movie-card'); // Add movie-card to inherit carousel styles
+
+                // MODIFIED: Use Airings[0].Image for the image source
+                const imageUrl = item.Airings[0] && item.Airings[0].Image ? getFullImageUrl(item.Airings[0].Image) : '';
+                const hasImage = !!imageUrl;
+
+                const imageHtml = `
+                    <div class="channel-card-image-container movie-card-image-container">
+                        <img src="${imageUrl}" alt="${item.Channel.Name}" class="main-image"
+                             style="${hasImage ? '' : 'display: none;'}" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/120x90/333/eee?text=No+Image';
+                                      this.classList.add('error-img');
+                                      this.style.display='none';
+                                      this.closest('.channel-card-image-container').querySelector('.no-image-text').style.display='block';" />
+                        <div class="no-image-text"
+                             style="${hasImage ? 'display: none;' : 'display: block;'}">No Image Available</div>
+                    </div>
+                `;
+
+                card.innerHTML = `
+                    ${imageHtml}
+                    <div class="channel-card-content movie-card-content">
+                        <h3>${item.Channel.Name} (${item.Channel.Number})</h3>
+                        <p class="episode-details">${item.Airings[0] ? item.Airings[0].Title : 'No Program Info'}</p>
+                        ${item.Airings[0] && item.Airings[0].Summary ? `<p class="summary">${item.Airings[0].Summary}</p>` : ''}
+                        <div class="play-button-container">
+                            <button class="control-button play-button" onclick="playChannel('${item.Channel.Number}')">Tune In</button>
+                        </div>
+                    </div>
+                `;
+                channelCollectionsList.appendChild(card);
+            });
+            checkArrowVisibility(channelCollectionsList);
+        } else {
+            channelCollectionsList.innerHTML = '<p>No channels found in this collection or no "now playing" data available for them.</p>';
+            checkArrowVisibility(channelCollectionsList);
+        }
+
+    } catch (error) {
+        console.error('Error fetching now playing data for collection:', error);
+        channelCollectionsList.innerHTML = `<p>Error loading channel information: ${error.message}. Please ensure the DVR server is running and accessible.</p>`;
+        channelCollectionsList.classList.remove('loading');
+        showNotification(`Error loading channel info: ${error.message}`, true);
+    }
+};
+
+// Function to simulate playing a channel
+const playChannel = async (channelNumber) => {
+    // MODIFIED: Use sendCommand function to send play request to the selected client
+    if (!selectedClientIp) {
+        showNotification("Please select a Channels App client first to play the channel.", true);
+        return;
+    }
+    // sendCommand already handles error messages and notifications
+    sendCommand('play_channel', channelNumber);
+};
