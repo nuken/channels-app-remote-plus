@@ -176,6 +176,8 @@ def control_channels():
                 client.stop()
             elif action == 'toggle_cc':
                 client.toggle_cc()
+            elif action == 'toggle_record':
+                client.toggle_record()
             elif action == 'navigate':
                 if value:
                     client.navigate(value)

@@ -374,7 +374,7 @@ async function selectDvrServer() {
         nowPlayingDisplay.classList.add('hidden');
         channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel collections.</p>'; // Clear collections
         collectionSelect.innerHTML = '<option value="">Select a Collection</option>'; // Clear collection dropdown
-        collectionSelect.disabled = true; // Disable collection dropdown
+        collectionSelect.disabled = true;
         channelCollectionSortBySelect.disabled = true; // Disable sort dropdowns
         channelCollectionSortOrderSelect.disabled = true;
         stopChannelRefresh(); // Stop refresh if DVR server is deselected
@@ -556,6 +556,20 @@ async function rewindAndEnableCC() {
         showNotification("Rewound 15s and Closed Captions toggled.", false);
     } else {
         showNotification("Rewound 15s, but failed to toggle Closed Captions.", true);
+    }
+}
+
+// NEW: Function to toggle recording
+async function toggleRecord() {
+    if (!selectedClientIp) {
+        showNotification("Please select a client device first.", true);
+        return;
+    }
+    const status = await sendCommand('toggle_record');
+    if (status === 'success') {
+        showNotification("Recording toggled.", false);
+    } else {
+        showNotification("Failed to toggle recording.", true);
     }
 }
 
