@@ -28,15 +28,22 @@
     <div class="container">
         <h1>Channels App Remote Plus</h1>
 
-        <div style="margin-bottom: 20px;">
-            <label for="theme-select" style="margin-right: 10px;">Select Theme:</label>
-            <select id="theme-select" onchange="applyTheme()">
-                <option value="default-light">Default Light</option>
-                <option value="light-purple">Light (Purple Buttons)</option>
-                <option value="dark-gray">Dark (Gray Buttons)</option>
-                <option value="dark-green">Dark (Green Buttons)</option>
-            </select>
+        <div id="theme-selection-section">
+            <div class="section-header">
+                <h2>Theme Selection</h2>
+                <button class="section-toggle-button" onclick="toggleSection('theme-selection-content', this)">Hide Content</button>
+            </div>
+            <div id="theme-selection-content">
+                <label for="theme-select" style="margin-right: 10px;">Select Theme:</label>
+                <select id="theme-select" onchange="applyTheme()">
+                    <option value="default-light">Default Light</option>
+                    <option value="light-purple">Light (Purple Buttons)</option>
+                    <option value="dark-gray">Dark (Gray Buttons)</option>
+                    <option value="dark-green">Dark (Green Buttons)</option>
+                </select>
+            </div>
         </div>
+
           <div class="status-section" style="margin-bottom: 10px;">
     <h2>Current Device Status</h2>
     <button class="control-button" onclick="getStatus()">Refresh Status</button>
@@ -46,46 +53,52 @@
     <pre id="status-display" style="margin-top: 10px;"></pre>
 </div>  
 
-        <div class="config-info">
-            <p><strong>Configured Clients:</strong></p>
-            <select id="client-select" onchange="selectClient()">
-                <option value="">Select a Client</option>
-                {% for client in clients %}
-                   <option value="{{ client.ip }}">{{ client.name }} ({{ client.ip }})</option>
-                {% endfor %}
-            </select>
-            {% if not clients_configured %}
-                <p style="color: red;">No clients configured. Set CHANNELS_APP_CLIENTS environment variable.</p>
-            {% endif %}
-            <p>
-                <strong>Select Channels DVR Server:</strong><br>
-                <select id="dvr-server-select" onchange="selectDvrServer()">
-                    <option value="">Select a DVR Server</option>
-                    {% for server in dvr_servers %}
-                        {# MODIFIED: Value is now IP:Port, display is also IP:Port #}
-                        <option value="{{ server.ip }}:{{ server.port }}">{{ server.ip }}:{{ server.port }}</option>
+        <div id="client-server-selection-section" class="config-info">
+            <div class="section-header">
+                <h2>Client and Server Selection</h2>
+                <button class="section-toggle-button" onclick="toggleSection('client-server-selection-content', this)">Hide Content</button>
+            </div>
+            <div id="client-server-selection-content">
+                <p><strong>Configured Clients:</strong></p>
+                <select id="client-select" onchange="selectClient()">
+                    <option value="">Select a Client</option>
+                    {% for client in clients %}
+                       <option value="{{ client.ip }}">{{ client.name }} ({{ client.ip }})</option>
                     {% endfor %}
                 </select>
-                {% if not dvr_servers_configured %}
-                    <p style="color: red;">No DVR servers configured. Set CHANNELS_DVR_SERVERS environment variable.</p>
+                {% if not clients_configured %}
+                    <p style="color: red;">No clients configured. Set CHANNELS_APP_CLIENTS environment variable.</p>
                 {% endif %}
-               <div id="dvr-server-ip-display" style="display: none;"></div></p>
+                <p>
+                    <strong>Select Channels DVR Server:</strong><br>
+                    <select id="dvr-server-select" onchange="selectDvrServer()">
+                        <option value="">Select a DVR Server</option>
+                        {% for server in dvr_servers %}
+                            {# MODIFIED: Value is now IP:Port, display is also IP:Port #}
+                            <option value="{{ server.ip }}:{{ server.port }}">{{ server.ip }}:{{ server.port }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if not dvr_servers_configured %}
+                        <p style="color: red;">No DVR servers configured. Set CHANNELS_DVR_SERVERS environment variable.</p>
+                    {% endif %}
+                   <div id="dvr-server-ip-display" style="display: none;"></div></p>
 
-            <div class="col-md-auto d-flex align-items-center" style="margin-top: 15px;">
-                <button class="btn btn-primary" id="sendMessageButton">Send Message</button>
-            </div>
+                <div class="col-md-auto d-flex align-items-center" style="margin-top: 15px;">
+                    <button class="btn btn-primary" id="sendMessageButton">Send Message</button>
+                </div>
 
-            <div id="messageForm" style="display: none; margin-top: 20px;">
-                <h2>Send Notification</h2>
-                <div class="mb-3">
-                    <label for="notificationTitle" class="form-label">Title</label>
-                    <input type="text" class="form-control" id="notificationTitle" placeholder="e.g. Alert">
+                <div id="messageForm" style="display: none; margin-top: 20px;">
+                    <h2>Send Notification</h2>
+                    <div class="mb-3">
+                        <label for="notificationTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="notificationTitle" placeholder="e.g. Alert">
+                    </div>
+                    <div class="mb-3">
+                        <label for="notificationBody" class="form-label">Message Body</label>
+                        <textarea class="form-control" id="notificationBody" rows="3" placeholder="e.g. Dinners Ready"></textarea>
+                    </div>
+                    <button class="btn btn-success" id="sendNotificationBtn">Send</button>
                 </div>
-                <div class="mb-3">
-                    <label for="notificationBody" class="form-label">Message Body</label>
-                    <textarea class="form-control" id="notificationBody" rows="3" placeholder="e.g. Dinners Ready"></textarea>
-                </div>
-                <button class="btn btn-success" id="sendNotificationBtn">Send</button>
             </div>
         </div>
 

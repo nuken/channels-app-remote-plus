@@ -275,6 +275,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }, { once: true }); // Only run once to avoid multiple fetches on subsequent changes
     }
+
+    // Load and apply initial visibility states from localStorage
+    applyInitialSectionVisibility('theme-selection-content');
+    applyInitialSectionVisibility('client-server-selection-content'); // Corrected ID here
+    applyInitialSectionVisibility('movies-carousel-wrapper');
+    applyInitialSectionVisibility('episodes-carousel-wrapper');
+    applyInitialSectionVisibility('channel-collections-carousel-wrapper');
 });
 
 // Helper function to get full image URL, handling relative vs absolute paths
@@ -960,9 +967,9 @@ async function playRecording(recordingId) {
 
 function toggleSection(wrapperId, button) {
     const wrapperDiv = document.getElementById(wrapperId);
-    const currentDisplay = window.getComputedStyle(wrapperDiv).display;
+    const isHidden = window.getComputedStyle(wrapperDiv).display === 'none';
 
-    if (currentDisplay === 'none') {
+    if (isHidden) {
         wrapperDiv.style.display = 'block';
         button.textContent = 'Hide Content';
         const carouselDiv = wrapperDiv.querySelector('#movies-list, #episodes-list, #channel-collections-list');
@@ -971,7 +978,37 @@ function toggleSection(wrapperId, button) {
         wrapperDiv.style.display = 'none';
         button.textContent = 'Show Content';
     }
+    // Save the state to localStorage
+    localStorage.setItem(wrapperId + 'Visible', !isHidden);
 }
+
+function applyInitialSectionVisibility(wrapperId) { // Removed localStorageKey argument
+    const wrapperDiv = document.getElementById(wrapperId);
+    if (wrapperDiv) {
+        const localStorageKey = wrapperId + 'Visible'; // Generate key consistently
+        const savedState = localStorage.getItem(localStorageKey);
+        
+        const parentSection = wrapperDiv.closest('div[id$="-section"]');
+        let toggleButton = null;
+        if (parentSection) {
+            toggleButton = parentSection.querySelector('.section-toggle-button');
+        }
+
+        // Default to visible if no state is saved or if savedState is 'true'
+        if (savedState === 'false') { // If explicitly saved as false (hidden)
+            wrapperDiv.style.display = 'none';
+            if (toggleButton) {
+                toggleButton.textContent = 'Show Content';
+            }
+        } else { // Default to visible or if explicitly saved as true
+            wrapperDiv.style.display = 'block';
+            if (toggleButton) {
+                toggleButton.textContent = 'Hide Content';
+            }
+        }
+    }
+}
+
 
 function scrollCarousel(carouselElement, direction) {
     // MODIFIED: Calculate scrollAmount dynamically based on the visible width of the carousel.
@@ -1259,9 +1296,9 @@ const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollec
                 const hasImage = !!imageUrl;
 
                 const imageHtml = `
-                    <div class="channel-card-image-container movie-card-image-container">
+                    <div class="channel-card-image-container">
                         <img src="${imageUrl}" alt="${item.Channel.Name}" class="main-image"
-                             style="${hasImage ? '' : 'display: none;'}" 
+                             style="${hasImage ? '' : 'display: none;'}"
                              onerror="this.onerror=null; this.src='https://placehold.co/120x90/333/eee?text=No+Image';
                                       this.classList.add('error-img');
                                       this.style.display='none';
@@ -1269,11 +1306,7 @@ const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollec
                         <div class="no-image-text"
                              style="${hasImage ? 'display: none;' : 'display: block;'}">No Image Available</div>
                     </div>
-                `;
-
-                card.innerHTML = `
-                    ${imageHtml}
-                    <div class="channel-card-content movie-card-content">
+                    <div class="channel-card-content">
                         <h3>${item.Channel.Name} (${item.Channel.Number})</h3>
                         <p class="episode-details">${item.Airings[0] ? item.Airings[0].Title : 'No Program Info'}</p>
                         ${item.Airings[0] && item.Airings[0].Summary ? `<p class="summary">${item.Airings[0].Summary}</p>` : ''}
