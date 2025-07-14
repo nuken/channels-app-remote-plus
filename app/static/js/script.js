@@ -7,7 +7,7 @@ const statusDisplay = document.getElementById('status-display');
 const nowPlayingDisplay = document.getElementById('now-playing-display');
 const controlButtons = document.querySelectorAll('.control-button');
 const themeSelect = document.getElementById('theme-select');
-const dvrServerIpDisplay = document.getElementById('dvr-server-ip-display');
+// const dvrServerIpDisplay = document.getElementById('dvr-server-ip-display'); // Removed from HTML
 const moviesListDiv = document.getElementById('movies-list');
 const episodesListDiv = document.getElementById('episodes-list');
 
@@ -278,10 +278,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load and apply initial visibility states from localStorage
     // console.log("Applying initial section visibility states:");
-    applyInitialSectionVisibility('theme-selection-content');
-    // console.log("Theme section visibility applied.");
-    applyInitialSectionVisibility('client-server-selection-content');
-    // console.log("Client/Server section visibility applied.");
+    // Removed old calls for theme-selection-content and client-server-selection-content
+    applyInitialSectionVisibility('control-panel-content-wrapper'); // NEW: Apply to the combined control panel
+    // console.log("Control Panel section visibility applied.");
     applyInitialSectionVisibility('movies-content-wrapper'); // MODIFIED
     // console.log("Movies section visibility applied.");
     applyInitialSectionVisibility('episodes-content-wrapper'); // MODIFIED
@@ -355,8 +354,8 @@ async function selectDvrServer() {
         selectedDvrServerPort = port;
         localStorage.setItem('lastSelectedDvrServerIpPort', selectedValue);
         // console.log("[DEBUG] selectDvrServer: Saved lastSelectedDvrServerIpPort to localStorage:", selectedValue); // ADDED LOG
-        dvrServerIpDisplay.textContent = `Selected: ${selectedValue}`;
-        dvrServerIpDisplay.style.display = 'inline';
+        // dvrServerIpDisplay.textContent = `Selected: ${selectedValue}`; // REMOVED
+        // dvrServerIpDisplay.style.display = 'inline'; // REMOVED
         showNotification(`DVR Server selected: ${selectedValue}`, false);
         
         // --- NEW: Fetch and populate clients for the selected DVR server ---
@@ -369,8 +368,8 @@ async function selectDvrServer() {
     } else {
         localStorage.removeItem('lastSelectedDvrServerIpPort');
         // console.log("[DEBUG] selectDvrServer: Cleared lastSelectedDvrServerIpPort from localStorage (no DVR server selected)."); // ADDED LOG
-        dvrServerIpDisplay.textContent = 'Not Selected';
-        dvrServerIpDisplay.style.display = 'none';
+        // dvrServerIpDisplay.textContent = 'Not Selected'; // REMOVED
+        // dvrServerIpDisplay.style.display = 'none'; // REMOVED
         moviesListDiv.innerHTML = '<p>Please select a DVR server to load movies.</p>';
         episodesListDiv.innerHTML = '<p>Please select a DVR server to load episodes.</p>';
         showNotification("Please select a DVR server.", true);
@@ -446,7 +445,7 @@ async function fetchClientsForDvrServer(dvrIp, dvrPort) {
                     toggleControls(false); // Disable controls
                     statusDisplay.innerText = "No eligible client selected/found.";
                     nowPlayingDisplay.classList.add('hidden');
-                    // console.log("[DEBUG] fetchClientsForDvrServer: No eligible clients found, clearing selection."); // ADDED LOG
+                    // console.log("[DEBUG] fetchClientsForDvrServer: No clients found by discovery. Clearing selection."); // ADDED LOG
                 }
             }
             
