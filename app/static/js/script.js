@@ -1034,19 +1034,18 @@ function applyInitialSectionVisibility(wrapperId) {
             toggleButton = parentSection.querySelector('.section-toggle-button');
         }
 
-        // Default to visible if no state is saved or if savedState is 'true'
-        if (savedState === 'false') { // If explicitly saved as false (hidden)
-            wrapperDiv.style.display = 'none';
-            if (toggleButton) {
-                toggleButton.textContent = 'Show Content';
-            }
-            // console.log(`[DEBUG applyInitialSectionVisibility] Hiding ${wrapperId} based on saved state.`); // Commented out
-        } else { // Default to visible or if explicitly saved as true
+        // If explicitly saved as 'true', show it. Otherwise, leave it hidden (default CSS state).
+        // If savedState is null (first load), it will remain hidden by default CSS.
+        if (savedState === 'true') {
             wrapperDiv.style.display = 'block';
             if (toggleButton) {
                 toggleButton.textContent = 'Hide Content';
             }
-            // console.log(`[DEBUG applyInitialSectionVisibility] Showing ${wrapperId} based on saved state or default.`); // Commented out
+        } else { // savedState is 'false' or null
+            wrapperDiv.style.display = 'none'; // Explicitly hide, although CSS might already do this
+            if (toggleButton) {
+                toggleButton.textContent = 'Show Content';
+            }
         }
     } else {
         // console.warn(`[DEBUG applyInitialSectionVisibility] Wrapper div not found for ID: ${wrapperId}`); // Commented out

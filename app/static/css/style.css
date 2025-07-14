@@ -449,7 +449,6 @@ pre {
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: auto; /* Changed from hidden to auto */
-    -webkit-overflow-scrolling: touch;
     gap: 20px;
     padding-bottom: 20px;
     padding-left: 10px;
@@ -855,4 +854,12 @@ html.theme-dark-green .collection-dropdown { /* MODIFIED: Added .collection-drop
 /* Specific styling for the collection dropdown to push it left */
 .collection-dropdown {
     margin-right: auto; /* Pushes the dropdown to the left within its flex container */
+}
+
+/* Added for FOUC prevention */
+#control-panel-content-wrapper,
+#movies-content-wrapper,
+#episodes-content-wrapper,
+#channel-collections-content-wrapper {
+    display: none;
 }
