@@ -161,96 +161,102 @@
             <div class="section-header">
                 <h2>Channel Collections</h2>
                 <div class="section-actions">
-                    <button class="section-toggle-button" onclick="toggleSection('channel-collections-carousel-wrapper', this)">Hide Content</button>
+                    <button class="section-toggle-button" onclick="toggleSection('channel-collections-content-wrapper', this)">Hide Content</button>
                 </div>
             </div>
-            {# MODIFIED: Moved collection-select here, outside of section-actions, and added sort dropdowns #}
-            <div class="filter-sort-controls" style="margin-top: 15px; margin-bottom: 15px;">
-                <label for="collection-select">Select Collection:</label>
-                <select id="collection-select" class="collection-dropdown"></select>
-                
-                <label for="channel-collection-sort-by">Sort By:</label>
-                <select id="channel-collection-sort-by">
-                    <option value="number">Channel Number</option>
-                    <option value="name">Channel Name</option>
-                    <option value="title">Program Title</option>
-                </select>
+            <div id="channel-collections-content-wrapper"> {# NEW WRAPPER DIV #}
+                {# MODIFIED: Moved collection-select here, outside of section-actions, and added sort dropdowns #}
+                <div class="filter-sort-controls" style="margin-top: 15px; margin-bottom: 15px;">
+                    <label for="collection-select">Select Collection:</label>
+                    <select id="collection-select" class="collection-dropdown"></select>
+                    
+                    <label for="channel-collection-sort-by">Sort By:</label>
+                    <select id="channel-collection-sort-by">
+                        <option value="number">Channel Number</option>
+                        <option value="name">Channel Name</option>
+                        <option value="title">Program Title</option>
+                    </select>
 
-                <label for="channel-collection-sort-order">Order:</label>
-                <select id="channel-collection-sort-order">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
-                </select>
-            </div>
-            <div id="channel-collections-carousel-wrapper" class="carousel-wrapper">
-                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('channel-collections-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('channel-collections-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
-                <div id="channel-collections-list">
-                    </div>
-                <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('channel-collections-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('channel-collections-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
-            </div>
+                    <label for="channel-collection-sort-order">Order:</label>
+                    <select id="channel-collection-sort-order">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </div>
+                <div id="channel-collections-carousel-wrapper" class="carousel-wrapper">
+                    <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('channel-collections-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('channel-collections-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
+                    <div id="channel-collections-list">
+                        </div>
+                    <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('channel-collections-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('channel-collections-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
+                </div>
+            </div> {# END NEW WRAPPER DIV #}
         </div>
 
         <div id="movies-list-section">
             <div class="section-header">
                 <h2>Movies</h2>
-                <button class="section-toggle-button" onclick="toggleSection('movies-carousel-wrapper', this)">Hide Content</button>
+                <button class="section-toggle-button" onclick="toggleSection('movies-content-wrapper', this)">Hide Content</button>
             </div>
-            <div class="filter-sort-controls">
-                <label for="movies-search">Search:</label>
-                <input type="search" id="movies-search" placeholder="Search movies by title/summary">
+            <div id="movies-content-wrapper"> {# NEW WRAPPER DIV #}
+                <div class="filter-sort-controls">
+                    <label for="movies-search">Search:</label>
+                    <input type="search" id="movies-search" placeholder="Search movies by title/summary">
 
-                <label for="movies-sort-by">Sort By:</label>
-                <select id="movies-sort-by">
-                    <option value="date_released">Release Date</option>
-                    <option value="alpha">Title</option>
-                    <option value="duration">Duration</option>
-                </select>
+                    <label for="movies-sort-by">Sort By:</label>
+                    <select id="movies-sort-by">
+                        <option value="date_released">Release Date</option>
+                        <option value="alpha">Title</option>
+                        <option value="duration">Duration</option>
+                    </select>
 
-                <label for="movies-sort-order">Order:</label>
-                <select id="movies-sort-order">
-                    <option value="desc">Descending</option>
-                    <option value="asc">Ascending</option>
-                </select>
-            </div>
-
-            <div id="movies-carousel-wrapper" class="carousel-wrapper">
-                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('movies-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
-                <div id="movies-list">
+                    <label for="movies-sort-order">Order:</label>
+                    <select id="movies-sort-order">
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
                 </div>
-                <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('movies-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
-            </div>
+
+                <div id="movies-carousel-wrapper" class="carousel-wrapper">
+                    <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('movies-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), -1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
+                    <div id="movies-list">
+                    </div>
+                    <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('movies-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('movies-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
+                </div>
+            </div> {# END NEW WRAPPER DIV #}
         </div>
 
         <div id="shows-list-section">
             <div class="section-header">
                 <h2>TV Shows (Recent Episodes)</h2>
-                <button class="section-toggle-button" onclick="toggleSection('episodes-carousel-wrapper', this)">Hide Content</button>
+                <button class="section-toggle-button" onclick="toggleSection('episodes-content-wrapper', this)">Hide Content</button>
             </div>
-            <div class="filter-sort-controls">
-                <label for="shows-search">Search:</label>
-                <input type="search" id="shows-search" placeholder="Search shows/episodes by title/summary">
+            <div id="episodes-content-wrapper"> {# NEW WRAPPER DIV #}
+                <div class="filter-sort-controls">
+                    <label for="shows-search">Search:</label>
+                    <input type="search" id="shows-search" placeholder="Search shows/episodes by title/summary">
 
-                <label for="shows-sort-by">Sort By:</label>
-                <select id="shows-sort-by">
-                    <option value="date_aired">Air Date</option>
-                    <option value="title">Show Title</option> 
-                    <option value="episode_title">Episode Title</option> 
-                    <option value="date_added">Date Added</option>
-                    <option value="duration">Duration</option>
-                </select>
+                    <label for="shows-sort-by">Sort By:</label>
+                    <select id="shows-sort-by">
+                        <option value="date_aired">Air Date</option>
+                        <option value="title">Show Title</option> 
+                        <option value="episode_title">Episode Title</option> 
+                        <option value="date_added">Date Added</option>
+                        <option value="duration">Duration</option>
+                    </select>
 
-                <label for="shows-sort-order">Order:</label>
-                <select id="shows-sort-order">
-                    <option value="desc">Descending</option>
-                    <option value="asc">Ascending</option>
-                </select>
-            </div>
-            <div id="episodes-carousel-wrapper" class="carousel-wrapper">
-                <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('episodes-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
-                <div id="episodes-list">
+                    <label for="shows-sort-order">Order:</label>
+                    <select id="shows-sort-order">
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
                 </div>
-                <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('episodes-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
-            </div>
+                <div id="episodes-carousel-wrapper" class="carousel-wrapper">
+                    <button class="scroll-arrow left" onmousedown="startAutoScroll(document.getElementById('episodes-list'), -1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9664;</button>
+                    <div id="episodes-list">
+                    </div>
+                    <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('episodes-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
+                </div>
+            </div> {# END NEW WRAPPER DIV #}
         </div>
  <div id="notification-area"></div>
     <script>

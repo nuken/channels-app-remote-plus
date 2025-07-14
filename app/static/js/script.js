@@ -282,11 +282,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // console.log("Theme section visibility applied.");
     applyInitialSectionVisibility('client-server-selection-content');
     // console.log("Client/Server section visibility applied.");
-    applyInitialSectionVisibility('movies-carousel-wrapper');
+    applyInitialSectionVisibility('movies-content-wrapper'); // MODIFIED
     // console.log("Movies section visibility applied.");
-    applyInitialSectionVisibility('episodes-carousel-wrapper');
+    applyInitialSectionVisibility('episodes-content-wrapper'); // MODIFIED
     // console.log("Episodes section visibility applied.");
-    applyInitialSectionVisibility('channel-collections-carousel-wrapper');
+    applyInitialSectionVisibility('channel-collections-content-wrapper'); // MODIFIED
     // console.log("Channel Collections section visibility applied.");
 });
 
