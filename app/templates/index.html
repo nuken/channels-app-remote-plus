@@ -44,10 +44,7 @@
     <div id="now-playing-display" class="hidden">
     </div>
     <pre id="status-display" style="margin-top: 10px;"></pre>
-</div>
-    
-
-    <div id="notification-area"></div>
+</div>  
 
         <div class="config-info">
             <p><strong>Configured Clients:</strong></p>
@@ -242,7 +239,7 @@
                 <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('episodes-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
             </div>
         </div>
-
+ <div id="notification-area"></div>
     <script>
         const flaskClients = {{ clients | tojson }};
         const clientsConfiguredViaEnv = {{ clients_configured | tojson }};
