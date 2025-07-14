@@ -37,6 +37,17 @@
                 <option value="dark-green">Dark (Green Buttons)</option>
             </select>
         </div>
+          <div class="status-section" style="margin-bottom: 10px;">
+    <h2>Current Device Status</h2>
+    <button class="control-button" onclick="getStatus()">Refresh Status</button>
+    <button class="control-button" onclick="toggleRecord()">Record</button>
+    <div id="now-playing-display" class="hidden">
+    </div>
+    <pre id="status-display" style="margin-top: 10px;"></pre>
+</div>
+    
+
+    <div id="notification-area"></div>
 
         <div class="config-info">
             <p><strong>Configured Clients:</strong></p>
@@ -231,18 +242,6 @@
                 <button class="scroll-arrow right" onmousedown="startAutoScroll(document.getElementById('episodes-list'), 1, event)" onmouseup="stopAutoScroll()" onmouseleave="stopAutoScroll()" ontouchstart="startAutoScroll(document.getElementById('episodes-list'), 1, event)" ontouchend="stopAutoScroll()" ontouchcancel="stopAutoScroll()">&#9654;</button>
             </div>
         </div>
-
-       <div class="status-section">
-    <h2>Current Device Status</h2>
-    <button class="control-button" onclick="getStatus()">Refresh Status</button>
-    <button class="control-button" onclick="toggleRecord()">Record</button>
-    <div id="now-playing-display" class="hidden">
-    </div>
-    <pre id="status-display" style="margin-top: 10px;"></pre>
-</div>
-    </div>
-
-    <div id="notification-area"></div>
 
     <script>
         const flaskClients = {{ clients | tojson }};
