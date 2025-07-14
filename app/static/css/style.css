@@ -255,6 +255,7 @@ h1, h2 {
 button {
     padding: 12px 15px;
     font-size: 1em;
+    background-color: #007bff; /* Fallback direct color to prevent white flash */
     background-color: var(--button-bg-color);
     color: var(--button-text-color);
     border: none;
@@ -262,7 +263,6 @@ button {
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
     white-space: nowrap;
-    /* Added to prevent flash of white */
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
