@@ -421,6 +421,15 @@ pre {
     display: none;
 }
 
+/* NEW: Style for channel name and number in now playing */
+#now-playing-info .channel-info {
+    font-size: 0.9em;
+    color: var(--now-playing-episode-color);
+    margin-top: 5px;
+    margin-bottom: 5px;
+    transition: color 0.3s ease;
+}
+
 /* New styles for DVR movies and shows section */
 #movies-list-section, #shows-list-section, #channel-collections-section {
     margin-top: 25px;
@@ -439,7 +448,7 @@ pre {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto; /* Changed from hidden to auto */
     -webkit-overflow-scrolling: touch;
     gap: 20px;
     padding-bottom: 20px;

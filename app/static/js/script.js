@@ -45,7 +45,7 @@ const CHANNEL_REFRESH_INTERVAL_MS = 300000; // Refresh every 5 minutes (300000 m
 
 function showNotification(message, isError = false) {
     if (!enablePopupsCheckbox.checked) {
-        console.log("Notification suppressed:", message);
+        // console.log("Notification suppressed:", message);
         return;
     }
     const notification = document.createElement('div');
@@ -71,18 +71,18 @@ function toggleControls(enable) {
 
 function applyTheme() {
     const selectedTheme = themeSelect.value;
-    console.log("applyTheme function called. Selected theme:", selectedTheme);
+    // console.log("applyTheme function called. Selected theme:", selectedTheme);
 
     document.documentElement.className = '';
 
     if (selectedTheme !== 'default-light') {
         document.documentElement.classList.add(`theme-${selectedTheme}`);
-        console.log(`applyTheme: Applied theme-${selectedTheme} to <html>.`);
+        // console.log(`applyTheme: Applied theme-${selectedTheme} to <html>.`);
     } else {
-        console.log("applyTheme: Reverting to default-light theme (no class added to <html>).");
+        // console.log("applyTheme: Reverting to default-light theme (no class added to <html>).");
     }
     localStorage.setItem('selectedTheme', selectedTheme);
-    console.log("applyTheme: Saved selectedTheme to localStorage:", selectedTheme);
+    // console.log("applyTheme: Saved selectedTheme to localStorage:", selectedTheme);
 }
 
 // NEW: Function to toggle expanded layout
@@ -98,9 +98,9 @@ function toggleExpandedLayout() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const savedTheme = localStorage.getItem('selectedTheme') || 'default-light';
-    console.log("DOMContentLoaded: Initial savedTheme from localStorage:", savedTheme);
+    // console.log("DOMContentLoaded: Initial savedTheme from localStorage:", savedTheme);
     themeSelect.value = savedTheme;
-    console.log("DOMContentLoaded: Set themeSelect dropdown value to:", themeSelect.value);
+    // console.log("DOMContentLoaded: Set themeSelect dropdown value to:", themeSelect.value);
 
     const savedPopupState = localStorage.getItem('enablePopups');
     if (savedPopupState !== null) {
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load last selected client IP after DVR server (and thus client list) is loaded
     const lastSelectedClientIp = localStorage.getItem('lastSelectedClientIp');
-    console.log("[DEBUG] DOMContentLoaded: Initial selectedClientIp from localStorage:", lastSelectedClientIp); // ADDED LOG
+    // console.log("[DEBUG] DOMContentLoaded: Initial selectedClientIp from localStorage:", lastSelectedClientIp); // ADDED LOG
     let foundLastClient = false;
     if (lastSelectedClientIp) {
         // Find in the dynamically populated clientSelect options
@@ -166,13 +166,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!foundLastClient && clientSelect.options.length > 1) { // >1 because of "Select a Client" option
         clientSelect.selectedIndex = 1; // Select the first actual client
         await selectClient();
-        console.log("[DEBUG] DOMContentLoaded: Selected first client as fallback."); // ADDED LOG
+        // console.log("[DEBUG] DOMContentLoaded: Selected first client as fallback."); // ADDED LOG
     } else if (clientSelect.options.length <= 1) { // No clients beyond the placeholder
         toggleControls(false);
         statusDisplay.innerText = "No Channels App clients configured/discovered. Please ensure a DVR server is selected and reachable.";
         nowPlayingDisplay.classList.add('hidden');
         showNotification("No Channels App clients configured/discovered.", true);
-        console.log("[DEBUG] DOMContentLoaded: No clients found, controls disabled."); // ADDED LOG
+        // console.log("[DEBUG] DOMContentLoaded: No clients found, controls disabled."); // ADDED LOG
     }
 
 
@@ -277,13 +277,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Load and apply initial visibility states from localStorage
-    console.log("Applying initial section visibility states:");
+    // console.log("Applying initial section visibility states:");
     applyInitialSectionVisibility('theme-selection-content');
+    // console.log("Theme section visibility applied.");
     applyInitialSectionVisibility('client-server-selection-content');
+    // console.log("Client/Server section visibility applied.");
     applyInitialSectionVisibility('movies-carousel-wrapper');
+    // console.log("Movies section visibility applied.");
     applyInitialSectionVisibility('episodes-carousel-wrapper');
+    // console.log("Episodes section visibility applied.");
     applyInitialSectionVisibility('channel-collections-carousel-wrapper');
-    console.log("Finished applying initial section visibility states.");
+    // console.log("Channel Collections section visibility applied.");
 });
 
 // Helper function to get full image URL, handling relative vs absolute paths
@@ -304,7 +308,7 @@ function getFullImageUrl(relativePath) {
 function startChannelRefresh(collectionItems, isFavorites) {
     stopChannelRefresh(); // Clear any existing interval
     channelRefreshIntervalId = setInterval(async () => {
-        console.log("Automatically refreshing channel collection data...");
+        // console.log("Automatically refreshing channel collection data...");
         await displayChannelsInCollection(collectionItems, isFavorites);
     }, CHANNEL_REFRESH_INTERVAL_MS);
 }
@@ -314,7 +318,7 @@ function stopChannelRefresh() {
     if (channelRefreshIntervalId) {
         clearInterval(channelRefreshIntervalId);
         channelRefreshIntervalId = null;
-        console.log("Stopped channel collection auto-refresh.");
+        // console.log("Stopped channel collection auto-refresh.");
     }
 }
 
@@ -323,7 +327,7 @@ async function selectClient() {
     selectedClientIp = clientSelect.value;
     if (selectedClientIp) {
         localStorage.setItem('lastSelectedClientIp', selectedClientIp);
-        console.log("[DEBUG] selectClient: Saved selectedClientIp to localStorage:", selectedClientIp); // ADDED LOG
+        // console.log("[DEBUG] selectClient: Saved selectedClientIp to localStorage:", selectedClientIp); // ADDED LOG
         showNotification(`Controlling: ${clientSelect.options[clientSelect.selectedIndex].text}`, false);
         toggleControls(true);
         getStatus();
@@ -331,7 +335,7 @@ async function selectClient() {
         fetchChannelCollections(); // Re-fetch collections to update favorites based on new client
     } else {
         localStorage.removeItem('lastSelectedClientIp');
-        console.log("[DEBUG] selectClient: Cleared lastSelectedClientIp from localStorage (no client selected)."); // ADDED LOG
+        // console.log("[DEBUG] selectClient: Cleared lastSelectedClientIp from localStorage (no client selected)."); // ADDED LOG
         showNotification("Please select a client device.", true);
         toggleControls(false);
         statusDisplay.innerText = "Select a client and click \"Refresh Status\" to fetch.";
@@ -347,14 +351,14 @@ async function selectDvrServer() {
     const selectedValue = dvrServerSelect.value;
     if (selectedValue) {
         const [ip, port] = selectedValue.split(':');
-        selectedDvrServerIp = ip;
+        selectedDvrServerIp = ip; 
         selectedDvrServerPort = port;
         localStorage.setItem('lastSelectedDvrServerIpPort', selectedValue);
-        console.log("[DEBUG] selectDvrServer: Saved lastSelectedDvrServerIpPort to localStorage:", selectedValue); // ADDED LOG
+        // console.log("[DEBUG] selectDvrServer: Saved lastSelectedDvrServerIpPort to localStorage:", selectedValue); // ADDED LOG
         dvrServerIpDisplay.textContent = `Selected: ${selectedValue}`;
         dvrServerIpDisplay.style.display = 'inline';
         showNotification(`DVR Server selected: ${selectedValue}`, false);
-
+        
         // --- NEW: Fetch and populate clients for the selected DVR server ---
         await fetchClientsForDvrServer(selectedDvrServerIp, selectedDvrServerPort);
 
@@ -364,7 +368,7 @@ async function selectDvrServer() {
         loadShows();
     } else {
         localStorage.removeItem('lastSelectedDvrServerIpPort');
-        console.log("[DEBUG] selectDvrServer: Cleared lastSelectedDvrServerIpPort from localStorage (no DVR server selected)."); // ADDED LOG
+        // console.log("[DEBUG] selectDvrServer: Cleared lastSelectedDvrServerIpPort from localStorage (no DVR server selected)."); // ADDED LOG
         dvrServerIpDisplay.textContent = 'Not Selected';
         dvrServerIpDisplay.style.display = 'none';
         moviesListDiv.innerHTML = '<p>Please select a DVR server to load movies.</p>';
@@ -396,7 +400,7 @@ async function fetchClientsForDvrServer(dvrIp, dvrPort) {
     clientSelect.disabled = true;
     selectedClientIp = ''; // Clear previously selected client. This does NOT clear localStorage.
     toggleControls(false); // Disable controls while clients are loading
-    console.log("[DEBUG] fetchClientsForDvrServer: Starting client discovery for", dvrIp, dvrPort); // ADDED LOG
+    // console.log("[DEBUG] fetchClientsForDvrServer: Starting client discovery for", dvrIp, dvrPort); // ADDED LOG
 
     try {
         const response = await fetch(`/dvr_clients?dvr_server_ip=${dvrIp}&dvr_server_port=${dvrPort}`);
@@ -408,7 +412,7 @@ async function fetchClientsForDvrServer(dvrIp, dvrPort) {
             showNotification(`Failed to load clients: ${result.message}`, true);
             clientSelect.innerHTML = `<option value="">Error: ${result.message}</option>`;
             clientSelect.disabled = true;
-            console.log("[DEBUG] fetchClientsForDvrServer: Client discovery error:", result.message); // ADDED LOG
+            // console.log("[DEBUG] fetchClientsForDvrServer: Client discovery error:", result.message); // ADDED LOG
             // MODIFIED: Clear localStorage and selectedClientIp on error as well
             selectedClientIp = '';
             localStorage.removeItem('lastSelectedClientIp');
@@ -421,38 +425,38 @@ async function fetchClientsForDvrServer(dvrIp, dvrPort) {
             });
             clientSelect.disabled = false;
             showNotification(`Loaded ${result.clients.length} clients for ${dvrIp}:${dvrPort}.`, false);
-            console.log("[DEBUG] fetchClientsForDvrServer: Clients loaded. Current clientSelect.options:", Array.from(clientSelect.options).map(o => o.value)); // ADDED LOG
+            // console.log("[DEBUG] fetchClientsForDvrServer: Clients loaded. Current clientSelect.options:", Array.from(clientSelect.options).map(o => o.value)); // ADDED LOG
 
             const lastSelectedClient = localStorage.getItem('lastSelectedClientIp'); // Read the value AFTER clients are populated
             const foundClientInNewList = result.clients.find(client => client.ip === lastSelectedClient);
-            console.log("[DEBUG] fetchClientsForDvrServer: Attempting re-selection. lastSelectedClient:", lastSelectedClient, "foundInNewList:", !!foundClientInNewList); // ADDED LOG
+            // console.log("[DEBUG] fetchClientsForDvrServer: Attempting re-selection. lastSelectedClient:", lastSelectedClient, "foundInNewList:", !!foundClientInNewList); // ADDED LOG
 
             if (foundClientInNewList) {
                 clientSelect.value = lastSelectedClient; // Re-select if it was found
                 await selectClient();
-                console.log("[DEBUG] fetchClientsForDvrServer: Re-selecting last client:", lastSelectedClient); // ADDED LOG
+                // console.log("[DEBUG] fetchClientsForDvrServer: Re-selecting last client:", lastSelectedClient); // ADDED LOG
             } else { // If last client not found or no previous selection, select first available if any
                 if (result.clients.length > 0) {
                     clientSelect.selectedIndex = 1; // Select the first actual client (index 0 is "Select a Client")
                     await selectClient();
-                    console.log("[DEBUG] fetchClientsForDvrServer: Last client not found or no previous selection, selecting first client:", clientSelect.value); // ADDED LOG
+                    // console.log("[DEBUG] fetchClientsForDvrServer: Last client not found or no previous selection, selecting first client:", clientSelect.value); // ADDED LOG
                 } else { // Should not happen if result.clients.length > 0 but good for robustness
                     selectedClientIp = ''; // Ensure selectedClientIp is reset
                     localStorage.removeItem('lastSelectedClientIp'); // Clear invalid selection HERE
                     toggleControls(false); // Disable controls
                     statusDisplay.innerText = "No eligible client selected/found.";
                     nowPlayingDisplay.classList.add('hidden');
-                    console.log("[DEBUG] fetchClientsForDvrServer: No eligible clients found, clearing selection."); // ADDED LOG
+                    // console.log("[DEBUG] fetchClientsForDvrServer: No eligible clients found, clearing selection."); // ADDED LOG
                 }
             }
-
+            
         } else { // No clients found by discovery at all
             showNotification(`No eligible clients found for ${dvrIp}:${dvrPort}.`, false);
             clientSelect.innerHTML = '<option value="">No Clients Found</option>';
             clientSelect.disabled = true;
             selectedClientIp = ''; // Ensure selectedClientIp is reset
             localStorage.removeItem('lastSelectedClientIp'); // Clear invalid selection HERE (if result.clients is empty)
-            console.log("[DEBUG] fetchClientsForDvrServer: No clients found by discovery. Clearing selection."); // ADDED LOG
+            // console.log("[DEBUG] fetchClientsForDvrServer: No clients found by discovery. Clearing selection."); // ADDED LOG
         }
     } catch (error) {
         showNotification(`Error fetching clients for DVR server ${dvrIp}:${dvrPort}: ${error.message}`, true);
@@ -461,7 +465,7 @@ async function fetchClientsForDvrServer(dvrIp, dvrPort) {
         selectedClientIp = ''; // Ensure selectedClientIp is reset
         localStorage.removeItem('lastSelectedClientIp'); // Clear invalid selection HERE (on error)
         console.error("Error fetching clients:", error);
-        console.log("[DEBUG] fetchClientsForDvrServer: Error during client fetch. Clearing selection:", error); // ADDED LOG
+        // console.log("[DEBUG] fetchClientsForDvrServer: Error during client fetch. Clearing selection:", error); // ADDED LOG
     }
 }
 
@@ -602,6 +606,7 @@ async function getStatus() {
             showNotification(`Status refreshed for ${selectedClientIp}.`, false);
 
             const np = status.now_playing;
+            const channel = status.channel; // Get the channel object from the status response
 
             if (np && np.title) {
                 let episodeDetails = '';
@@ -617,20 +622,50 @@ async function getStatus() {
                 // MODIFIED: Use getFullImageUrl helper
                 const imageUrl = getFullImageUrl(np.image_url);
 
+                // Add channel name and number if available and it's not already part of the main title/episode details
+                let channelInfoHtml = '';
+                if (channel && channel.name && channel.number) {
+                    channelInfoHtml = `<p class="channel-info">${channel.name} (${channel.number})</p>`;
+                } else if (channel && channel.name) {
+                    channelInfoHtml = `<p class="channel-info">${channel.name}</p>`;
+                } else if (channel && channel.number) {
+                    channelInfoHtml = `<p class="channel-info">Channel ${channel.number}</p>`;
+                }
+
+
                 nowPlayingDisplay.innerHTML = `
                     ${imageUrl ? `<img src="${imageUrl}" alt="Now Playing Image">` : ''}
                     <div id="now-playing-info">
                         <h3>${np.title}</h3>
                         ${episodeDetails ? `<p class="episode-details">${episodeDetails}</p>` : ''}
+                        ${channelInfoHtml}
                         ${np.summary ? `<p class="summary">${np.summary}</p>` : ''}
                     </div>
                 `;
                 nowPlayingDisplay.classList.remove('hidden');
                 statusDisplay.style.display = 'none';
             } else {
-                nowPlayingDisplay.classList.add('hidden');
-                statusDisplay.style.display = 'block';
-                statusDisplay.innerText = "No 'Now Playing' information available (or not currently playing).\n\n" + statusDisplay.innerText;
+                // This block handles cases where 'now_playing' might be empty, but a channel is still tuned.
+                // In such a scenario, we can still show channel info if available.
+                let channelOnlyInfoHtml = '';
+                const statusChannel = status.channel; // Get channel info directly from status if now_playing is empty
+                if (statusChannel && statusChannel.name && statusChannel.number) {
+                    channelOnlyInfoHtml = `<h3>${statusChannel.name} (${statusChannel.number})</h3><p>No current program details available.</p>`;
+                } else if (statusChannel && statusChannel.name) {
+                    channelOnlyInfoHtml = `<h3>${statusChannel.name}</h3><p>No current program details available.</p>`;
+                } else if (statusChannel && statusChannel.number) {
+                    channelOnlyInfoHtml = `<h3>Channel ${statusChannel.number}</h3><p>No current program details available.</p>`;
+                }
+
+                if (channelOnlyInfoHtml) {
+                    nowPlayingDisplay.innerHTML = `<div id="now-playing-info">${channelOnlyInfoHtml}</div>`;
+                    nowPlayingDisplay.classList.remove('hidden');
+                    statusDisplay.style.display = 'none'; // Hide raw status if we show channel info
+                } else {
+                    nowPlayingDisplay.classList.add('hidden');
+                    statusDisplay.style.display = 'block';
+                    statusDisplay.innerText = "No 'Now Playing' information available (or not currently playing).\n\n" + statusDisplay.innerText;
+                }
             }
         }
     } catch (error) {
@@ -760,7 +795,6 @@ function renderMovies(moviesToRender) {
                  style="${hasImage ? '' : 'display: none;'}"
                  onerror="this.onerror=null; this.src='https://placehold.co/120x90/333/eee?text=No+Image';
                           this.classList.add('error-img');
-                          this.style.display='none';
                           this.closest('.movie-card-image-container').querySelector('.no-image-text').style.display='block';" />
             <div class="no-image-text"
                  style="${hasImage ? 'display: none;' : 'display: block;'}">No Image Available</div>
@@ -791,7 +825,6 @@ function renderMovies(moviesToRender) {
     });
     checkArrowVisibility(moviesListDiv);
 }
-
 
 async function loadShows() {
     if (!selectedDvrServerIp || !selectedDvrServerPort) {
@@ -908,7 +941,6 @@ function renderShows(episodesToRender) {
                  style="${hasImage ? '' : 'display: none;'}"
                  onerror="this.onerror=null; this.src='https://placehold.co/120x90/333/eee?text=No+Image';
                           this.classList.add('error-img');
-                          this.style.display='none';
                           this.closest('.episode-card-image-container').querySelector('.no-image-text').style.display='block';" />
             <div class="no-image-text"
                  style="${hasImage ? 'display: none;' : 'display: block;'}">No Image Available</div>
@@ -970,23 +1002,23 @@ async function playRecording(recordingId) {
 function toggleSection(wrapperId, button) {
     const wrapperDiv = document.getElementById(wrapperId);
     if (!wrapperDiv) {
-        console.error(`[toggleSection] Wrapper div with ID "${wrapperId}" not found.`);
+        // console.error(`[toggleSection] Wrapper div with ID "${wrapperId}" not found.`); // Commented out
         return;
     }
     const isHidden = window.getComputedStyle(wrapperDiv).display === 'none';
 
-    if (isHidden) {
+    if (isHidden) { // If it's currently hidden, we are about to show it
         wrapperDiv.style.display = 'block';
         button.textContent = 'Hide Content';
         const carouselDiv = wrapperDiv.querySelector('#movies-list, #episodes-list, #channel-collections-list');
         if (carouselDiv) checkArrowVisibility(carouselDiv);
-        console.log(`[toggleSection] Showing ${wrapperId}. Saving state 'true'.`);
-        localStorage.setItem(wrapperId + 'Visible', 'true');
-    } else {
+        // console.log(`[toggleSection] Showing ${wrapperId}. Saving state 'true'.`); // Commented out
+        localStorage.setItem(wrapperId + 'Visible', 'true'); // Save as 'true' for visible
+    } else { // If it's currently visible, we are about to hide it
         wrapperDiv.style.display = 'none';
         button.textContent = 'Show Content';
-        console.log(`[toggleSection] Hiding ${wrapperId}. Saving state 'false'.`);
-        localStorage.setItem(wrapperId + 'Visible', 'false');
+        // console.log(`[toggleSection] Hiding ${wrapperId}. Saving state 'false'.`); // Commented out
+        localStorage.setItem(wrapperId + 'Visible', 'false'); // Save as 'false' for hidden
     }
 }
 
@@ -995,7 +1027,7 @@ function applyInitialSectionVisibility(wrapperId) {
     if (wrapperDiv) {
         const localStorageKey = wrapperId + 'Visible';
         const savedState = localStorage.getItem(localStorageKey);
-        console.log(`[DEBUG applyInitialSectionVisibility] Wrapper ID: ${wrapperId}, localStorageKey: ${localStorageKey}, Saved State: ${savedState}`);
+        // console.log(`[DEBUG applyInitialSectionVisibility] Wrapper ID: ${wrapperId}, localStorageKey: ${localStorageKey}, Saved State: ${savedState}`); // Commented out
 
         const parentSection = wrapperDiv.closest('div[id$="-section"]');
         let toggleButton = null;
@@ -1003,21 +1035,22 @@ function applyInitialSectionVisibility(wrapperId) {
             toggleButton = parentSection.querySelector('.section-toggle-button');
         }
 
-        if (savedState === 'false') {
+        // Default to visible if no state is saved or if savedState is 'true'
+        if (savedState === 'false') { // If explicitly saved as false (hidden)
             wrapperDiv.style.display = 'none';
             if (toggleButton) {
                 toggleButton.textContent = 'Show Content';
             }
-            console.log(`[DEBUG applyInitialSectionVisibility] Hiding ${wrapperId} based on saved state.`);
-        } else { // Default to visible if no state is saved or if savedState is 'true'
+            // console.log(`[DEBUG applyInitialSectionVisibility] Hiding ${wrapperId} based on saved state.`); // Commented out
+        } else { // Default to visible or if explicitly saved as true
             wrapperDiv.style.display = 'block';
             if (toggleButton) {
                 toggleButton.textContent = 'Hide Content';
             }
-            console.log(`[DEBUG applyInitialSectionVisibility] Showing ${wrapperId} based on saved state or default.`);
+            // console.log(`[DEBUG applyInitialSectionVisibility] Showing ${wrapperId} based on saved state or default.`); // Commented out
         }
     } else {
-        console.warn(`[DEBUG applyInitialSectionVisibility] Wrapper div not found for ID: ${wrapperId}`);
+        // console.warn(`[DEBUG applyInitialSectionVisibility] Wrapper div not found for ID: ${wrapperId}`); // Commented out
     }
 }
 
@@ -1113,7 +1146,7 @@ const fetchChannelCollections = async () => {
     }
 
     channelCollectionsList.innerHTML = '<p>Loading collections...</p>';
-
+    
     try {
         const collectionsResponse = await fetch(`/collections_list?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}`);
         if (!collectionsResponse.ok) {
@@ -1143,8 +1176,8 @@ const fetchChannelCollections = async () => {
             }
         } else {
              // Clear favorites if no client selected or if previous client was deselected
-             favoriteChannelsData = [];
-             console.log("No client selected, skipping favorite channels fetch for collections.");
+             favoriteChannelsData = []; 
+             // console.log("No client selected, skipping favorite channels fetch for collections.");
         }
 
 
@@ -1167,7 +1200,7 @@ const fetchChannelCollections = async () => {
         // Remove existing listener to prevent duplicates if function is called multiple times
         collectionSelect.removeEventListener('change', onCollectionSelectChange);
         collectionSelect.addEventListener('change', onCollectionSelectChange);
-
+        
         // Auto-select the first collection (or Favorites if available)
         if (allCollectionsData.length > 0) {
             // Find the "Favorites" collection first
@@ -1327,6 +1360,8 @@ const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollec
                         </div>
                     </div>
                 `;
+                // console.log("Generated imageHtml for card:", imageHtml); // Commented out
+                card.innerHTML = imageHtml;
                 channelCollectionsList.appendChild(card);
             });
             checkArrowVisibility(channelCollectionsList);
