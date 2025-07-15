@@ -139,6 +139,77 @@ html.theme-light-purple {
     --recording-summary-color: #555;
 }
 
+/* NEW: Light Theme (Blue-Gray) - Sophisticated & Professional */
+html.theme-light-blue-gray {
+    --body-bg-color: #f0f4f7; /* Very light blue-gray */
+    --text-color: #444444; /* Dark, soft gray */
+    --container-bg-color: #ffffff; /* Clean white */
+    --box-shadow: 0 4px 12px rgba(0,0,0,0.06); /* Subtle shadow */
+    --header-color: #0a587a; /* Professional blue */
+    --config-info-bg: #dbe3eb; /* Light, subtle gray-blue */
+
+    --button-bg-color: #34749e; /* Muted, professional blue */
+    --button-hover-bg-color: #2a5d7c; /* Slightly darker button blue */
+    --button-active-bg-color: #1f4860; /* Even darker button blue */
+    --button-text-color: white;
+
+    --input-border-color: #c8d4e0; /* Light gray-blue */
+    --pre-bg-color: #dbe3eb; /* Same as config-info-bg */
+    --pre-border-color: #c8d4e0; /* Same as input-border-color */
+
+    --notification-success-bg: #28a745; /* Standard green */
+    --notification-error-bg: #dc3545; /* Standard red */
+
+    --now-playing-bg: #dbe3eb; /* Same as config-info-bg */
+    --now-playing-border: #c8d4e0; /* Same as input-border-color */
+    --now-playing-header-color: #0a587a; /* Same as header-color */
+    --now-playing-text-color: #444444; /* Same as text-color */
+    --now-playing-episode-color: #777777; /* Medium gray */
+    --now-playing-summary-color: #666666; /* Slightly lighter medium gray */
+    --now-playing-image-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+    --recording-card-bg: #f8fafd; /* Very subtle light gray */
+    --recording-card-border: #e0e6ed; /* Light, cool gray */
+    --recording-title-color: #0a587a; /* Same as header-color */
+    --recording-episode-color: #777777; /* Same as now-playing-episode-color */
+    --recording-summary-color: #666666; /* Same as now-playing-summary-color */
+}
+
+/* NEW: Dark Theme (Deep Blue-Gray) - Sophisticated & Professional */
+html.theme-dark-blue-gray {
+    --body-bg-color: #212b36; /* Deep blue-gray */
+    --text-color: #e0e6ed; /* Light, desaturated blue-gray */
+    --container-bg-color: #2c3947; /* Slightly lighter dark background */
+    --box-shadow: 0 2px 10px rgba(0,0,0,0.4); /* Dark, subtle shadow */
+    --header-color: #4b77aa; /* Vibrant, professional light blue/cyan */
+    --config-info-bg: #3a4755; /* Slightly lighter dark background */
+
+    --button-bg-color: #4a688a; /* Deep, muted blue */
+    --button-hover-bg-color: #5a799b; /* Slightly lighter shade of the button blue */
+    --button-active-bg-color: #3a597b; /* Darker shade of the button blue */
+    --button-text-color: white;
+
+    --input-border-color: #556c80; /* Muted blue-gray */
+    --pre-bg-color: #3a4755; /* Same as config-info-bg */
+    --pre-border-color: #556c80; /* Same as input-border-color */
+
+    --notification-success-bg: #28a745; /* Standard green */
+    --notification-error-bg: #dc3545; /* Standard red */
+
+    --now-playing-bg: #3a4755; /* Same as config-info-bg */
+    --now-playing-border: #556c80; /* Same as input-border-color */
+    --now-playing-header-color: #4b77aa; /* Same as header-color */
+    --now-playing-text-color: #e0e6ed; /* Same as text-color */
+    --now-playing-episode-color: #a8b3c0; /* Slightly darker light gray */
+    --now-playing-summary-color: #91a1b3; /* Medium gray */
+    --now-playing-image-shadow: 0 2px 5px rgba(0,0,0,0.3);
+
+    --recording-card-bg: #2c3947; /* Same as container-bg-color */
+    --recording-card-border: #3d4d5d; /* Subtle border */
+    --recording-title-color: #4b77aa; /* Same as header-color */
+    --recording-episode-color: #a8b3c0; /* Same as now-playing-episode-color */
+    --recording-summary-color: #91a1b3; /* Same as now-playing-summary-color */
+}
 
 /* General Styles using CSS Variables */
 body {
@@ -731,9 +802,28 @@ html.theme-dark-green #dvr-server-select,
 html.theme-dark-green .input-group select,
 html.theme-dark-green .channel-list-section select,
 html.theme-dark-green .filter-sort-controls select,
-html.theme-dark-green .collection-dropdown { /* MODIFIED: Added .collection-dropdown here */
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+html.theme-dark-green .collection-dropdown, /* MODIFIED: Added .collection-dropdown here */
+html.theme-light-blue-gray #theme-select, /* NEW: Apply to light-blue-gray theme for dark arrow */
+html.theme-light-blue-gray #client-select,
+html.theme-light-blue-gray #dvr-server-select,
+html.theme-light-blue-gray .input-group select,
+html.theme-light-blue-gray .channel-list-section select,
+html.theme-light-blue-gray .filter-sort-controls select,
+html.theme-light-blue-gray .collection-dropdown {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23444444" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* Darker arrow for light theme */
 }
+
+/* NEW: Adjust arrow color for dark-blue-gray theme for light arrow */
+html.theme-dark-blue-gray #theme-select,
+html.theme-dark-blue-gray #client-select,
+html.theme-dark-blue-gray #dvr-server-select,
+html.theme-dark-blue-gray .input-group select,
+html.theme-dark-blue-gray .channel-list-section select,
+html.theme-dark-blue-gray .filter-sort-controls select,
+html.theme-dark-blue-gray .collection-dropdown {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e6ed" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* Lighter arrow for dark theme */
+}
+
 
 /* Styling for the selected DVR server display */
 #dvr-server-ip-display {
