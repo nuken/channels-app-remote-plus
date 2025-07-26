@@ -12,6 +12,24 @@
     --button-active-bg-color: #004085;
     --button-text-color: white;
 
+    --button-play-bg: #28a745;
+    --button-play-hover-bg: #218838;
+    --button-stop-bg: #dc3545;
+    --button-stop-hover-bg: #c82333;
+    --button-record-bg: #dc3545;
+    --button-record-hover-bg: #c82333;
+    --button-send-bg: #17a2b8;
+    --button-send-hover-bg: #138496;
+    --button-go-bg: #ffc107;
+    --button-go-hover-bg: #e0a800;
+    --button-nav-bg: #6f42c1;
+    --button-nav-hover-bg: #5a378a;
+    --button-channel-bg: #fd7e14;
+    --button-channel-hover-bg: #e3640c;
+    --button-utility-bg: #6c757d;
+    --button-utility-hover-bg: #5a6268;
+
+
     --input-border-color: #ccc;
     --pre-bg-color: #e9ecef;
     --pre-border-color: #dee2e6;
@@ -34,7 +52,7 @@
     --recording-summary-color: #495057;
 }
 
-/* Dark Theme 1: Default Dark with Gray Buttons */
+/* Dark Theme 1: Default Dark (Light Blue Header) */
 html.theme-dark-gray {
     --body-bg-color: #2c2c2c;
     --text-color: #e0e0e0;
@@ -47,6 +65,11 @@ html.theme-dark-gray {
     --button-hover-bg-color: #666666;
     --button-active-bg-color: #444444;
     --button-text-color: #ffffff;
+    
+    --button-nav-bg: #5a6268;
+    --button-nav-hover-bg: #4e555a;
+    --button-channel-bg: #6c757d;
+    --button-channel-hover-bg: #5a6268;
 
     --input-border-color: #666;
     --pre-bg-color: #4a4a4a;
@@ -69,7 +92,7 @@ html.theme-dark-gray {
     --recording-summary-color: #c0c0c0;
 }
 
-/* Dark Theme 2: Dark with Green Buttons */
+/* Dark Theme 2: Dark (Light Green Header) */
 html.theme-dark-green {
     --body-bg-color: #1e1e1e;
     --text-color: #e0e0e0;
@@ -82,6 +105,12 @@ html.theme-dark-green {
     --button-hover-bg-color: #218838;
     --button-active-bg-color: #1e7e34;
     --button-text-color: #ffffff;
+    
+    --button-nav-bg: #1e7e34;
+    --button-nav-hover-bg: #145221;
+    --button-channel-bg: #218838;
+    --button-channel-hover-bg: #1a632a;
+
 
     --input-border-color: #555;
     --pre-bg-color: #3c3c3c;
@@ -104,7 +133,7 @@ html.theme-dark-green {
     --recording-summary-color: #c0c0c0;
 }
 
-/* Light Theme 2: Light with Purple Buttons */
+/* Light Theme 2: Light (Purple Header) */
 html.theme-light-purple {
     --body-bg-color: #f0f2f5;
     --text-color: #333;
@@ -117,6 +146,11 @@ html.theme-light-purple {
     --button-hover-bg-color: #5c37a7;
     --button-active-bg-color: #4b2e8a;
     --button-text-color: white;
+    
+    --button-nav-bg: #6f42c1;
+    --button-nav-hover-bg: #5a378a;
+    --button-channel-bg: #8a63d2;
+    --button-channel-hover-bg: #6f42c1;
 
     --input-border-color: #d1d4d8;
     --pre-bg-color: #e6eaf0;
@@ -139,7 +173,7 @@ html.theme-light-purple {
     --recording-summary-color: #555;
 }
 
-/* NEW: Light Theme (Blue-Gray) - Sophisticated & Professional */
+/* NEW: Light Theme (Blue-Gray Header) - Sophisticated & Professional */
 html.theme-light-blue-gray {
     --body-bg-color: #f0f4f7; /* Very light blue-gray */
     --text-color: #444444; /* Dark, soft gray */
@@ -152,6 +186,11 @@ html.theme-light-blue-gray {
     --button-hover-bg-color: #2a5d7c; /* Slightly darker button blue */
     --button-active-bg-color: #1f4860; /* Even darker button blue */
     --button-text-color: white;
+    
+    --button-nav-bg: #0a587a;
+    --button-nav-hover-bg: #08435e;
+    --button-channel-bg: #34749e;
+    --button-channel-hover-bg: #2a5d7c;
 
     --input-border-color: #c8d4e0; /* Light gray-blue */
     --pre-bg-color: #dbe3eb; /* Same as config-info-bg */
@@ -175,7 +214,7 @@ html.theme-light-blue-gray {
     --recording-summary-color: #666666; /* Same as now-playing-summary-color */
 }
 
-/* NEW: Dark Theme (Deep Blue-Gray) - Sophisticated & Professional */
+/* NEW: Dark Theme (Light Blue Header) - Sophisticated & Professional */
 html.theme-dark-blue-gray {
     --body-bg-color: #212b36; /* Deep blue-gray */
     --text-color: #e0e6ed; /* Light, desaturated blue-gray */
@@ -188,6 +227,11 @@ html.theme-dark-blue-gray {
     --button-hover-bg-color: #5a799b; /* Slightly lighter shade of the button blue */
     --button-active-bg-color: #3a597b; /* Darker shade of the button blue */
     --button-text-color: white;
+    
+    --button-nav-bg: #4b77aa;
+    --button-nav-hover-bg: #3a5f8a;
+    --button-channel-bg: #4a688a;
+    --button-channel-hover-bg: #5a799b;
 
     --input-border-color: #556c80; /* Muted blue-gray */
     --pre-bg-color: #3a4755; /* Same as config-info-bg */
@@ -213,7 +257,7 @@ html.theme-dark-blue-gray {
 
 /* General Styles using CSS Variables */
 body {
-    font-family: sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     margin: 20px;
     background-color: var(--body-bg-color);
     color: var(--text-color);
@@ -224,9 +268,9 @@ body {
     margin: 0 auto;
     background-color: var(--container-bg-color);
     padding: 25px;
-    border-radius: 8px;
+    border-radius: 16px;
     box-shadow: var(--box-shadow);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease, max-width 0.3s ease; /* Added max-width transition */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, max-width 0.3s ease;
 }
 
 /* NEW: Expanded layout class */
@@ -235,116 +279,156 @@ body.expanded .container {
     margin: 0 auto; /* Ensure it stays centered */
 }
 
-
 h1, h2 {
     color: var(--header-color);
     transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 .config-info {
     background-color: var(--config-info-bg);
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 12px;
     margin-bottom: 20px;
     font-size: 0.9em;
     transition: background-color 0.3s ease;
 }
-/* Styling for "Configured Clients" and "Select Channels DVR Server" labels */
 .config-info p strong {
     display: block;
     font-size: 0.95em;
     margin-bottom: 5px;
     color: var(--text-color);
 }
-/* Consistent margin-top for subsequent sections within config-info */
 .config-info p:nth-of-type(2) {
     margin-top: 15px;
     font-size: inherit;
 }
 
-/* Remove or modify the existing .button-grid if it's no longer the primary layout for ALL controls */
 .button-grid {
-    /* Keep this if you want some buttons to still use a grid directly */
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
     gap: 10px;
     margin-bottom: 20px;
 }
 
-/* NEW: Styles for the overall playback controls container */
 .playback-controls-container {
     display: grid;
-    /* Define grid columns for your groups. Example: 3 columns for 3 groups */
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjust minmax as needed */
-    gap: 20px; /* Space between groups */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
     margin-bottom: 20px;
-    align-items: start; /* Align items to the start of their grid cell */
+    align-items: start;
 }
 
-/* NEW: Styles for generic button groups */
 .button-group {
     display: flex;
-    flex-direction: column; /* Default to column for vertical stacking within groups */
-    gap: 8px; /* Space between buttons within a group */
-    background-color: var(--config-info-bg); /* Use a subtle background for grouping */
+    flex-direction: column;
+    gap: 8px;
+    background-color: var(--config-info-bg);
     padding: 15px;
-    border-radius: 8px;
+    border-radius: 12px;
     box-shadow: var(--box-shadow);
     justify-content: center;
-    align-items: stretch; /* Make buttons stretch to fill group width */
+    align-items: stretch;
 }
 
-/* Specific adjustment for horizontal groups if you have them */
 .button-group.playback-group,
 .button-group.audio-video-group,
-.button-group.channel-misc-group { /* NEW: Add channel-misc-group here */
-    flex-direction: row; /* Arrange these buttons horizontally */
-    flex-wrap: wrap; /* Allow wrapping if space is tight */
-    justify-content: center; /* Center buttons horizontally */
+.button-group.channel-misc-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
-/* NEW: Styles for larger channel buttons and their vertical stack */
 .channel-group.vertical-stack {
-    flex-direction: column; /* Explicitly stack vertically */
-    gap: 15px; /* More space between stacked channel buttons */
-    /* You might want to remove padding or adjust it if the buttons fill it completely */
+    flex-direction: column;
+    gap: 15px;
 }
 
-.large-channel-button {
-    min-height: 60px; /* Make the buttons taller */
-    font-size: 1.2em; /* Increase font size */
-    padding: 15px 20px; /* Adjust padding for larger size */
-}
-
-/* Remove old combined channel nav group styles if no longer used */
-.channel-nav-group {
-    /* This can be removed or commented out if you switch to the new structure */
-    display: none;
-}
-
-
-/* Adjust button padding/size as a general rule if needed */
-button {
+button.control-button {
     padding: 12px 15px;
     font-size: 1em;
-    background-color: #007bff; /* Fallback direct color to prevent white flash */
     background-color: var(--button-bg-color);
     color: var(--button-text-color);
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.1s ease;
     white-space: nowrap;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
-button:hover { background-color: var(--button-hover-bg-color); }
-button:active { background-color: var(--button-active-bg-color); }
-button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
+button.control-button:hover {
+    transform: translateY(-2px);
+}
+button.control-button:active {
+    transform: translateY(1px);
+    transition: transform 0.05s ease;
+}
+button.control-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    color: #666;
+    transform: none;
+}
+
+.control-button.play-button {
+    background-color: var(--button-play-bg);
+}
+.control-button.play-button:hover {
+    background-color: var(--button-play-hover-bg);
+}
+.control-button.stop-button {
+    background-color: var(--button-stop-bg);
+}
+.control-button.stop-button:hover {
+    background-color: var(--button-stop-hover-bg);
+}
+.control-button.record-button {
+    background-color: var(--button-record-bg);
+}
+.control-button.record-button:hover {
+    background-color: var(--button-record-hover-bg);
+}
+.control-button.send-button {
+    background-color: var(--button-send-bg);
+}
+.control-button.send-button:hover {
+    background-color: var(--button-send-hover-bg);
+}
+.control-button.go-button {
+    background-color: var(--button-go-bg);
+    color: #333;
+}
+.control-button.go-button:hover {
+    background-color: var(--button-go-hover-bg);
+}
+.control-button.nav-button {
+    background-color: var(--button-nav-bg);
+}
+.control-button.nav-button:hover {
+    background-color: var(--button-nav-hover-bg);
+}
+.control-button.channel-button {
+    background-color: var(--button-channel-bg);
+}
+.control-button.channel-button:hover {
+    background-color: var(--button-channel-hover-bg);
+}
+.control-button.utility-button {
+    background-color: var(--button-utility-bg);
+}
+.control-button.utility-button:hover {
+    background-color: var(--button-utility-hover-bg);
+}
 
 .input-group { margin-top: 15px; display: flex; gap: 10px; align-items: center; }
 
-/* General input and select styling for a modern look */
 .input-group input,
 #theme-select,
 #client-select,
@@ -358,7 +442,7 @@ button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
     padding: 10px 15px;
     font-size: 1em;
     border: 1px solid var(--input-border-color);
-    border-radius: 6px;
+    border-radius: 12px;
     background-color: var(--container-bg-color);
     color: var(--text-color);
     transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
@@ -368,7 +452,6 @@ button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
     box-sizing: border-box;
 }
 
-/* Focus state */
 .input-group input:focus,
 #theme-select:focus,
 #client-select:focus,
@@ -383,7 +466,6 @@ button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
     border-color: var(--button-hover-bg-color);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
-
 
 #seek_amount_input {
     width: 70px;
@@ -404,7 +486,7 @@ button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
 pre {
     background-color: var(--pre-bg-color);
     padding: 15px;
-    border-radius: 5px;
+    border-radius: 8px;
     white-space: pre-wrap;
     word-wrap: break-word;
     font-size: 0.85em;
@@ -422,7 +504,6 @@ pre {
 .channel-list-section .refresh-button-container { text-align: right; margin-top: 5px; }
 .seek-controls { margin-top: 15px; }
 
-/* Notification Styling */
 #notification-area {
     position: fixed;
     top: 10px;
@@ -437,7 +518,7 @@ pre {
     background-color: var(--notification-success-bg);
     color: white;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 8px;
     opacity: 0;
     transition: opacity 0.5s ease-in-out, background-color 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -446,13 +527,12 @@ pre {
 .notification.error { background-color: var(--notification-error-bg); }
 .notification.show { opacity: 1; }
 
-/* Styling for Now Playing display */
 #now-playing-display {
     display: flex;
     align-items: flex-start;
     background-color: var(--now-playing-bg);
     padding: 15px;
-    border-radius: 5px;
+    border-radius: 12px;
     border: 1px solid var(--now-playing-border);
     margin-top: 10px;
     gap: 15px;
@@ -461,7 +541,7 @@ pre {
 #now-playing-display img {
     max-width: 120px;
     height: auto;
-    border-radius: 4px;
+    border-radius: 8px;
     box-shadow: var(--now-playing-image-shadow);
     flex-shrink: 0;
 }
@@ -496,7 +576,6 @@ pre {
     display: none;
 }
 
-/* NEW: Style for channel name and number in now playing */
 #now-playing-info .channel-info {
     font-size: 0.9em;
     color: var(--now-playing-episode-color);
@@ -505,12 +584,10 @@ pre {
     transition: color 0.3s ease;
 }
 
-/* New styles for DVR movies and shows section */
 #movies-list-section, #shows-list-section, #channel-collections-section {
     margin-top: 25px;
 }
 
-/* Wrapper for horizontal scrolling + arrows */
 .carousel-wrapper {
     position: relative;
     margin-top: 15px;
@@ -518,27 +595,19 @@ pre {
     overflow: hidden;
 }
 
-/* MODIFIED for Horizontal Scrolling */
 #movies-list, #episodes-list, #channel-collections-list {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
-    overflow-y: auto; /* Changed from hidden to auto */
+    overflow-y: hidden;
     gap: 20px;
-    padding-bottom: 20px;
-    padding-left: 10px;
-    padding-right: 10px;
-
-
+    padding: 10px;
     scroll-snap-type: x mandatory;
-    scroll-padding-left: 10px;
-
-
+    scroll-padding: 10px;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
 
-/* Hide scrollbar for WebKit browsers (Chrome, Safari) */
 #movies-list::-webkit-scrollbar,
 #episodes-list::-webkit-scrollbar,
 #channel-collections-list::-webkit-scrollbar {
@@ -548,13 +617,12 @@ pre {
 .movie-card, .episode-card, .channel-card {
     background-color: var(--recording-card-bg);
     border: 1px solid var(--recording-card-border);
-    border-radius: 8px;
+    border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
-
     flex-shrink: 0;
     width: 280px;
     scroll-snap-align: start;
@@ -574,6 +642,7 @@ pre {
     justify-content: center;
     overflow: hidden;
     position: relative;
+    border-radius: 12px 12px 0 0;
 }
 
 .movie-card-image-container img, .episode-card-image-container img, .channel-card-image-container img {
@@ -632,15 +701,16 @@ pre {
     transition: color 0.3s ease;
 }
 
-.movie-card-content .play-button-container, .episode-card-content .play-button-container, .channel-card-content .play-button-container {
+.play-button-container {
     margin-top: auto;
     text-align: center;
 }
 
-.movie-card-content .play-button, .episode-card-content .play-button, .channel-card-content .play-button {
+.play-button-container .control-button {
     padding: 8px 15px;
     font-size: 0.9em;
     width: 100%;
+    border-radius: 20px;
 }
 
 #movies-list.loading::after, #episodes-list.loading::after, #channel-collections-list.loading::after {
@@ -661,29 +731,39 @@ pre {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
 }
-
+.section-header:hover {
+    background-color: var(--config-info-bg);
+}
 .section-header h2 {
     margin: 0;
     padding: 0;
+    font-size: 1.3em;
 }
 
 .section-toggle-button {
-    padding: 8px 12px;
-    font-size: 0.85em;
-    background-color: #6c757d;
-    color: white;
+    background: none;
     border: none;
-    border-radius: 5px;
+    color: var(--text-color);
+    font-size: 1.2em;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: transform 0.3s ease-in-out;
 }
 
-.section-toggle-button:hover {
-    background-color: #5a6268;
+.section-header.is-collapsed .section-toggle-button {
+    transform: rotate(-90deg);
 }
 
-/* Scroll Arrows Styling */
+/* Corrected: Reverted to display: none for section hiding */
+.section-content {
+    display: none;
+}
+
+
 .scroll-arrow {
     position: absolute;
     top: 50%;
@@ -743,24 +823,22 @@ pre {
     min-width: 100px;
 }
 
-/* Specific styling for selects (to try to control default arrow better) */
 #theme-select,
 #client-select,
 #dvr-server-select,
 .input-group select,
 .channel-list-section select,
 .filter-sort-controls select,
-.collection-dropdown { /* MODIFIED: Added .collection-dropdown here */
+.collection-dropdown {
     padding: 10px 15px;
     font-size: 1em;
     border: 1px solid var(--input-border-color);
-    border-radius: 6px;
+    border-radius: 12px;
     background-color: var(--container-bg-color);
     color: var(--text-color);
     transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
     flex-grow: 1;
-
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -772,8 +850,6 @@ pre {
     flex-grow: 0;
 }
 
-/* Focus state */
-.input-group input:focus,
 #theme-select:focus,
 #client-select:focus,
 #dvr-server-select:focus,
@@ -781,39 +857,36 @@ pre {
 .channel-list-section select:focus,
 .filter-sort-controls input[type="search"]:focus,
 .filter-sort-controls select:focus,
-.collection-dropdown:focus { /* MODIFIED: Added .collection-dropdown here */
+.collection-dropdown:focus {
     outline: none;
     border-color: var(--button-hover-bg-color);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
-
-/* Adjust arrow color for dark themes */
 html.theme-dark-gray #theme-select,
 html.theme-dark-gray #client-select,
 html.theme-dark-gray #dvr-server-select,
 html.theme-dark-gray .input-group select,
 html.theme-dark-gray .channel-list-section select,
 html.theme-dark-gray .filter-sort-controls select,
-html.theme-dark-gray .collection-dropdown, /* MODIFIED: Added .collection-dropdown here */
+html.theme-dark-gray .collection-dropdown,
 html.theme-dark-green #theme-select,
 html.theme-dark-green #client-select,
 html.theme-dark-green #dvr-server-select,
 html.theme-dark-green .input-group select,
 html.theme-dark-green .channel-list-section select,
 html.theme-dark-green .filter-sort-controls select,
-html.theme-dark-green .collection-dropdown, /* MODIFIED: Added .collection-dropdown here */
-html.theme-light-blue-gray #theme-select, /* NEW: Apply to light-blue-gray theme for dark arrow */
+html.theme-dark-green .collection-dropdown,
+html.theme-light-blue-gray #theme-select,
 html.theme-light-blue-gray #client-select,
 html.theme-light-blue-gray #dvr-server-select,
 html.theme-light-blue-gray .input-group select,
 html.theme-light-blue-gray .channel-list-section select,
 html.theme-light-blue-gray .filter-sort-controls select,
 html.theme-light-blue-gray .collection-dropdown {
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%23444444" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* Darker arrow for light theme */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23444444" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
 }
 
-/* NEW: Adjust arrow color for dark-blue-gray theme for light arrow */
 html.theme-dark-blue-gray #theme-select,
 html.theme-dark-blue-gray #client-select,
 html.theme-dark-blue-gray #dvr-server-select,
@@ -821,17 +894,16 @@ html.theme-dark-blue-gray .input-group select,
 html.theme-dark-blue-gray .channel-list-section select,
 html.theme-dark-blue-gray .filter-sort-controls select,
 html.theme-dark-blue-gray .collection-dropdown {
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e6ed" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* Lighter arrow for dark theme */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e6ed" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
 }
 
 
-/* Styling for the selected DVR server display */
 #dvr-server-ip-display {
     display: inline-block;
     padding: 8px 12px;
     margin-left: 10px;
     border: 1px solid var(--input-border-color);
-    border-radius: 6px;
+    border-radius: 12px;
     background-color: var(--config-info-bg);
     color: var(--text-color);
     font-size: 0.95em;
@@ -839,11 +911,9 @@ html.theme-dark-blue-gray .collection-dropdown {
     vertical-align: middle;
 }
 
-
-/* Media queries */
 @media (max-width: 768px) {
     .playback-controls-container {
-        grid-template-columns: 1fr; /* Stack groups vertically on smaller screens */
+        grid-template-columns: 1fr;
     }
 }
 
@@ -864,96 +934,11 @@ html.theme-dark-blue-gray .collection-dropdown {
     }
 }
 
-/* Specific adjustments for .channel-card to ensure carousel display */
 .channel-card {
     flex-shrink: 0;
     width: 280px;
 }
 
-.channel-card-image-container {
-    width: 100%;
-    height: 160px;
-    background-color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-}
-
-.channel-card-image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.channel-card-image-container img.error-img {
-    display: none;
-}
-
-.channel-card-image-container .no-image-text {
-    color: #fff;
-    font-size: 0.9em;
-    text-align: center;
-    padding: 10px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.channel-card-content {
-    padding: 15px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.channel-card-content h3 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    font-size: 1.1em;
-    color: var(--recording-title-color);
-}
-
-.channel-card-content .episode-details {
-    font-size: 0.85em;
-    color: var(--recording-episode-color);
-    margin-bottom: 8px;
-}
-
-.channel-card-content .summary {
-    font-size: 0.8em;
-    color: var(--recording-summary-color);
-    margin-bottom: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-}
-
-.channel-card-content .play-button-container {
-    margin-top: auto;
-    text-align: center;
-}
-
-.channel-card-content .play-button {
-    padding: 8px 15px;
-    font-size: 0.9em;
-    width: 100%;
-}
-
-/* Specific styling for the collection dropdown to push it left */
 .collection-dropdown {
-    margin-right: auto; /* Pushes the dropdown to the left within its flex container */
-}
-
-/* Added for FOUC prevention of sections */
-#control-panel-content-wrapper,
-#movies-content-wrapper,
-#episodes-content-wrapper,
-#channel-collections-content-wrapper {
-    display: none;
+    margin-right: auto;
 }

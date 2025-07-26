@@ -36,6 +36,7 @@
 This app is distributed as a multi-architecture Docker image (`linux/amd64` and `linux/arm64/v8`).
 
 ### 1. Pull the Image
+
 ```bash
 docker pull rcvaughn2/channels-remote-plus
 ```
@@ -45,6 +46,7 @@ docker pull rcvaughn2/channels-remote-plus
 Set the `CHANNELS_DVR_SERVERS` environment variable with a comma-separated list of `IP:Port` pairs. No spaces around commas or colons.
 
 **Example:**
+
 ```bash
 docker run -d --restart unless-stopped \
   -p 5020:5000 \
@@ -63,9 +65,9 @@ Using Hostnames: You can use local hostnames (e.g., media-server8:8089) instead 
 
 Once running, access the remote via:
 
-```
 http://<Your_Docker_Host_IP>:5020
-```
+
+http://<Your_Docker_Host_IP>:5020
 
 For example, use `localhost` or `192.168.x.x` depending on your environment.
 

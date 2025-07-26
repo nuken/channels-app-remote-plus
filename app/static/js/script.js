@@ -89,7 +89,8 @@ function applyTheme() {
 function toggleExpandedLayout() {
     const isExpanded = document.body.classList.toggle('expanded');
     localStorage.setItem('isExpandedLayout', isExpanded);
-    expandButton.textContent = isExpanded ? 'Shrink Layout' : 'Expand Layout';
+    expandButton.innerHTML = isExpanded ? '<i class="fa-solid fa-compress"></i> Shrink Layout' : '<i class="fa-solid fa-expand"></i> Expand Layout';
+    expandButton.title = isExpanded ? 'Shrink the layout' : 'Expand the layout';
 
     // Trigger re-check of carousel arrows after layout change
     setupCarouselNavigation();
@@ -117,9 +118,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isExpandedLayout = localStorage.getItem('isExpandedLayout');
     if (isExpandedLayout === 'true') {
         document.body.classList.add('expanded');
-        expandButton.textContent = 'Shrink Layout';
+        expandButton.innerHTML = '<i class="fa-solid fa-compress"></i> Shrink Layout';
+        expandButton.title = 'Shrink the layout';
     } else {
-        expandButton.textContent = 'Expand Layout';
+        expandButton.innerHTML = '<i class="fa-solid fa-expand"></i> Expand Layout';
+        expandButton.title = 'Expand the layout';
     }
     expandButton.addEventListener('click', toggleExpandedLayout);
 
@@ -214,10 +217,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         var sendMessageButton = document.getElementById('sendMessageButton'); // Get button reference
         if (messageForm.style.display === 'none') {
             messageForm.style.display = 'block';
-            sendMessageButton.textContent = 'Hide Message'; // Change text to "Hide Message"
+            sendMessageButton.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Hide Message'; // Change text to "Hide Message"
+            sendMessageButton.title = 'Hide the notification form';
         } else {
             messageForm.style.display = 'none';
-            sendMessageButton.textContent = 'Send Message'; // Change text back to "Send Message"
+            sendMessageButton.innerHTML = '<i class="fa-solid fa-comment-dots"></i> Send Message'; // Change text back to "Send Message"
+            sendMessageButton.title = 'Show the notification form';
         }
     });
 
@@ -253,7 +258,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('notificationTitle').value = '';
                 document.getElementById('notificationBody').value = '';
                 document.getElementById('messageForm').style.display = 'none';
-                document.getElementById('sendMessageButton').textContent = 'Send Message'; // Reset button text on successful send
+                document.getElementById('sendMessageButton').innerHTML = '<i class="fa-solid fa-comment-dots"></i> Send Message'; // Reset button text on successful send
+                document.getElementById('sendMessageButton').title = 'Show the notification form';
             } else {
                 alert('Error sending notification: ' + data.message);
             }
@@ -277,16 +283,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Load and apply initial visibility states from localStorage
-    // console.log("Applying initial section visibility states:");
-    // Removed old calls for theme-selection-content and client-server-selection-content
-    applyInitialSectionVisibility('control-panel-content-wrapper'); // NEW: Apply to the combined control panel
-    // console.log("Control Panel section visibility applied.");
-    applyInitialSectionVisibility('movies-content-wrapper'); // MODIFIED
-    // console.log("Movies section visibility applied.");
-    applyInitialSectionVisibility('episodes-content-wrapper'); // MODIFIED
-    // console.log("Episodes section visibility applied.");
-    applyInitialSectionVisibility('channel-collections-content-wrapper'); // MODIFIED
-    // console.log("Channel Collections section visibility applied.");
+    applyInitialSectionVisibility('control-panel-content-wrapper');
+    applyInitialSectionVisibility('movies-content-wrapper');
+    applyInitialSectionVisibility('episodes-content-wrapper');
+    applyInitialSectionVisibility('channel-collections-content-wrapper');
 });
 
 // Helper function to get full image URL, handling relative vs absolute paths
@@ -816,7 +816,7 @@ function renderMovies(moviesToRender) {
                 ${movieDetails}
                 ${movie.summary ? `<p class="summary">${movie.summary}</p>` : ''}
                 <div class="play-button-container">
-                    <button class="control-button play-button" onclick="playRecording('${movie.id}')">Play</button>
+                    <button class="control-button play-button" onclick="playRecording('${movie.id}')" title="Play this movie"><i class="fa-solid fa-play"></i> Play</button>
                 </div>
             </div>
         `;
@@ -975,7 +975,7 @@ function renderShows(episodesToRender) {
                 ${episodeDetails}
                 ${episode.summary ? `<p class="summary">${episode.summary}</p>` : ''}
                 <div class="play-button-container">
-                    <button class="control-button play-button" onclick="playRecording('${episode.id}')">Play Episode</button>
+                    <button class="control-button play-button" onclick="playRecording('${episode.id}')" title="Play this episode"><i class="fa-solid fa-play"></i> Play Episode</button>
                 </div>
             </div>
         `;
@@ -998,65 +998,51 @@ async function playRecording(recordingId) {
     }
 }
 
-function toggleSection(wrapperId, button) {
+function toggleSection(wrapperId, headerElement) {
     const wrapperDiv = document.getElementById(wrapperId);
     if (!wrapperDiv) {
-        // console.error(`[toggleSection] Wrapper div with ID "${wrapperId}" not found.`); // Commented out
         return;
     }
     const isHidden = window.getComputedStyle(wrapperDiv).display === 'none';
+    const button = headerElement.querySelector('.section-toggle-button');
 
-    if (isHidden) { // If it's currently hidden, we are about to show it
+
+    if (isHidden) {
         wrapperDiv.style.display = 'block';
-        button.textContent = 'Hide Content';
+        headerElement.classList.remove('is-collapsed');
         const carouselDiv = wrapperDiv.querySelector('#movies-list, #episodes-list, #channel-collections-list');
         if (carouselDiv) checkArrowVisibility(carouselDiv);
-        // console.log(`[toggleSection] Showing ${wrapperId}. Saving state 'true'.`); // Commented out
-        localStorage.setItem(wrapperId + 'Visible', 'true'); // Save as 'true' for visible
-    } else { // If it's currently visible, we are about to hide it
+        localStorage.setItem(wrapperId + 'Visible', 'true');
+    } else {
         wrapperDiv.style.display = 'none';
-        button.textContent = 'Show Content';
-        // console.log(`[toggleSection] Hiding ${wrapperId}. Saving state 'false'.`); // Commented out
-        localStorage.setItem(wrapperId + 'Visible', 'false'); // Save as 'false' for hidden
+        headerElement.classList.add('is-collapsed');
+        localStorage.setItem(wrapperId + 'Visible', 'false');
     }
 }
 
 function applyInitialSectionVisibility(wrapperId) {
     const wrapperDiv = document.getElementById(wrapperId);
     if (wrapperDiv) {
-        const localStorageKey = wrapperId + 'Visible';
-        const savedState = localStorage.getItem(localStorageKey);
-        // console.log(`[DEBUG applyInitialSectionVisibility] Wrapper ID: ${wrapperId}, localStorageKey: ${localStorageKey}, Saved State: ${savedState}`); // Commented out
+        const savedState = localStorage.getItem(wrapperId + 'Visible');
+        const headerElement = wrapperDiv.previousElementSibling;
 
-        const parentSection = wrapperDiv.closest('div[id$="-section"]');
-        let toggleButton = null;
-        if (parentSection) {
-            toggleButton = parentSection.querySelector('.section-toggle-button');
-        }
-
-        // If explicitly saved as 'true', show it. Otherwise, leave it hidden (default CSS state).
-        // If savedState is null (first load), it will remain hidden by default CSS.
         if (savedState === 'true') {
             wrapperDiv.style.display = 'block';
-            if (toggleButton) {
-                toggleButton.textContent = 'Hide Content';
+            if (headerElement) {
+                headerElement.classList.remove('is-collapsed');
             }
-        } else { // savedState is 'false' or null
-            wrapperDiv.style.display = 'none'; // Explicitly hide, although CSS might already do this
-            if (toggleButton) {
-                toggleButton.textContent = 'Show Content';
+        } else {
+            wrapperDiv.style.display = 'none';
+            if (headerElement) {
+                headerElement.classList.add('is-collapsed');
             }
         }
-    } else {
-        // console.warn(`[DEBUG applyInitialSectionVisibility] Wrapper div not found for ID: ${wrapperId}`); // Commented out
     }
 }
 
 
 function scrollCarousel(carouselElement, direction) {
-    // MODIFIED: Calculate scrollAmount dynamically based on the visible width of the carousel.
-    // This will make the carousel scroll by roughly one "page" of content.
-    const scrollAmount = carouselElement.clientWidth * 0.8; // Scroll 80% of the visible width for a smoother experience
+    const scrollAmount = carouselElement.clientWidth * 0.8; 
     carouselElement.scrollBy({
         left: direction * scrollAmount,
         behavior: 'smooth'
@@ -1068,9 +1054,7 @@ function startAutoScroll(carouselElement, direction, event) {
         event.preventDefault();
     }
     stopAutoScroll();
-    // Perform an immediate scroll when the mouse button is pressed down
     scrollCarousel(carouselElement, direction);
-    // Then, start the interval for continuous scrolling if the button is held
     autoScrollInterval = setInterval(() => {
         scrollCarousel(carouselElement, direction);
     }, 75);
@@ -1130,7 +1114,6 @@ function setupCarouselNavigation() {
     });
 }
 
-// Function to fetch and display channel collections (MODIFIED to include favorites)
 const fetchChannelCollections = async () => {
     if (!selectedDvrServerIp || !selectedDvrServerPort) {
         channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel collections.</p>';
@@ -1139,7 +1122,7 @@ const fetchChannelCollections = async () => {
         channelCollectionSortBySelect.disabled = true;
         channelCollectionSortOrderSelect.disabled = true;
         showNotification("Please select a DVR server to load channel collections.", true);
-        stopChannelRefresh(); // Stop refresh if no DVR server is selected
+        stopChannelRefresh();
         return;
     }
 
@@ -1153,35 +1136,29 @@ const fetchChannelCollections = async () => {
         }
         let collections = await collectionsResponse.json();
 
-        // Fetch favorite channels if a client is selected
         if (selectedClientIp) {
             const favoritesResponse = await fetch(`/channels_list?device_ip=${selectedClientIp}`);
             if (!favoritesResponse.ok) {
                 const errorData = await favoritesResponse.json();
                 console.warn(`Failed to load favorite channels: ${errorData.message}`);
                 showNotification(`Warning: Failed to load favorite channels: ${errorData.message}`, true);
-                favoriteChannelsData = []; // Ensure it's cleared if fetch fails
+                favoriteChannelsData = [];
             } else {
                 favoriteChannelsData = await favoritesResponse.json();
-                // Create a synthetic "Favorites" collection
-                const favoriteChannelNumbers = favoriteChannelsData.map(c => c.number); // Use 'number' from favorite_channels response
-                collections.unshift({ // Add to the beginning of the list
+                const favoriteChannelNumbers = favoriteChannelsData.map(c => c.number);
+                collections.unshift({
                     name: "Favorites",
                     slug: "favorites",
                     items: favoriteChannelNumbers,
-                    isFavorites: true // Custom flag to identify this collection
+                    isFavorites: true
                 });
             }
         } else {
-             // Clear favorites if no client selected or if previous client was deselected
              favoriteChannelsData = []; 
-             // console.log("No client selected, skipping favorite channels fetch for collections.");
         }
 
+        allCollectionsData = collections;
 
-        allCollectionsData = collections; // Store all collections for sorting/filtering
-
-        // Populate the dropdown
         collectionSelect.innerHTML = '<option value="">Select a Collection</option>';
         allCollectionsData.forEach(collection => {
             const option = document.createElement('option');
@@ -1193,31 +1170,26 @@ const fetchChannelCollections = async () => {
         channelCollectionSortBySelect.disabled = false;
         channelCollectionSortOrderSelect.disabled = false;
 
-
-        // Event listener for dropdown change - ensures it's added only once
-        // Remove existing listener to prevent duplicates if function is called multiple times
         collectionSelect.removeEventListener('change', onCollectionSelectChange);
         collectionSelect.addEventListener('change', onCollectionSelectChange);
         
-        // Auto-select the first collection (or Favorites if available)
         if (allCollectionsData.length > 0) {
-            // Find the "Favorites" collection first
             const favoritesCollection = allCollectionsData.find(col => col.slug === 'favorites');
             if (favoritesCollection) {
                 collectionSelect.value = favoritesCollection.slug;
                 await displayChannelsInCollection(favoritesCollection.items, true);
-                startChannelRefresh(favoritesCollection.items, true); // Start refresh for favorites
+                startChannelRefresh(favoritesCollection.items, true);
             } else {
                 collectionSelect.value = allCollectionsData[0].slug;
                 await displayChannelsInCollection(allCollectionsData[0].items, allCollectionsData[0].isFavorites);
-                startChannelRefresh(allCollectionsData[0].items, allCollectionsData[0].isFavorites); // Start refresh for first collection
+                startChannelRefresh(allCollectionsData[0].items, allCollectionsData[0].isFavorites);
             }
         } else {
             channelCollectionsList.innerHTML = '<p>No channel collections found on this DVR server.</p>';
             collectionSelect.disabled = true;
             channelCollectionSortBySelect.disabled = true;
             channelCollectionSortOrderSelect.disabled = true;
-            stopChannelRefresh(); // Stop refresh if no collections found
+            stopChannelRefresh();
         }
 
     } catch (error) {
@@ -1228,40 +1200,36 @@ const fetchChannelCollections = async () => {
         channelCollectionSortBySelect.disabled = true;
         channelCollectionSortOrderSelect.disabled = true;
         showNotification(`Error loading collections: ${error.message}`, true);
-        stopChannelRefresh(); // Stop refresh on error
+        stopChannelRefresh();
     }
 };
 
-// New handler for collection select change
 async function onCollectionSelectChange(event) {
     const selectedCollectionSlug = event.target.value;
-    stopChannelRefresh(); // Stop current refresh when collection changes
+    stopChannelRefresh();
     if (selectedCollectionSlug) {
         const selectedCollection = allCollectionsData.find(col => col.slug === selectedCollectionSlug);
         if (selectedCollection) {
             await displayChannelsInCollection(selectedCollection.items, selectedCollection.isFavorites);
-            startChannelRefresh(selectedCollection.items, selectedCollection.isFavorites); // Start refresh for new collection
+            startChannelRefresh(selectedCollection.items, selectedCollection.isFavorites);
         }
     } else {
-        channelCollectionsList.innerHTML = ''; // Clear content if no collection is selected
+        channelCollectionsList.innerHTML = '';
     }
 }
 
-
-// Function to display channels within a selected collection (MODIFIED for sorting and favorites)
 const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollection = false) => {
     if (!selectedDvrServerIp || !selectedDvrServerPort) {
         channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel information.</p>';
         showNotification("Please select a DVR server to load channel information.", true);
-        stopChannelRefresh(); // Stop refresh if no DVR server is selected
+        stopChannelRefresh();
         return;
     }
     if (!selectedClientIp && isFavoritesCollection) {
         channelCollectionsList.innerHTML = '<p>Please select a Channels App client to view Favorite Channels.</p>';
-        stopChannelRefresh(); // Stop refresh if favorites selected but no client
+        stopChannelRefresh();
         return;
     }
-
 
     channelCollectionsList.innerHTML = '<p>Loading channels...</p>';
     channelCollectionsList.classList.add('loading');
@@ -1277,18 +1245,15 @@ const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollec
         let channelsToDisplay = [];
 
         if (isFavoritesCollection) {
-            // Filter nowPlayingData to include only favorite channels
             const favoriteChannelNumbers = favoriteChannelsData.map(fav => fav.number);
             channelsToDisplay = nowPlayingData.filter(item =>
                 favoriteChannelNumbers.includes(item.Channel.Number)
             ).map(item => {
-                // Merge with favorite channel data for image_url if not present in nowPlaying
                 const favChannel = favoriteChannelsData.find(fav => fav.number === item.Channel.Number);
-                // MODIFIED: Prioritize Airings[0].Image, then favChannel.image_url, then Channel.Image
                 const imageUrl = (item.Airings[0] && item.Airings[0].Image) || (favChannel ? favChannel.image_url : '') || item.Channel.Image;
                 return { ...item,
                     Channel: { ...item.Channel, Image: imageUrl },
-                    Airings: item.Airings || [] // Ensure Airings is an array
+                    Airings: item.Airings || []
                 };
             });
 
@@ -1300,7 +1265,6 @@ const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollec
             );
         }
 
-        // Apply sorting
         const sortBy = channelCollectionSortBySelect.value;
         const sortOrder = channelCollectionSortOrderSelect.value;
 
@@ -1323,18 +1287,15 @@ const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollec
             return 0;
         });
 
-
-        channelCollectionsList.innerHTML = ''; // Clear loading message
+        channelCollectionsList.innerHTML = '';
         channelCollectionsList.classList.remove('loading');
-
 
         if (channelsToDisplay.length > 0) {
             channelsToDisplay.forEach(item => {
                 const card = document.createElement('div');
-                card.classList.add('channel-card'); // Add channel-card class
-                card.classList.add('movie-card'); // Add movie-card to inherit carousel styles
+                card.classList.add('channel-card');
+                card.classList.add('movie-card');
 
-                // MODIFIED: Prioritize Airings[0].Image for the image source
                 const imageUrl = getFullImageUrl((item.Airings[0] && item.Airings[0].Image) || item.Channel.Image);
                 const hasImage = !!imageUrl;
 
@@ -1354,11 +1315,10 @@ const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollec
                         <p class="episode-details">${item.Airings[0] ? item.Airings[0].Title : 'No Program Info'}</p>
                         ${item.Airings[0] && item.Airings[0].Summary ? `<p class="summary">${item.Airings[0].Summary}</p>` : ''}
                         <div class="play-button-container">
-                            <button class="control-button play-button" onclick="playChannel('${item.Channel.Number}')">Tune In</button>
+                            <button class="control-button play-button" onclick="playChannel('${item.Channel.Number}')" title="Tune to this channel"><i class="fa-solid fa-play"></i> Tune In</button>
                         </div>
                     </div>
                 `;
-                // console.log("Generated imageHtml for card:", imageHtml); // Commented out
                 card.innerHTML = imageHtml;
                 channelCollectionsList.appendChild(card);
             });
@@ -1373,17 +1333,14 @@ const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollec
         channelCollectionsList.innerHTML = `<p>Error loading channel information: ${error.message}. Please ensure the DVR server is running and accessible.</p>`;
         channelCollectionsList.classList.remove('loading');
         showNotification(`Error loading channel info: ${error.message}`, true);
-        stopChannelRefresh(); // Stop refresh on error
+        stopChannelRefresh();
     }
 };
 
-// Function to simulate playing a channel
 const playChannel = async (channelNumber) => {
-    // MODIFIED: Use sendCommand function to send play request to the selected client
     if (!selectedClientIp) {
         showNotification("Please select a Channels App client first to play the channel.", true);
         return;
     }
-    // sendCommand already handles error messages and notifications
     sendCommand('play_channel', channelNumber);
 };
