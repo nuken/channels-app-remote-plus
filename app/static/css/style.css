@@ -584,6 +584,30 @@ pre {
     transition: color 0.3s ease;
 }
 
+.formatted-status {
+    background-color: var(--now-playing-bg);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--now-playing-border);
+    margin-top: 10px;
+    text-align: center;
+    font-size: 1.2em;
+    color: var(--now-playing-text-color);
+}
+
+.formatted-status i {
+    margin-right: 10px;
+    color: var(--header-color);
+}
+
+.formatted-status.error i {
+    color: var(--button-stop-bg);
+}
+
+#formatted-status-display.hidden {
+    display: none;
+}
+
 #movies-list-section, #shows-list-section, #channel-collections-section {
     margin-top: 25px;
 }

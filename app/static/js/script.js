@@ -5,6 +5,7 @@ const enablePopupsCheckbox = document.getElementById('enablePopups');
 const notificationArea = document.getElementById('notification-area');
 const statusDisplay = document.getElementById('status-display');
 const nowPlayingDisplay = document.getElementById('now-playing-display');
+const formattedStatusDisplay = document.getElementById('formatted-status-display');
 const controlButtons = document.querySelectorAll('.control-button');
 const themeSelect = document.getElementById('theme-select');
 // const dvrServerIpDisplay = document.getElementById('dvr-server-ip-display'); // Removed from HTML
@@ -339,6 +340,7 @@ async function selectClient() {
         toggleControls(false);
         statusDisplay.innerText = "Select a client and click \"Refresh Status\" to fetch.";
         nowPlayingDisplay.classList.add('hidden');
+        formattedStatusDisplay.classList.add('hidden');
         // channelSelect.innerHTML = '<option value="">Select a Client First</option>'; // No longer needed
         fetchChannelCollections(); // Re-fetch collections to clear favorites if client unselected
         stopChannelRefresh(); // Stop refresh if client is deselected
@@ -384,6 +386,7 @@ async function selectDvrServer() {
         toggleControls(false); // Disable controls as no client is selected
         statusDisplay.innerText = "No DVR server selected.";
         nowPlayingDisplay.classList.add('hidden');
+        formattedStatusDisplay.classList.add('hidden');
         channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel collections.</p>'; // Clear collections
         collectionSelect.innerHTML = '<option value="">Select a Collection</option>'; // Clear collection dropdown
         collectionSelect.disabled = true;
@@ -587,25 +590,28 @@ async function toggleRecord() {
 
 async function getStatus() {
     if (!selectedClientIp) {
-        statusDisplay.innerText = "No client selected.";
         nowPlayingDisplay.classList.add('hidden');
+        formattedStatusDisplay.classList.add('hidden');
         return;
     }
+
+    nowPlayingDisplay.classList.add('hidden');
+    statusDisplay.style.display = 'none';
+    formattedStatusDisplay.classList.add('hidden');
+
     try {
         const response = await fetch(`/status?device_ip=${selectedClientIp}`);
         const status = await response.json();
 
-        statusDisplay.innerText = JSON.stringify(status, null, 2);
-        statusDisplay.style.display = 'block';
-
         if (status.status === 'error') {
             showNotification(`Status Error: ${status.message}`, true);
-            nowPlayingDisplay.classList.add('hidden');
+            formattedStatusDisplay.innerHTML = `<div class="formatted-status error"><i class="fa-solid fa-power-off"></i> Client Offline</div>`;
+            formattedStatusDisplay.classList.remove('hidden');
         } else {
             showNotification(`Status refreshed for ${selectedClientIp}.`, false);
 
             const np = status.now_playing;
-            const channel = status.channel; // Get the channel object from the status response
+            const channel = status.channel;
 
             if (np && np.title) {
                 let episodeDetails = '';
@@ -618,10 +624,8 @@ async function getStatus() {
                     episodeDetails += np.episode_title;
                 }
 
-                // MODIFIED: Use getFullImageUrl helper
                 const imageUrl = getFullImageUrl(np.image_url);
 
-                // Add channel name and number if available and it's not already part of the main title/episode details
                 let channelInfoHtml = '';
                 if (channel && channel.name && channel.number) {
                     channelInfoHtml = `<p class="channel-info">${channel.name} (${channel.number})</p>`;
@@ -630,7 +634,6 @@ async function getStatus() {
                 } else if (channel && channel.number) {
                     channelInfoHtml = `<p class="channel-info">Channel ${channel.number}</p>`;
                 }
-
 
                 nowPlayingDisplay.innerHTML = `
                     ${imageUrl ? `<img src="${imageUrl}" alt="Now Playing Image">` : ''}
@@ -642,12 +645,9 @@ async function getStatus() {
                     </div>
                 `;
                 nowPlayingDisplay.classList.remove('hidden');
-                statusDisplay.style.display = 'none';
             } else {
-                // This block handles cases where 'now_playing' might be empty, but a channel is still tuned.
-                // In such a scenario, we can still show channel info if available.
                 let channelOnlyInfoHtml = '';
-                const statusChannel = status.channel; // Get channel info directly from status if now_playing is empty
+                const statusChannel = status.channel;
                 if (statusChannel && statusChannel.name && statusChannel.number) {
                     channelOnlyInfoHtml = `<h3>${statusChannel.name} (${statusChannel.number})</h3><p>No current program details available.</p>`;
                 } else if (statusChannel && statusChannel.name) {
@@ -659,18 +659,15 @@ async function getStatus() {
                 if (channelOnlyInfoHtml) {
                     nowPlayingDisplay.innerHTML = `<div id="now-playing-info">${channelOnlyInfoHtml}</div>`;
                     nowPlayingDisplay.classList.remove('hidden');
-                    statusDisplay.style.display = 'none'; // Hide raw status if we show channel info
                 } else {
-                    nowPlayingDisplay.classList.add('hidden');
-                    statusDisplay.style.display = 'block';
-                    statusDisplay.innerText = "No 'Now Playing' information available (or not currently playing).\n\n" + statusDisplay.innerText;
+                    formattedStatusDisplay.innerHTML = `<div class="formatted-status"><i class="fa-solid fa-bed"></i> Nothing Playing</div>`;
+                    formattedStatusDisplay.classList.remove('hidden');
                 }
             }
         }
     } catch (error) {
-        statusDisplay.innerText = `Error fetching status: ${error.message}\nEnsure the Channels App is running on ${selectedClientIp} and reachable.`;
-        nowPlayingDisplay.classList.add('hidden');
-        statusDisplay.style.display = 'block';
+        formattedStatusDisplay.innerHTML = `<div class="formatted-status error"><i class="fa-solid fa-power-off"></i> Client Offline</div>`;
+        formattedStatusDisplay.classList.remove('hidden');
         showNotification(`Status fetch error for ${selectedClientIp}: ${error.message}`, true);
     }
 }
@@ -1137,13 +1134,11 @@ const fetchChannelCollections = async () => {
         let collections = await collectionsResponse.json();
 
         if (selectedClientIp) {
-            const favoritesResponse = await fetch(`/channels_list?device_ip=${selectedClientIp}`);
-            if (!favoritesResponse.ok) {
-                const errorData = await favoritesResponse.json();
-                console.warn(`Failed to load favorite channels: ${errorData.message}`);
-                showNotification(`Warning: Failed to load favorite channels: ${errorData.message}`, true);
-                favoriteChannelsData = [];
-            } else {
+            try {
+                const favoritesResponse = await fetch(`/channels_list?device_ip=${selectedClientIp}`);
+                if (!favoritesResponse.ok) {
+                    throw new Error('Client is off or unreachable');
+                }
                 favoriteChannelsData = await favoritesResponse.json();
                 const favoriteChannelNumbers = favoriteChannelsData.map(c => c.number);
                 collections.unshift({
@@ -1152,6 +1147,10 @@ const fetchChannelCollections = async () => {
                     items: favoriteChannelNumbers,
                     isFavorites: true
                 });
+            } catch (error) {
+                console.warn(`Failed to load favorite channels. Client may be off or unreachable.`);
+                showNotification(`Warning: Could not load favorites. Client is off or unreachable.`, true);
+                favoriteChannelsData = [];
             }
         } else {
              favoriteChannelsData = []; 
