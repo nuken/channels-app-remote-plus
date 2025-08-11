@@ -255,6 +255,59 @@ html.theme-dark-blue-gray {
     --recording-summary-color: #91a1b3; /* Same as now-playing-summary-color */
 }
 
+/* NEW: Dark Theme (Vibrant Indigo) - Based on User Screenshots */
+html.theme-dark-vibrant-indigo {
+    --body-bg-color: #1a1d24; /* Very dark, cool gray */
+    --text-color: #e8e6e3; /* Off-white text */
+    --container-bg-color: #222630; /* EDITED: Darker slate blue container */
+    --box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    --header-color: #50c1e9; /* Bright cyan for headers */
+    --config-info-bg: #222630; /* EDITED: Same as new container background */
+
+    /* Default button is a neutral dark gray, specific buttons override this */
+    --button-bg-color: #4a4a4a;
+    --button-hover-bg-color: #5a5a5a;
+    --button-active-bg-color: #3a3a3a;
+    --button-text-color: white;
+
+    /* Specific Button Colors from Screenshots */
+    --button-play-bg: #28a745;
+    --button-play-hover-bg: #218838;
+    --button-stop-bg: #dc3545;
+    --button-stop-hover-bg: #c82333;
+    --button-record-bg: #dc3545; /* Same as stop */
+    --button-record-hover-bg: #c82333;
+    --button-nav-bg: #8250df; /* Vibrant Indigo/Purple */
+    --button-nav-hover-bg: #6c3dd0;
+    --button-channel-bg: #f4511e; /* Deep Orange */
+    --button-channel-hover-bg: #d84315;
+    --button-utility-bg: #616161; /* Medium Gray */
+    --button-utility-hover-bg: #757575;
+    --button-go-bg: #ffab00; /* Amber/Yellow for "Go" button */
+    --button-go-hover-bg: #ff9100;
+    --button-send-bg: #17a2b8; /* Keep send button consistent */
+    --button-send-hover-bg: #138496;
+
+    /* Inputs and Status Displays */
+    --input-border-color: #545c6e;
+    --pre-bg-color: #333946;
+    --pre-border-color: #545c6e;
+    --now-playing-bg: #333946;
+    --now-playing-border: #545c6e;
+    --now-playing-header-color: var(--header-color);
+    --now-playing-text-color: var(--text-color);
+    --now-playing-episode-color: #b0bec5; /* Lighter, cool gray */
+    --now-playing-summary-color: #90a4ae;
+    --now-playing-image-shadow: 0 2px 8px rgba(0,0,0,0.3);
+
+    /* Recording/Media Cards */
+    --recording-card-bg: #222630; /* EDITED: Same as new container background */
+    --recording-card-border: #404656;
+    --recording-title-color: var(--header-color); /* Bright cyan title */
+    --recording-episode-color: #b0bec5;
+    --recording-summary-color: #90a4ae;
+}
+
 /* General Styles using CSS Variables */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -917,7 +970,14 @@ html.theme-dark-blue-gray #dvr-server-select,
 html.theme-dark-blue-gray .input-group select,
 html.theme-dark-blue-gray .channel-list-section select,
 html.theme-dark-blue-gray .filter-sort-controls select,
-html.theme-dark-blue-gray .collection-dropdown {
+html.theme-dark-blue-gray .collection-dropdown,
+html.theme-dark-vibrant-indigo #theme-select,
+html.theme-dark-vibrant-indigo #client-select,
+html.theme-dark-vibrant-indigo #dvr-server-select,
+html.theme-dark-vibrant-indigo .input-group select,
+html.theme-dark-vibrant-indigo .channel-list-section select,
+html.theme-dark-vibrant-indigo .filter-sort-controls select,
+html.theme-dark-vibrant-indigo .collection-dropdown {
     background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e6ed" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
 }
 
