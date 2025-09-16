@@ -17,4 +17,4 @@ COPY app/ .
 EXPOSE 5000
 
 # Run the application when the container launches
-CMD ["python", "app.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "-k", "gevent", "app:app"]
