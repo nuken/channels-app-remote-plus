@@ -115,6 +115,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('enablePopups', enablePopupsCheckbox.checked);
     });
 
+    const seekAmountInput = document.getElementById('seek_amount_input');
+    seekAmountInput.addEventListener('click', () => {
+        seekAmountInput.value = '';
+    });
+
     // NEW: Load saved expanded layout state
     const isExpandedLayout = localStorage.getItem('isExpandedLayout');
     if (isExpandedLayout === 'true') {
@@ -507,10 +512,15 @@ async function sendSeekCommand(amount) {
         showNotification("Please select a client device first.", true);
         return 'error';
     }
-    const seekValue = parseInt(amount, 10);
+    let seekValue = parseInt(amount, 10);
     if (isNaN(seekValue)) {
         showNotification("Please enter a valid number for seek amount.", true);
         return 'error';
+    }
+
+    const seekUnit = document.querySelector('input[name="seek-unit"]:checked').value;
+    if (seekUnit === 'minutes') {
+        seekValue *= 60;
     }
 
     const data = { action: 'seek', device_ip: selectedClientIp, seek_amount: seekValue };

@@ -29,6 +29,7 @@
 <body>
     <div class="container">
         <h1><i class="fa-solid fa-satellite-dish"></i> Channels App Remote Plus</h1>
+        <p>Version: {{ version }}</p>
 
           <div class="status-section" style="margin-bottom: 10px;">
     <h2>Current Device Status</h2>
@@ -136,9 +137,15 @@
             </div>
         </div>
 
+        <div class="seek-units-toggle" style="margin-bottom: 10px;">
+            <input type="radio" id="seek-seconds" name="seek-unit" value="seconds" checked>
+            <label for="seek-seconds">Seconds</label>
+            <input type="radio" id="seek-minutes" name="seek-unit" value="minutes">
+            <label for="seek-minutes">Minutes</label>
+        </div>
         <div class="seek-controls input-group">
             <button class="control-button utility-button" onclick="sendSeekCommand(-1 * document.getElementById('seek_amount_input').value)" title="Seek backward by the specified amount"><i class="fa-solid fa-backward"></i></button>
-            <input type="number" id="seek_amount_input" value="30" placeholder="Secs" title="Enter seek time in seconds">
+            <input type="number" id="seek_amount_input" value="30" title="Enter seek time">
             <button class="control-button utility-button" onclick="sendSeekCommand(document.getElementById('seek_amount_input').value)" title="Seek forward by the specified amount"><i class="fa-solid fa-forward"></i></button>
         </div>
 

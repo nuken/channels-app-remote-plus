@@ -7,6 +7,8 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+VERSION = "3.4.0"
+
 # Configuration for Channels App client and Channels DVR Server ports
 CHANNELS_APP_PORT = 57000 # Standard Channels App API port
 CHANNELS_DVR_SERVER_PORT = 8089 # Standard Channels DVR Server API port - This will be used as a fallback or if not explicitly provided per server
@@ -98,7 +100,8 @@ def index():
                            clients=CHANNELS_CLIENTS, 
                            clients_configured=CLIENTS_CONFIGURED,
                            dvr_servers=CHANNELS_DVR_SERVERS, # Pass list of DVR servers
-                           dvr_servers_configured=DVR_SERVERS_CONFIGURED)
+                           dvr_servers_configured=DVR_SERVERS_CONFIGURED,
+                           version=VERSION)
 
 # New API endpoint to dynamically fetch clients for a selected DVR server
 @app.route('/dvr_clients', methods=['GET'])
