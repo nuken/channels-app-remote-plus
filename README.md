@@ -67,8 +67,6 @@ Once running, access the remote via:
 
 http://<Your_Docker_Host_IP>:5020
 
-http://<Your_Docker_Host_IP>:5020
-
 For example, use `localhost` or `192.168.x.x` depending on your environment.
 
 ---
