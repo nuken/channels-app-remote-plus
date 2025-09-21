@@ -1353,3 +1353,89 @@ const playChannel = async (channelNumber) => {
     }
     sendCommand('play_channel', channelNumber);
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    const voiceControlBtn = document.getElementById('voice-control-btn');
+
+    // Check if the browser supports Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        voiceControlBtn.disabled = true;
+        voiceControlBtn.textContent = 'Voice Not Supported';
+        console.error("Speech Recognition API is not supported in this browser.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false; // Listen for a single command
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    // Event handler for the voice control button
+    voiceControlBtn.addEventListener('click', () => {
+        recognition.start();
+        showNotification('Listening for a command...', false);
+        voiceControlBtn.innerHTML = '<i class="fa-solid fa-microphone-lines"></i> Listening...';
+        voiceControlBtn.disabled = true;
+    });
+
+    // Process the recognized speech
+    recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.toLowerCase().trim();
+        showNotification(`Command heard: "${command}"`, false);
+        handleVoiceCommand(command);
+    };
+
+    // Handle end of listening
+    recognition.onend = () => {
+        voiceControlBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Voice';
+        voiceControlBtn.disabled = false;
+    };
+    
+    // Handle errors
+    recognition.onerror = (event) => {
+        showNotification(`Voice recognition error: ${event.error}`, true);
+    };
+
+    // Function to map voice commands to actions
+    function handleVoiceCommand(command) {
+        const forwardMatch = command.match(/^forward (\d+) seconds?$/);
+        const backMatch = command.match(/^(?:back|rewind) (\d+) seconds?$/);
+
+        if (command.includes('pause') || command.includes('play')) {
+            sendCommand('toggle_pause');
+        } else if (command.includes('stop')) {
+            sendCommand('stop');
+        } else if (command.includes('mute')) {
+            sendCommand('toggle_mute');
+        } else if (command.includes('caption') || command.includes('close caption')) {
+            sendCommand('toggle_cc');
+        } else if (command.includes('replay')) {
+            sendSeekCommand(-10);
+        } else if (backMatch) {
+            const seconds = parseInt(backMatch[1], 10);
+            sendSeekCommand(-seconds);
+        } else if (forwardMatch) {
+            const seconds = parseInt(forwardMatch[1], 10);
+            sendSeekCommand(seconds);
+        } else if (command.includes('channel up')) {
+            sendCommand('channel_up');
+        } else if (command.includes('channel down')) {
+            sendCommand('channel_down');
+        } else if (command.includes('previous channel')) {
+            sendCommand('previous_channel');
+        } else if (command.startsWith('tune to channel')) {
+            const channelNumber = command.replace('tune to channel', '').trim();
+            if (channelNumber) {
+                sendCommand('play_channel', channelNumber);
+            }
+        } else if (command.includes('go to guide')) {
+             sendCommand('navigate', 'Guide');
+        } else if (command.includes('go to library')) {
+             sendCommand('navigate', 'Library');
+        } else {
+            showNotification(`Unknown command: "${command}"`, true);
+        }
+    }
+});
