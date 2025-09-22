@@ -173,7 +173,7 @@ def control_channels():
                         # Add this line to resume playback immediately after seeking
                         client.resume()
                     except ValueError:
-                        return jsonify({"status": "error", "message": "Seek amount must be an integer."}), 400
+                    return jsonify({"status": "error", "message": "Seek amount must be an integer."}), 400
                 else:
                     return jsonify({"status": "error", "message": "Seek amount required for 'seek' action."}), 400
             elif action == 'toggle_mute':
