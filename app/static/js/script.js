@@ -293,6 +293,71 @@ document.addEventListener('DOMContentLoaded', async () => {
     applyInitialSectionVisibility('movies-content-wrapper');
     applyInitialSectionVisibility('episodes-content-wrapper');
     applyInitialSectionVisibility('channel-collections-content-wrapper');
+
+    // START VOICE CONTROL IMPLEMENTATION (annyang.js)
+    const voiceControlBtn = document.getElementById('voice-control-btn');
+    if (typeof annyang === 'undefined') {
+        voiceControlBtn.disabled = true;
+        voiceControlBtn.innerHTML = '<i class="fa-solid fa-microphone-slash"></i> No Voice';
+        console.error("annyang library not loaded.");
+    } else {
+        const commands = {
+            'play': () => sendCommand('toggle_pause'),
+            'pause': () => sendCommand('toggle_pause'),
+            'stop': () => sendCommand('stop'),
+            'mute': () => sendCommand('toggle_mute'),
+            'unmute': () => sendCommand('toggle_mute'),
+            '(turn on) captions': () => sendCommand('toggle_cc'),
+            '(turn off) captions': () => sendCommand('toggle_cc'),
+            'replay': () => sendSeekCommand(-10),
+            'rewind *seconds seconds': (seconds) => sendSeekCommand(-parseInt(seconds, 10)),
+            'go back *seconds seconds': (seconds) => sendSeekCommand(-parseInt(seconds, 10)),
+            'forward *seconds seconds': (seconds) => sendSeekCommand(parseInt(seconds, 10)),
+            'skip ahead *seconds seconds': (seconds) => sendSeekCommand(parseInt(seconds, 10)),
+            'channel up': () => sendCommand('channel_up'),
+            'next channel': () => sendCommand('channel_up'),
+            'channel down': () => sendCommand('channel_down'),
+            'previous channel': () => sendCommand('previous_channel'),
+            'go to the guide': () => sendCommand('navigate', 'Guide'),
+            'show me the guide': () => sendCommand('navigate', 'Guide'),
+            'go to the library': () => sendCommand('navigate', 'Library'),
+            'show me the library': () => sendCommand('navigate', 'Library'),
+            'tune to channel *channel': (channel) => sendCommand('play_channel', channel)
+        };
+
+        annyang.addCommands(commands);
+
+        annyang.addCallback('start', () => {
+            voiceControlBtn.innerHTML = '<i class="fa-solid fa-microphone-lines"></i> Listening...';
+            voiceControlBtn.disabled = true;
+            showNotification('Listening...', false);
+        });
+
+        annyang.addCallback('end', () => {
+            voiceControlBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Voice';
+            voiceControlBtn.disabled = false;
+        });
+
+        annyang.addCallback('resultMatch', (userSaid, commandText, phrases) => {
+            console.log(`Command matched: ${userSaid} -> ${commandText}`);
+            showNotification(`Heard: "${userSaid}"`, false);
+        });
+
+        annyang.addCallback('resultNoMatch', (phrases) => {
+            console.log("No command matched:", phrases);
+            showNotification(`Sorry, I didn't recognize that command.`, true);
+        });
+        
+        annyang.addCallback('error', (err) => {
+            console.error('Annyang error:', err);
+            showNotification(`Voice Error: ${err.error}`, true);
+        });
+
+        voiceControlBtn.addEventListener('click', () => {
+            annyang.start({ autoRestart: false, continuous: false });
+        });
+    }
+    // END VOICE CONTROL IMPLEMENTATION
 });
 
 // Helper function to get full image URL, handling relative vs absolute paths
@@ -1353,89 +1418,3 @@ const playChannel = async (channelNumber) => {
     }
     sendCommand('play_channel', channelNumber);
 };
-
-document.addEventListener('DOMContentLoaded', () => {
-    const voiceControlBtn = document.getElementById('voice-control-btn');
-
-    // Check if the browser supports Speech Recognition
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        voiceControlBtn.disabled = true;
-        voiceControlBtn.textContent = 'Voice Not Supported';
-        console.error("Speech Recognition API is not supported in this browser.");
-        return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false; // Listen for a single command
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    // Event handler for the voice control button
-    voiceControlBtn.addEventListener('click', () => {
-        recognition.start();
-        showNotification('Listening for a command...', false);
-        voiceControlBtn.innerHTML = '<i class="fa-solid fa-microphone-lines"></i> Listening...';
-        voiceControlBtn.disabled = true;
-    });
-
-    // Process the recognized speech
-    recognition.onresult = (event) => {
-        const command = event.results[0][0].transcript.toLowerCase().trim();
-        showNotification(`Command heard: "${command}"`, false);
-        handleVoiceCommand(command);
-    };
-
-    // Handle end of listening
-    recognition.onend = () => {
-        voiceControlBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Voice';
-        voiceControlBtn.disabled = false;
-    };
-    
-    // Handle errors
-    recognition.onerror = (event) => {
-        showNotification(`Voice recognition error: ${event.error}`, true);
-    };
-
-    // Function to map voice commands to actions
-    function handleVoiceCommand(command) {
-        const forwardMatch = command.match(/^forward (\d+) seconds?$/);
-        const backMatch = command.match(/^(?:back|rewind) (\d+) seconds?$/);
-
-        if (command.includes('pause') || command.includes('play')) {
-            sendCommand('toggle_pause');
-        } else if (command.includes('stop')) {
-            sendCommand('stop');
-        } else if (command.includes('mute')) {
-            sendCommand('toggle_mute');
-        } else if (command.includes('caption') || command.includes('close caption')) {
-            sendCommand('toggle_cc');
-        } else if (command.includes('replay')) {
-            sendSeekCommand(-10);
-        } else if (backMatch) {
-            const seconds = parseInt(backMatch[1], 10);
-            sendSeekCommand(-seconds);
-        } else if (forwardMatch) {
-            const seconds = parseInt(forwardMatch[1], 10);
-            sendSeekCommand(seconds);
-        } else if (command.includes('channel up')) {
-            sendCommand('channel_up');
-        } else if (command.includes('channel down')) {
-            sendCommand('channel_down');
-        } else if (command.includes('previous channel')) {
-            sendCommand('previous_channel');
-        } else if (command.startsWith('tune to channel')) {
-            const channelNumber = command.replace('tune to channel', '').trim();
-            if (channelNumber) {
-                sendCommand('play_channel', channelNumber);
-            }
-        } else if (command.includes('go to guide')) {
-             sendCommand('navigate', 'Guide');
-        } else if (command.includes('go to library')) {
-             sendCommand('navigate', 'Library');
-        } else {
-            showNotification(`Unknown command: "${command}"`, true);
-        }
-    }
-});
