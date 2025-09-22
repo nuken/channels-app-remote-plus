@@ -164,16 +164,14 @@ def control_channels():
                     client.play_channel(str(value))
                 else:
                     return jsonify({"status": "error", "message": "Channel number required for 'play_channel'."}), 400
-           elif action == 'seek':
+            elif action == 'seek':
                 if seek_amount is not None:
                     try:
                         seek_seconds = int(seek_amount)
-                        # Ensure this line uses .seek(), not .seek_by()
                         client.seek(seek_seconds)
-                        # Add this line to resume playback immediately after seeking
                         client.resume()
                     except ValueError:
-                    return jsonify({"status": "error", "message": "Seek amount must be an integer."}), 400
+                        return jsonify({"status": "error", "message": "Seek amount must be an integer."}), 400
                 else:
                     return jsonify({"status": "error", "message": "Seek amount required for 'seek' action."}), 400
             elif action == 'toggle_mute':
