@@ -7,7 +7,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-VERSION = "3.4.1"
+VERSION = "3.4.0"
 
 # Configuration for Channels App client and Channels DVR Server ports
 CHANNELS_APP_PORT = 57000 # Standard Channels App API port
@@ -164,11 +164,14 @@ def control_channels():
                     client.play_channel(str(value))
                 else:
                     return jsonify({"status": "error", "message": "Channel number required for 'play_channel'."}), 400
-            elif action == 'seek':
+           elif action == 'seek':
                 if seek_amount is not None:
                     try:
                         seek_seconds = int(seek_amount)
-                        client.seek_by(seek_seconds)
+                        # Ensure this line uses .seek(), not .seek_by()
+                        client.seek(seek_seconds)
+                        # Add this line to resume playback immediately after seeking
+                        client.resume()
                     except ValueError:
                         return jsonify({"status": "error", "message": "Seek amount must be an integer."}), 400
                 else:
