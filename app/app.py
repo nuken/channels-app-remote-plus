@@ -7,7 +7,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-VERSION = "3.4.0"
+VERSION = "3.4.1"
 
 # Configuration for Channels App client and Channels DVR Server ports
 CHANNELS_APP_PORT = 57000 # Standard Channels App API port
