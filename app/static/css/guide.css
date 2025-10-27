@@ -1,0 +1,150 @@
+/* General Body and Font Styling */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Theme Variables */
+.theme-light {
+    --bg-color: #f5f5f7;
+    --text-color: #1d1d1f;
+    --header-bg-color: #ffffff;
+    --card-bg-color: #ffffff;
+    --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --secondary-text-color: #86868b;
+}
+
+.theme-dark {
+    --bg-color: #1d1d1f;
+    --text-color: #f5f5f7;
+    --header-bg-color: #000000;
+    --card-bg-color: #2c2c2e;
+    --card-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    --secondary-text-color: #86868b;
+}
+
+/* Applying Theme Colors */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+header {
+    background-color: var(--header-bg-color);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+/* Navigation link back to remote */
+header a {
+    color: var(--secondary-text-color);
+    text-decoration: none;
+    font-size: 0.9em;
+}
+header a:hover {
+    text-decoration: underline;
+}
+
+#theme-switcher {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: var(--card-shadow);
+}
+
+/* Program Guide Grid */
+#program-guide {
+    padding: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+/* Channel Card Styling */
+.channel-card {
+    background-color: var(--card-bg-color);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.channel-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.program-image {
+    width: 100%;
+    height: 160px;
+    background-color: #333; /* Placeholder color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9em;
+}
+
+.program-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.program-image span {
+    display: none; /* Hide 'No Image' text by default */
+}
+
+.channel-info {
+    padding: 15px;
+}
+
+.channel-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.program-title {
+    font-size: 0.9em;
+    font-weight: 500;
+    margin: 0;
+    color: var(--secondary-text-color);
+}
+.filter-controls {
+    margin: 0 auto; /* Helps center it between the title and other buttons */
+}
+
+#source-filter {
+    padding: 8px 16px;
+    border: 1px solid var(--secondary-text-color);
+    border-radius: 20px;
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+    font-weight: 500;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%2386868b" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 30px;
+}

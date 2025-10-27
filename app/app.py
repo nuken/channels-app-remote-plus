@@ -7,7 +7,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-VERSION = "3.4.0"
+VERSION = "3.4.1"
 
 # Configuration for Channels App client and Channels DVR Server ports
 CHANNELS_APP_PORT = 57000 # Standard Channels App API port
@@ -102,6 +102,77 @@ def index():
                            dvr_servers=CHANNELS_DVR_SERVERS, # Pass list of DVR servers
                            dvr_servers_configured=DVR_SERVERS_CONFIGURED,
                            version=VERSION)
+
+@app.route('/guide')
+def guide_page():
+    """Renders the new guide.html page."""
+    dvr_base_url = ""
+    # Try to get the first configured DVR server to pass to the template
+    # This ensures image URLs are built correctly
+    if CHANNELS_DVR_SERVERS:
+        server = CHANNELS_DVR_SERVERS[0]
+        dvr_base_url = f"http://{server['ip']}:{server['port']}"
+
+    return render_template('guide.html', dvr_base_url=dvr_base_url)
+
+@app.route('/api/channels')
+def get_all_channels():
+    """
+    This is a new proxy endpoint to get the complete list of channels
+    from the first configured DVR server.
+    """
+    if not CHANNELS_DVR_SERVERS:
+        return jsonify({"error": True, "message": "No DVR server configured."}), 500
+
+    server = CHANNELS_DVR_SERVERS[0]
+    # This is the new API endpoint the user provided
+    dvr_url = f"http://{server['ip']}:{server['port']}/api/v1/channels"
+
+    try:
+        response = requests.get(dvr_url, timeout=5)
+        response.raise_for_status()
+        # We just pass the JSON data directly through
+        return jsonify(response.json())
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": True, "message": str(e)}), 500
+
+@app.route('/api/guide')
+def get_guide_data():
+    """
+    This is our proxy endpoint for the guide.
+    It now accepts an optional 'source' query parameter for filtering.
+    """
+    source_filter = request.args.get('source')
+
+    if not CHANNELS_DVR_SERVERS:
+        return jsonify({"error": True, "message": "No DVR server configured in the backend."}), 500
+
+    server = CHANNELS_DVR_SERVERS[0]
+    dvr_url = f"http://{server['ip']}:{server['port']}/devices/ANY/guide/now"
+
+    try:
+        response = requests.get(dvr_url, timeout=5)
+        response.raise_for_status()
+        guide_data = response.json()
+
+        if source_filter and source_filter != 'all':
+            filtered_guide = []
+            for item in guide_data:
+                channel_info = item.get('Channel', {})
+                # The guide data from /guide/now uses the 'SourceName' key
+                source_name_from_guide = channel_info.get('SourceName')
+                
+                # Debugging print statement - this will show in your terminal
+                # print(f"Comparing filter '{source_filter}' with guide source '{source_name_from_guide}'")
+
+                if source_name_from_guide and source_name_from_guide.lower() == source_filter.lower():
+                    filtered_guide.append(item)
+            return jsonify(filtered_guide)
+        else:
+            return jsonify(guide_data)
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": True, "message": str(e)}), 500
 
 # New API endpoint to dynamically fetch clients for a selected DVR server
 @app.route('/dvr_clients', methods=['GET'])

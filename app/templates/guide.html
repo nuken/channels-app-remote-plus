@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live TV Guide</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/guide.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body data-dvr-url="{{ dvr_base_url }}">
+
+    <header>
+        <h1>Live TV</h1>
+
+        <div class="filter-controls">
+            <select id="source-filter">
+                <option value="all">All Sources</option>
+                </select>
+        </div>
+
+        <a href="/">Back to Remote</a>
+        <button id="theme-switcher">Toggle Theme</button>
+    </header>
+
+    <main id="program-guide">
+        </main>
+
+    <script src="{{ url_for('static', filename='js/guide.js') }}"></script>
+</body>
+</html>
