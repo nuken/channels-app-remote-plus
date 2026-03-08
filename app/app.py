@@ -173,6 +173,18 @@ def control_channels():
                         return jsonify({"status": "error", "message": "Seek amount must be an integer."}), 400
                 else:
                     return jsonify({"status": "error", "message": "Seek amount required for 'seek' action."}), 400
+            
+            # --- START OF CORRECTED BLOCK ---
+            elif action == 'toggle_pip':
+                pip_api_url = f"http://{target_device_ip}:{CHANNELS_APP_PORT}/api/toggle_pip"
+                try:
+                    response = requests.post(pip_api_url, timeout=5)
+                    response.raise_for_status()
+                    return jsonify({"status": "success", "message": "Toggled Picture-in-Picture."})
+                except requests.exceptions.RequestException as e:
+                    return jsonify({"status": "error", "message": f"Error toggling PiP: {e}"}), 500
+            # --- END OF CORRECTED BLOCK ---
+
             elif action == 'toggle_mute':
                 client.toggle_mute()
             elif action == 'stop':
