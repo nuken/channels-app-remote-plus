@@ -1,6 +1,6 @@
 # **Channels DVR Remote Plus**
 
-**Channels DVR Remote Plus Version: 3.4.1** provides a web-based remote control for your Channels DVR client apps (e.g., Apple TV, Fire TV, Google TV). It offers enhanced integration with your Channels DVR Server, enabling browsing and playback of recorded content — all optimized for mobile and designed with intuitive simplicity.
+**Channels DVR Remote Plus Version: 3.4.2** provides a web-based remote control for your Channels DVR client apps (e.g., Apple TV, Fire TV, Google TV). It offers enhanced integration with your Channels DVR Server, enabling browsing and playback of recorded content — all optimized for mobile and designed with intuitive simplicity.
 
 ---
 

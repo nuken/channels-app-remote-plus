@@ -967,12 +967,18 @@ function renderShows(episodesToRender) {
         if (episode.channel_call_sign) {
             episodeDetails += `<p class="episode-details">Channel: ${episode.channel_call_sign}</p>`;
         }
-        if (episode.air_date) {
-            const date = new Date(episode.air_date * 1000);
-            episodeDetails += `<p class="episode-details">Aired: ${date.toLocaleDateString()}</p>`;
-        }
-
-
+        if (episode.date_added) {
+    const date = new Date(episode.date_added * 1000);
+    // toLocaleString() displays both the date and the specific recording time
+    const formattedDate = date.toLocaleString([], { 
+        month: 'numeric', 
+        day: 'numeric', 
+        year: 'numeric', 
+        hour: 'numeric', 
+        minute: '2-digit' 
+    });
+    episodeDetails += `<p class="episode-details">Recorded: ${formattedDate}</p>`;
+}
         card.innerHTML = `
             <div class="episode-card-image-container">
                 ${imageHtml}
