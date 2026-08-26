@@ -3,3 +3,4 @@ pychannels
 requests
 gunicorn
 gevent
+packaging
