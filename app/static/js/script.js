@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const selectedCollection = allCollectionsData.find(col => col.slug === selectedCollectionSlug);
             if (selectedCollection) {
                 await displayChannelsInCollection(selectedCollection.items);
-                startChannelRefresh(selectedCollection.items); with new sort
+                startChannelRefresh(selectedCollection.items);
             }
         }
     });
@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const selectedCollection = allCollectionsData.find(col => col.slug === selectedCollectionSlug);
             if (selectedCollection) {
                 await displayChannelsInCollection(selectedCollection.items);
-                startChannelRefresh(selectedCollection.items); with new sort with new sort
+                startChannelRefresh(selectedCollection.items);
             }
         }
     });
