@@ -201,8 +201,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (selectedCollectionSlug) {
             const selectedCollection = allCollectionsData.find(col => col.slug === selectedCollectionSlug);
             if (selectedCollection) {
-                await displayChannelsInCollection(selectedCollection.items, selectedCollection.isFavorites);
-                startChannelRefresh(selectedCollection.items, selectedCollection.isFavorites); // Restart refresh with new sort
+                await displayChannelsInCollection(selectedCollection.items);
+                startChannelRefresh(selectedCollection.items); with new sort
             }
         }
     });
@@ -211,8 +211,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (selectedCollectionSlug) {
             const selectedCollection = allCollectionsData.find(col => col.slug === selectedCollectionSlug);
             if (selectedCollection) {
-                await displayChannelsInCollection(selectedCollection.items, selectedCollection.isFavorites);
-                startChannelRefresh(selectedCollection.items, selectedCollection.isFavorites); // Restart refresh with new sort
+                await displayChannelsInCollection(selectedCollection.items);
+                startChannelRefresh(selectedCollection.items); with new sort with new sort
             }
         }
     });
@@ -310,11 +310,11 @@ function getFullImageUrl(relativePath) {
 }
 
 // NEW: Function to start the channel refresh interval
-function startChannelRefresh(collectionItems, isFavorites) {
+function startChannelRefresh(collectionItems) {
     stopChannelRefresh(); // Clear any existing interval
     channelRefreshIntervalId = setInterval(async () => {
         // console.log("Automatically refreshing channel collection data...");
-        await displayChannelsInCollection(collectionItems, isFavorites);
+        await displayChannelsInCollection(collectionItems);
     }, CHANNEL_REFRESH_INTERVAL_MS);
 }
 
@@ -1140,38 +1140,15 @@ const fetchChannelCollections = async () => {
     }
 
     channelCollectionsList.innerHTML = '<p>Loading collections...</p>';
-    
+
     try {
         const collectionsResponse = await fetch(`/collections_list?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}`);
         if (!collectionsResponse.ok) {
             const errorData = await collectionsResponse.json();
-            throw new Error(`Server error fetching collections: ${collectionsResponse.status} - ${errorData.message || collectionsResponse.statusText}`);
+            throw new Error(`Server error fetching collections: ${collectionsResponse.status}`);
         }
+
         let collections = await collectionsResponse.json();
-
-        if (selectedClientIp) {
-            try {
-                const favoritesResponse = await fetch(`/channels_list?device_ip=${selectedClientIp}`);
-                if (!favoritesResponse.ok) {
-                    throw new Error('Client is off or unreachable');
-                }
-                favoriteChannelsData = await favoritesResponse.json();
-                const favoriteChannelNumbers = favoriteChannelsData.map(c => c.number);
-                collections.unshift({
-                    name: "Favorites",
-                    slug: "favorites",
-                    items: favoriteChannelNumbers,
-                    isFavorites: true
-                });
-            } catch (error) {
-                console.warn(`Failed to load favorite channels. Client may be off or unreachable.`);
-                showNotification(`Warning: Could not load favorites. Client is off or unreachable.`, true);
-                favoriteChannelsData = [];
-            }
-        } else {
-             favoriteChannelsData = []; 
-        }
-
         allCollectionsData = collections;
 
         collectionSelect.innerHTML = '<option value="">Select a Collection</option>';
@@ -1181,26 +1158,26 @@ const fetchChannelCollections = async () => {
             option.textContent = collection.name;
             collectionSelect.appendChild(option);
         });
+
         collectionSelect.disabled = false;
         channelCollectionSortBySelect.disabled = false;
         channelCollectionSortOrderSelect.disabled = false;
-
         collectionSelect.removeEventListener('change', onCollectionSelectChange);
         collectionSelect.addEventListener('change', onCollectionSelectChange);
-        
+
         if (allCollectionsData.length > 0) {
             const savedCollectionSlug = localStorage.getItem('lastSelectedCollection');
             let targetCollection = allCollectionsData.find(col => col.slug === savedCollectionSlug);
 
-            // Fallback to favorites, or the first collection if the saved one isn't found
+            // Fallback to the first collection if the saved one isn't found
             if (!targetCollection) {
-                targetCollection = allCollectionsData.find(col => col.slug === 'favorites') || allCollectionsData[0];
+                targetCollection = allCollectionsData[0];
             }
 
             if (targetCollection) {
                 collectionSelect.value = targetCollection.slug;
-                await displayChannelsInCollection(targetCollection.items, targetCollection.isFavorites);
-                startChannelRefresh(targetCollection.items, targetCollection.isFavorites);
+                await displayChannelsInCollection(targetCollection.items);
+                startChannelRefresh(targetCollection.items);
             }
         } else {
             channelCollectionsList.innerHTML = '<p>No channel collections found on this DVR server.</p>';
@@ -1209,14 +1186,10 @@ const fetchChannelCollections = async () => {
             channelCollectionSortOrderSelect.disabled = true;
             stopChannelRefresh();
         }
-
     } catch (error) {
         console.error('Error fetching channel collections:', error);
-        channelCollectionsList.innerHTML = `<p>Error loading channel collections: ${error.message}. Please ensure the DVR server is running and accessible.</p>`;
-        collectionSelect.innerHTML = '<option value="">Error loading collections</option>';
+        channelCollectionsList.innerHTML = `<p>Error loading channel collections: ${error.message}.</p>`;
         collectionSelect.disabled = true;
-        channelCollectionSortBySelect.disabled = true;
-        channelCollectionSortOrderSelect.disabled = true;
         showNotification(`Error loading collections: ${error.message}`, true);
         stopChannelRefresh();
     }
@@ -1231,8 +1204,8 @@ async function onCollectionSelectChange(event) {
 
         const selectedCollection = allCollectionsData.find(col => col.slug === selectedCollectionSlug);
         if (selectedCollection) {
-            await displayChannelsInCollection(selectedCollection.items, selectedCollection.isFavorites);
-            startChannelRefresh(selectedCollection.items, selectedCollection.isFavorites);
+            await displayChannelsInCollection(selectedCollection.items);
+            startChannelRefresh(selectedCollection.items);
         }
     } else {
         localStorage.removeItem('lastSelectedCollection');
@@ -1240,15 +1213,10 @@ async function onCollectionSelectChange(event) {
     }
 }
 
-const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollection = false) => {
+const displayChannelsInCollection = async (channelIdentifiers) => {
     if (!selectedDvrServerIp || !selectedDvrServerPort) {
         channelCollectionsList.innerHTML = '<p>Please select a DVR server to load channel information.</p>';
         showNotification("Please select a DVR server to load channel information.", true);
-        stopChannelRefresh();
-        return;
-    }
-    if (!selectedClientIp && isFavoritesCollection) {
-        channelCollectionsList.innerHTML = '<p>Please select a Channels App client to view Favorite Channels.</p>';
         stopChannelRefresh();
         return;
     }
@@ -1260,32 +1228,16 @@ const displayChannelsInCollection = async (channelIdentifiers, isFavoritesCollec
         const nowPlayingResponse = await fetch(`/now_playing_data?dvr_server_ip=${selectedDvrServerIp}&dvr_server_port=${selectedDvrServerPort}`);
         if (!nowPlayingResponse.ok) {
             const errorData = await nowPlayingResponse.json();
-            throw new Error(`Server error fetching now playing data: ${nowPlayingResponse.status} - ${errorData.message || nowPlayingResponse.statusText}`);
+            throw new Error(`Server error fetching now playing data: ${nowPlayingResponse.status}`);
         }
         const nowPlayingData = await nowPlayingResponse.json();
 
-        let channelsToDisplay = [];
-
-        if (isFavoritesCollection) {
-            const favoriteChannelNumbers = favoriteChannelsData.map(fav => fav.number);
-            channelsToDisplay = nowPlayingData.filter(item =>
-                favoriteChannelNumbers.includes(item.Channel.Number)
-            ).map(item => {
-                const favChannel = favoriteChannelsData.find(fav => fav.number === item.Channel.Number);
-                const imageUrl = (item.Airings[0] && item.Airings[0].Image) || (favChannel ? favChannel.image_url : '') || item.Channel.Image;
-                return { ...item,
-                    Channel: { ...item.Channel, Image: imageUrl },
-                    Airings: item.Airings || []
-                };
-            });
-
-        } else {
-            channelsToDisplay = nowPlayingData.filter(item =>
-                channelIdentifiers.includes(item.Channel.ChannelID) ||
-                channelIdentifiers.includes(item.Channel.Number) ||
-                channelIdentifiers.includes(item.Channel.Name)
-            );
-        }
+        // Standard collection filtering only
+        let channelsToDisplay = nowPlayingData.filter(item =>
+            channelIdentifiers.includes(item.Channel.ChannelID) ||
+            channelIdentifiers.includes(item.Channel.Number) ||
+            channelIdentifiers.includes(item.Channel.Name)
+        );
 
         const sortBy = channelCollectionSortBySelect.value;
         const sortOrder = channelCollectionSortOrderSelect.value;
