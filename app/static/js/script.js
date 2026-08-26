@@ -1189,15 +1189,18 @@ const fetchChannelCollections = async () => {
         collectionSelect.addEventListener('change', onCollectionSelectChange);
         
         if (allCollectionsData.length > 0) {
-            const favoritesCollection = allCollectionsData.find(col => col.slug === 'favorites');
-            if (favoritesCollection) {
-                collectionSelect.value = favoritesCollection.slug;
-                await displayChannelsInCollection(favoritesCollection.items, true);
-                startChannelRefresh(favoritesCollection.items, true);
-            } else {
-                collectionSelect.value = allCollectionsData[0].slug;
-                await displayChannelsInCollection(allCollectionsData[0].items, allCollectionsData[0].isFavorites);
-                startChannelRefresh(allCollectionsData[0].items, allCollectionsData[0].isFavorites);
+            const savedCollectionSlug = localStorage.getItem('lastSelectedCollection');
+            let targetCollection = allCollectionsData.find(col => col.slug === savedCollectionSlug);
+
+            // Fallback to favorites, or the first collection if the saved one isn't found
+            if (!targetCollection) {
+                targetCollection = allCollectionsData.find(col => col.slug === 'favorites') || allCollectionsData[0];
+            }
+
+            if (targetCollection) {
+                collectionSelect.value = targetCollection.slug;
+                await displayChannelsInCollection(targetCollection.items, targetCollection.isFavorites);
+                startChannelRefresh(targetCollection.items, targetCollection.isFavorites);
             }
         } else {
             channelCollectionsList.innerHTML = '<p>No channel collections found on this DVR server.</p>';
@@ -1223,12 +1226,16 @@ async function onCollectionSelectChange(event) {
     const selectedCollectionSlug = event.target.value;
     stopChannelRefresh();
     if (selectedCollectionSlug) {
+        // Save the selection to localStorage
+        localStorage.setItem('lastSelectedCollection', selectedCollectionSlug);
+
         const selectedCollection = allCollectionsData.find(col => col.slug === selectedCollectionSlug);
         if (selectedCollection) {
             await displayChannelsInCollection(selectedCollection.items, selectedCollection.isFavorites);
             startChannelRefresh(selectedCollection.items, selectedCollection.isFavorites);
         }
     } else {
+        localStorage.removeItem('lastSelectedCollection');
         channelCollectionsList.innerHTML = '';
     }
 }
