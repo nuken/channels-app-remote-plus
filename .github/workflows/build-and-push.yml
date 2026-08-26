@@ -18,25 +18,25 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Log in to Docker Hub
-      uses: docker/login-action@v3
+      uses: docker/login-action@v4
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Set up QEMU # NEW: Required for cross-platform emulation during build
       # This enables building images for different architectures (like arm64) on an amd64 runner
-      uses: docker/setup-qemu-action@v3
+      uses: docker/setup-qemu-action@v4
       with:
         platforms: all # Enable emulation for all supported platforms
 
     - name: Set up Docker Buildx # NEW: Buildx is essential for multi-platform builds
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@v4
 
     - name: Build and push Multi-Arch Docker image # MODIFIED STEP
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v7
       with:
         context: .
         push: true
